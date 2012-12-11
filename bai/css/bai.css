@@ -1,0 +1,207 @@
+@charset "utf-8";
+
+/*--- HTML元素 ---*/
+body { /* 字体 */
+	font: 14px/20px normal;
+}
+
+body>* {
+	margin: 0 auto;
+	width: 1000px;
+}
+
+a {
+	display: inline-block;
+	text-align: center;
+	vertical-align: bottom;
+	text-indent: 0;
+	cursor: pointer;
+	color: #009f3c;
+}
+
+a:hover {
+	font-weight: bold;
+}
+
+div {
+	overflow: hidden;
+}
+
+div.a {
+	overflow-y: auto;
+}
+
+div.v {
+	overflow: visible;
+}
+
+h1,h2,h3,h4,h5 {
+	margin: 0;
+	padding: 10px 0.5em;
+}
+
+img {
+	margin: 0;
+	border: none;
+	vertical-align: bottom;
+}
+
+p {
+	margin: 0;
+	padding: 0.5em 0.5em 0;
+	text-align: left;
+	text-indent: 2em;
+}
+
+pre {
+	margin: 4px;
+	padding: 0.5em 1em;
+	overflow-x: auto;
+	color: #0000ff;
+	background: #f0f9f0;
+	border: 1px dashed #99cc99;
+}
+
+textarea {
+	display: block;
+	margin: 0 auto;
+}
+
+menu,dl {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+dl li {
+	float: left;
+}
+
+ol,ul {
+	padding-left: 1.5em;
+	padding-right: 1em;
+}
+/*--- HTML元素 ---*/
+
+
+/*--- 常用 ---*/
+.b {
+	font-weight: bold;
+}
+
+.c {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.h {
+	display: none;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+.tr {
+	text-align: right;
+}
+
+.m4 {
+	margin: 4px;
+}
+
+.p4 {
+	padding: 4px;
+}
+
+.t { /* 标题 */
+	padding: 0.5em 0.5em 0;
+	font-weight: bold;
+	border-bottom: 1px solid #99cc99;
+}
+/*--- 常用 ---*/
+
+
+/*--- 页面布局 ---*/
+.menu a { /* 页首导航 */
+	width: 6em;
+	font: 16px/24px normal;
+	border: 1px solid #ffffff;
+    text-decoration: none;
+}
+
+.box { /* 布局盒 */
+	position: relative;
+	margin: 2px 8px 8px;
+	padding: 4px;
+	border: 1px solid #99cc99;
+	border-radius: 6px;
+	box-shadow: 0 0 2px 2px #eaf9ea;
+}
+
+footer nav a { /* 页脚链接 */
+	width: 6em;
+	border: 1px solid #ffffff;
+	background: #f0f9f0;
+    text-decoration: none;
+}
+/*--- 页面布局 ---*/
+
+
+/*--- 信息提示 --*/
+a.on {
+	background: #f0f9f0;
+}
+.error {
+	color: #ff0000;
+}
+
+.info {
+	color: #66a666;
+}
+
+.locked {
+	color: #cccccc;
+}
+
+.required {
+	color: #ff0000;
+}
+.hint,.notice {
+	position: absolute;
+	padding: 1px 3px;
+	z-index: 2;
+	cursor: pointer;
+	color: #ffffff;
+	background-color: #99cc99;
+}
+.hint {
+	display: none;
+}	background-color: #99cc99;
+}
+/*--- 信息提示 --*/
+
+
+/*--- 内容格式 ---*/
+.label {
+	font-style: italic;
+	text-align: right;
+}
+
+.line {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.row {
+	padding: 0.5em;
+}
+
+.text {
+	padding: 3px 0.5em;
+}
+/*--- 内容格式 ---*/
