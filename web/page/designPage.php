@@ -1,5 +1,4 @@
-<?php include 'header.php'; ?>
-<div>
+
 	<div class="box">
 		<div class="t">服务-流程-工场模式</div>
 		<p>BaiPHP（简单PHP）开发框架依据服务-流程-工场模式进行设计，该模式将程序划分为服务（Service）、流程（Flow）和工场（Work）三个部分。</p>
@@ -30,5 +29,3 @@
 			<li>服务一直在变，因为需求永不满足。</li>
 		</ul>
 	</div>
-</div>
-<?php include 'footer.php'; ?>

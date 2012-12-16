@@ -1,10 +1,9 @@
-<?php include 'header.php'; ?>
-<div>
+
 	<div class="box">
 		<div class="t">设计宗旨：大道至简</div>
 		<p>繁华的世界，由简单的道理支撑。</p>
 		<p>精彩的程序，由简单的规则驱动。</p>
-		<p>BaiPHP，做最简单的PHPer。</p>
+		<p>BaiPHP-简单PHP，化繁为简，还本溯源。</p>
 		<div class="t">设计模式：服务-流程-工场模式</div>
 		<p>程序设计，总是希望把善变与不变分开，同时又要方便做出改变。</p>
 		<p>不管呈现出什么样的面孔，程序的基本功能往往很少改变，改变的是组织与访问它们的方式，改变的是程序的【流程】。</p>
@@ -39,5 +38,3 @@
 		<p>系统函数列表</p>
 		<a class="row" href="/reference/">详细内容</a>
 	</div>
-</div>
-<?php include 'footer.php'; ?>

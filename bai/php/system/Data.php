@@ -1,366 +1,389 @@
 ﻿<?php
-
-### 权限检查
-if (! defined('_ISSUE'))
-	exit('对不起！请走正门……');
+/**
+ * <b>BaiPHP（简单PHP）开发框架</b>
+ * @author		白晓阳
+ * @copyright	Copyright (c) 2011 - 2012, 白晓阳
+ * @link		http://dacbe.com
+ * @version    V1.0.0 2012/03/31 首版
+ * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ */
 
 /**
- * <b>Bai数据访问工场：</b>
+ * <b>BaiPHP（简单PHP）开发框架</b><br/>
+ * <b>数据工场</b>
  * <p>连接数据库并访问数据</p>
  *
- * @author    白晓阳
- * @copyright Copyright (c) 2011 - 2012, 白晓阳
- * @link       http://www.dacbe.com
- * @version    V1.0.0 2012/03/21 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ * @author 白晓阳
+ * @see Work
  */
 class Data extends Work
 {
-	/** 数据库入口 */
-	protected $db = null;
-	/** 日志入口 */
-	protected $log = null;
-	/** 数据静态入口 */
-	protected static $ACCESS = null;
+	/** 数据标识：数据 */
+	const DATA = 'Data';
+	/** 数据标识：表头 */
+	const TITLE = 'Title';
+	/** 数据标识：记录 */
+	const RECORD = 'Record';
+
+	/** DB连接符：and */
+	static protected $AND = 'and';
+	/** DB连接符：, */
+	static protected $COMMA = ',';
+	/** 数据工场静态入口 */
+	static protected $ACCESS = null;
+
+	/** 数据库访问入口 */
+	protected $pdo = null;
 
 	/**
-	 * 获取数据入口
-	 * @param 连接信息： $access
+	 * <b>获取数据工场入口</b><br/>
+	 * 该入口是静态单一入口<br/>
+	 * ！！！长连接仅适用于数据访问特别频繁的情况！！！
+	 *
+	 * @param array $access 数据库连接信息
+	 * @param boolean $p 长连接标识
+	 *
+	 * @return DB 数据工场
 	 */
-	public static function access($access = null)
+	static public function access(array $access = null, $p = false)
 	{
-		if ($access)
+		### 获取现有连接
+		if (! $access)
 		{
-			self::$ACCESS = $access;
-			return null;
+			if (is_object(self::$ACCESS))
+			{
+				return $ACCESS;
+			}
+			if (is_array(self::$ACCESS))
+			{
+				return new Data(self::$ACCESS);
+			}
+			Log::logs(__FUNCTION__, __CLASS__);
+			return false;
 		}
-		return new Data(self::$ACCESS);
+		if ($p)
+		{
+			### 建立长连接
+			self::$ACCESS = new Data($access);
+			return self::$ACCESS;
+		}
+		### 建立普通连接
+		self::$ACCESS = $access;
+		return true;
 	}
 
 	/**
-	 * 执行SQL语句
-	 * @param SQL语句： $sql
-	 * @param SQL参数： $params
+	 * <b>执行SQL语句</b><br/>
+	 * SQL语句中以〖:fieldName〗作为占位符，参数列表中以〖fieldName〗作为键值<br/>
+	 *
+	 * @param string $sql SQL语句
+	 * @param array $params SQL参数列表
+	 *
+	 * @return mixed 执行结果：影响件数或检索结果
 	 */
-	public function sql($sql, $params = null)
+	public function entrust($sql = null, array $params = null)
 	{
-		if (! $this->db || ! $sql)
-			return;
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
+		if ( ! $sql || ! $this->pdo)
+		{
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
+		}
 
 		### SQL语句
-		$this->log->assign($sql, Log::L_DEBUG);
+		Log::logs($sql);
 
 		### 执行SQL语句
-		$stm = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$stm = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		if (! $stm || ! $stm->execute($params))
 		{
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo(), Log::L_EXCEPTION);
-			return null;
+			Log::logs(__CLASS__, __CLASS__, Log::L_EXCEPTION);
+			Log::logs($this->pdo->errorInfo(), null, Log::L_EXCEPTION);
+			return false;
 		}
 
 		### 执行结果
-		$amount = $stm->rowCount();
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		$result = $stm->fetchAll();
-		if (! $result)
-			return $amount;
-		return $result;
+		$rowCount = $stm->rowCount();
+		$rows = $stm->fetchAll();
+		Log::logf(__FUNCTION__, $rowCount, __CLASS__);
+		if (! $rows)
+		{
+			return $rowCount;
+		}
+		return $rows;
 	}
 
 	/**
-	 * 统计数据
-	 * @param 表名： $table
-	 * @param 条件： $where
+	 * <b>统计数据件数</b><br/>
+	 * 检索条件为数组形式，其中以表字段名作为键值，各条件默认以and链接
+	 *
+	 * @param string $table 表名
+	 * @param array $where 条件
+	 *
+	 * @return integer 执行结果
 	 */
-	public function count($table, $where = null)
+	static public function count($table, array $where = null)
 	{
-		if (! $this->db || ! $table)
-			return;
+		if (! $table || ! ($data = Data::access()))
+		{
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
+		}
 
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
-		### SQL语句
-		$sql = 'select count(0) as amount from $table';
+		### 建立SQL语句
+		$sql = 'select count(0) as rowcount from '.$data->field($table);
 		if ($where)
-			$sql .= ' where '.$this->join($where, 'and');
-		$this->log->assign($sql, Log::L_DEBUG);
-
-		### 执行SQL语句
-		$stm = $this->db->query($sql);
-		if (! $stm)
 		{
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo(), Log::L_EXCEPTION);
-			return null;
+			$sql .= ' where '.$data->join($where);
 		}
 
-		### 执行结果
-		$result = $stm->fetch();
-		$amount = $result['amount'];
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		return $amount;
+		### 执行SQL语句
+		$rows = $data->entrust($sql, $where);
+		if (! is_array($rows)) {
+			return false;
+		}
+		$rowCount = $rows[0]['rowcount'];
+		Log::logf(__FUNCTION__, $rowCount, __CLASS__);
+		return (int)$rowCount;
 	}
 
 	/**
-	 * 检索数据
-	 * @param 表名： $table
-	 * @param 条件： $where
-	 * @param 排序： $order
-	 * @param 件数： $limit
+	 * <b>检索数据</b><br/>
+	 * 检索条件为数组形式，其中以表字段名作为键值，各条件默认以and链接
+	 *
+	 * @param string $table 表名
+	 * @param array $where 条件
+	 * @param stirng $order 排序
+	 * @param integer $limit 件数
+	 * @param integer $offset 起始位置
+	 *
+	 * @return array 检索结果
 	 */
-	public function read($table, $where = null, $order = null, $limit = 0)
+	static public function read($table, array $where = null, array $order = null, $limit = 0, $offset = 0)
 	{
-		if (! $this->db || ! $table)
-			return;
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
-		### SQL语句
-		$sql = "select * from $table";
-		if ($where) $sql .= ' where '.$this->join($where, 'and');
-		if ($order) $sql .= ' order by '.$this->join($order);
-		if ($limit) $sql .= " limit $limit";
-		$this->log->assign($sql, Log::L_DEBUG);
-
-		### 执行SQL语句
-		$stm = $this->db->query($sql);
-		if (! $stm)
+		if (! $table || ! ($data = Data::access()))
 		{
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo(), Log::L_EXCEPTION);
-			return null;
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
 		}
 
-		### 执行结果
-		$amount = $stm->columnCount();
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		$result = $stm->fetchAll();
-		return $result;
+		### 建立SQL语句
+		$sql = 'select * from '.$data->field($table);
+		if ($where)
+		{
+			$sql .= ' where '.$data->join($where);
+		}
+		if ($order)
+		{
+			$sql .= ' order by '.$data->join($order, self::$COMMA, false);
+		}
+		if ($limit > 0)
+		{
+			$sql .= ' limit '.$limit;
+			if ($offset > 0) {
+				$sql .= ' offset '.$offset;
+			}
+		}
+
+		### 执行SQL语句
+		$rows = $data->entrust($sql, $where);
+		return $rows;
 	}
 
 	/**
-	 * 追加数据
-	 * @param 表名：   $table
-	 * @param 字段值： $values
+	 * <b>追加数据</b><br/>
+	 * 字段值为数组形式，其中以表字段名作为键值
+	 *
+	 * @param string $table 表名
+	 * @param array $values 字段值
+	 *
+	 * @return integer 执行结果
 	 */
-	public function add($table, $values)
+	static public function create($table, array $values)
 	{
-		if (! $this->db || ! $table)
-			return;
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
-		### 字段值
+		if (! $table || ! ($data = Data::access()))
+		{
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
+		}
+		### SQL字段值
 		if (! $values)
 		{
-			$message = $this->log->message('value', __CLASS__);
-			$this->log->assign($message);
-			$this->log->assign($this->db->errorInfo());
-			return null;
+			Log::logs('value', __CLASS__);
+			return false;
 		}
 
-		### SQL语句
-		$sql = "insert into $table set ".$this->join($values);
-		$this->log->assign($sql, Log::L_DEBUG);
+		### 建立SQL语句
+		$sql = 'insert into '.$data->field($table).' set '.$data->join($values, self::$COMMA);
 
 		### 执行SQL语句
-		$this->db->beginTransaction();
-		$stm = $this->db->exec($sql);
-		if ($stm === false)
+		$data->pdo->beginTransaction();
+		$rowCount = $data->entrust($sql, $values);
+		if ($rowCount > 0)
 		{
-			$this->db->rollBack();
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo());
-			return null;
+			$data->pdo->commit();
+			return $rowCount;
 		}
-		$this->db->commit();
-
-		### 执行结果
-		$amount = $stm->rowCount();
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		return $amount;
+		$data->pdo->rollback();
+		return false;
 	}
 
 	/**
-	 * 更新数据
-	 * @param 表名：   $table
-	 * @param 字段值： $values
-	 * @param 条件：   $where
+	 * <b>更新数据</b><br/>
+	 * 字段值为数组形式，其中以表字段名作为键值
+	 * 检索条件为数组形式，其中以表字段名作为键值，各条件默认以and链接<br/>
+	 *
+	 * @param string $table 表名
+	 * @param array $values 字段值
+	 * @param array $where 条件
+	 *
+	 * @return integer 执行结果
 	 */
-	public function update($table, $values, $where)
+	static public function update($table, array $values, array $where)
 	{
-		if (! $this->db || ! $table)
-			return;
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
-		### 字段值
+		if (! $table || ! ($data = Data::access()))
+		{
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
+		}
+		### SQL字段值
 		if (! $values)
 		{
-			$message = $this->log->message('value', __CLASS__);
-			$this->log->assign($message);
-			return null;
+			Log::logs('value', __CLASS__);
+			return false;
 		}
-		### 条件
+		### SQL条件
 		if (! $where)
 		{
-			$message = $this->log->message('where', __CLASS__);
-			$this->log->assign($message);
-			return null;
+			Log::logs('where', __CLASS__);
+			return false;
 		}
 
-		### SQL语句
-		$sql = "update $table set ".$this->join($values);
-		$sql .= ' where '.$this->join($where, 'and');
-		$this->log->assign($sql, Log::L_DEBUG);
+		### 建立SQL语句
+		$sql = 'update '.$data->field($table).' set '.$data->join($values, self::$COMMA);
+		$sql .= ' where '.$data->join($where);
 
 		### 执行SQL语句
-		$this->db->beginTransaction();
-		$stm = $this->db->exec($sql);
-		if ($stm === false)
+		$data->pdo->beginTransaction();
+		$rowCount = $data->entrust($sql, $values + $where);
+		if ($rowCount > 0)
 		{
-			$this->db->rollBack();
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo());
-			return null;
+			$data->pdo->commit();
+			return $rowCount;
 		}
-		$this->db->commit();
-
-		### 执行结果
-		$amount = $stm->rowCount();
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		return $amount;
+		$data->pdo->rollback();
+		return false;
 	}
 
 	/**
-	 * 删除数据
-	 * @param 表名： $table
-	 * @param 条件： $where
+	 * <b>删除数据</b><br/>
+	 * 检索条件为数组形式，其中以表字段名作为键值，各条件默认以and链接<br/>
+	 *
+	 * @param string 表名 $table
+	 * @param array 条件 $where
+	 *
+	 * @return integer 执行结果
 	 */
-	public function delete($table, $where)
+	static public function delete($table, array $where)
 	{
-		if (! $this->db || ! $table)
-			return;
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
-		### 条件
+		if (! $table || ! ($data = Data::access())) {
+			Log::logs('access', __CLASS__, Log::L_WARING);
+			return false;
+		}
+		### SQL条件
 		if (! $where)
 		{
-			$message = $this->log->message('where', __CLASS__);
-			$this->log->assign($message);
-			return null;
+			Log::logs('where', __CLASS__);
+			return false;
 		}
 
-		### SQL语句
-		$sql = "delete from $table where ".$this->join($where, "and");
-		$this->log->assign($sql, Log::L_DEBUG);
+		### 建立SQL语句
+		$sql = 'delete from '.$data->field($table).' where '.$data->join($where);
 
 		### 执行SQL语句
-		$this->db->beginTransaction();
-		$stm = $this->db->exec($sql);
-		if ($stm === false)
+		$data->pdo->beginTransaction();
+		$rowCount = $data->entrust($sql, $where);
+		if ($rowCount > 0)
 		{
-			$this->db->rollBack();
-			$message = $this->log->message(__CLASS__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($this->db->errorInfo());
-			return null;
+			$data->pdo->commit();
+			return $rowCount;
 		}
-		$this->db->commit();
-
-		### 执行结果
-		$amount = $stm->rowCount();
-		$message = $this->log->messagef(__FUNCTION__, $amount, __CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-		return $amount;
+		$data->pdo->rollback();
+		return false;
 	}
 
 	/**
-	 * 输入值转换成SQL值
-	 * @param 输入值： $value
+	 * <b>连结SQL参数</b><br/>
+	 *
+	 * @param array $params SQL参数
+	 * @param string $gap 分割符
+	 *
+	 * @return string
 	 */
-	protected function convert($value)
+	protected function join(array $params, $gap = 'and', $holder = true)
 	{
-		if (is_string($value))
-			if (trim($value) == '')
-				return 'null';
-			return $this->db->quote($value);
-		if (is_bool($value))
-			return ($value ? 1 : 0);
-		if (is_null($value))
-			return 'null';
-		return $value;
-	}
-
-	/**
-	 * 连结SQL参数
-	 * @param SQL参数： $params
-	 * @param 连接符：  $glue
-	 */
-	protected function join($params, $glue = ',')
-	{
-		if (! is_array($params))
-			return $params;
 		$sql = '';
-		foreach ($params as $key => $value)
-		{
-			$value = $this->convert($value);
-			$sql .= "$glue $key = $value ";
+		if ($holder) {
+			foreach ($params as $item => $value)
+			{
+				$field = $data->field($item);
+				$sql .= "$gap $field=:$item ";
+			}
+			return substr($sql, strlen($gap));
 		}
-		return substr($sql, strlen($glue));
+		foreach ($params as $item => $value)
+		{
+			$field = $data->field($item);
+			$sql .= "$gap $field ";
+		}
+		return substr($sql, strlen($gap));
+	}
+	
+	protected function field($field)
+	{
+		if (! is_string($field) || ! $field)
+		{
+			return '``';
+		}
+		$field = '`'.str_replace('`', '``', $field).'`';
+		return $field;
 	}
 
 	/**
-	 * 连接数据库
-	 * @param 连接信息 $access
+	 * <b>连接数据库</b><br/>
+	 *
+	 * @param 数据库连接信息 $access
+	 *
+	 * @return bool
 	 */
-	private function connect($access)
+	private function connect(array $access)
 	{
-		if (! $access)
-			return;
+		if (! $access || empty($access['dsn']) || empty($access['user']))
+		{
+			return false;
+		}
 		try
 		{
-			$this->db = new PDO($access['dsn'], $access['user'],
-					$access['password']);
-			$this->db->query("set names 'utf8'");
+			$this->pdo = new PDO($access['dsn'], $access['user'], $access['password']);
+			$this->pdo->query('set names `utf8`');
+			return true;
 		}
 		catch (PDOException $e)
 		{
-			$message = $this->log->message(__FUNCTION__, __CLASS__);
-			$this->log->assign($message, Log::L_EXCEPTION);
-			$this->log->assign($e->getMessage(), Log::L_EXCEPTION);
+			Log::logs(__FUNCTION__, __CLASS__, Log::L_EXCEPTION);
+			Log::logs($e->getMessage(), null, Log::L_EXCEPTION);
+			return false;
 		}
 	}
 
-	private function __construct($access)
+	/**
+	 * <b>数据工场初始化</b><br/>
+	 * 建立数据库连接
+	 *
+	 * @param array $access 数据库连接信息
+	 */
+	private function __construct(array $access)
 	{
-		$this->log = Log::access();
 		$this->connect($access);
 	}
-
-	//	function __destruct()
-	//	{
-	//		$this->db = null;
-	//	}
 }
 ?>

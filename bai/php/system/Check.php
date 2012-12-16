@@ -1,220 +1,246 @@
 <?php
-
-### 权限检查
-if (! defined('_ISSUE'))
-	exit('对不起！请走正门……');
+/**
+ * <b>BaiPHP（简单PHP）开发框架</b>
+ * @author		白晓阳
+ * @copyright	Copyright (c) 2011 - 2012, 白晓阳
+ * @link		http://dacbe.com
+ * @version     V1.0.0 2012/03/31 首版
+ * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ */
 
 /**
- * <b>Bai输入检验工场：</b>
- * <p>检验输入内容并返回检验结果</p>
+ * <b>BaiPHP（简单PHP）开发框架</b><br/>
+ * <b>输入检验工场</b>
+ * <p>检验输入内容并返回提示信息</p>
  *
- * @author    白晓阳
- * @copyright Copyright (c) 2011 - 2012, 白晓阳
- * @link       http://www.dacbe.com
- * @version    V1.0.0 2012/03/21 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ * @author 白晓阳
+ * @see Work
  */
 class Check extends Work
 {
-	/** 日志入口 */
-	protected $log = null;
-	/** 检验静态入口 */
-	private static $ACCESS = null;
+	/** 检验项目分割符 */
+	const GAP_CHECK = ' ';
+	/** 检验条件分隔符 */
+	const GAP_PARAM = '=';
+	/** 检验工场静态入口 */
+	static private $ACCESS = null;
 
 	/**
-	 * 获取检验入口
-	 * @param 预设检验内容： $preset
+	 * <b>获取检验工场入口</b><br/>
+	 * 该入口是静态单一入口
+	 * 
+	 * @param string $preset 预置检验规则
+	 * 
+	 * @return Check
 	 */
-	public static function access($preset = null)
+	static public function access(array $preset = null)
 	{
-		if (! self::$ACCESS)
+		if (! self::$ACCESS) {
 			self::$ACCESS = new Check($preset);
+		}
 		return self::$ACCESS;
 	}
 
 	/**
-	 * 检验输入项目
-	 * 检验规则: required min=9 max=9 type=N function=param
-	 *           required: 非空
-	 *           min.9   : 最小长度
-	 *           max.9   : 最大长度
-	 *           type    : 内容属性
-	 *           function: 调用函数
-	 *
-	 * @param 请求事件： $event
+	 * <b>检验输入内容</b><br/>
+	 * 检验规则: required min=9 max=9 type=N function=P<br/>
+	 * <ul>
+	 * <li>required : 非空</li>
+	 * <li>min=9 : 最小长度</li>
+	 * <li>max=9 : 最大长度</li>
+	 * <li>type=N : 内容属性</li>
+	 * <li>function=P : 调用函数</li>
+	 * </ul>
+	 * 各规则可以任意组合，规则之间以空格分隔
+	 * 检验规则在用户配置文件（user.php）中的Check下设置
+	 * 
+	 * @param Event $event 事件
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
 	 */
-	public function assign($event)
+	public function entrust(Event $event = null)
 	{
-		if (empty($this->preset[$event]))
+		### 检验规则未设置
+		if (empty($this->preset[$event->event]))
+		{
 			return false;
-		$checks = $this->preset[$event];
-
-		$message = $this->log->message(__CLASS__);
-		$this->log->assign($message, Log::L_DEBUG);
-
+		}
+	
+		### 检验规则
+		$checks = $this->preset[$event->event];
+		Log::logs(__CLASS__, 'Event');
 		foreach ($checks as $item => $check)
 		{
-			if (! $check)
-				continue;
-			$message = $this->log->messagef(__CLASS__, $item.'【'.$check.'】', __CLASS__);
-			$this->log->assign($message, Log::L_DEBUG);
-			### 输入内容检验
-			$message = $this->checkItem(cRead($item), explode(' ', $check));
+			Log::logf(__CLASS__, $item.'〖'.$check.'〗', __CLASS__);
+			### 危险字符检验
+			$message = $this->risk($event->$item);
 			if ($message)
-				return $message;
-		}
-		return false;
-	}
-
-	/**
-	 * 检验项目内容
-	 * @param 项目内容： $value
-	 * @param 检验内容： $checks
-	 */
-	private function checkItem($value, $checks)
-	{
-		try
-		{
-			foreach ($checks as $check)
 			{
-				$params = explode('=', $check);
-				$message = $this->$params[0]($value, array_slice($params, 1));
-				if ($message)
-				{
-					$this->log->assign($message);
-					return $message;
-				}
+				$event[__CLASS__][$item] = $message;
+				continue;
+			}
+			if (! $check)
+			{
+				continue;
+			}
+			### 输入项目检验
+			$message = $this->checkItem($event->$item, explode(self::GAP_CHECK, $check));
+			if ($message)
+			{
+				$event[__CLASS__][$item] = $message;
 			}
 		}
-		catch (Exception $e)
+		return ! empty($event[__CLASS__]);
+	}
+
+	/**
+	 * <b>检验输入项目</b><br/>
+	 * 
+	 * @param string $item 检验项目
+	 * @param array $checks 检验内容
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	private function checkItem($item, array $checks)
+	{
+		foreach ($checks as $check)
 		{
-			$message = $this->log->messagef(__FUNCTION__, $check, __CLASS__);
-			$this->log->assign($message);
-			$this->log->assign($e->getMessage());
-			return $message;
+			$params = explode(self::GAP_PARAM, $check);
+			### 调用检验方法
+			$message = $this->$params[0]($item, array_slice($params, 1));
+			if ($message)
+			{
+				### 检验未通过
+				return $message;
+			}
 		}
 		return false;
 	}
 
 	/**
-	 * 非空检验
-	 * @param 项目内容： $value
-	 * @param 检验参数： $params
+	 * <b>敏感字符检验</b><br/>
+	 * 
+	 * @param string $item 检验项目
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
 	 */
-	public function required($value, $params = null)
+	protected function risk($item)
 	{
-		$message = $this->log->message(__FUNCTION__, __CLASS__);
-		if ($value == null)
-			return $message;
-		#if (is_array($value) && ! $value)
-		#	return $message;
-		if (is_string($value) && trim($value) == '')
-			return $message;
-		return false;
-	}
-
-	/**
-	 * 最小长度检验
-	 * @param 项目内容： $value
-	 * @param 检验参数:  $params
-	 */
-	public function min($value, $params = null)
-	{
-		if (! $params)
-			return false;
-		$message = $this->log->messagef(__FUNCTION__, $params[0], __CLASS__);
-		if (mb_strlen($value, 'utf-8') < $params[0])
-			return $message;
-		return false;
-	}
-
-	/**
-	 * 最大长度检验
-	 * @param 项目内容： $value
-	 * @param 检验参数:  $params
-	 */
-	public function max($value, $params = null)
-	{
-		if (! $params)
-			return false;
-		$message = $this->log->messagef(__FUNCTION__, $params[0], __CLASS__);
-		if (mb_strlen($value, 'utf-8') > $params[0])
-			return $message;
-		return false;
-	}
-
-	/**
-	 * 属性检验
-	 * @param 项目内容： $value
-	 * @param 检验参数:  $params
-	 */
-	public function type($value, $params = null) {
-		if ((! $value && $value != '0') || ! $params) {
-			return false;
-		}
-
-		switch (strtolower($params[0]))
+		if ($item && preg_match(c('Input', 'Risk'), $item))
 		{
-			case 'number': ### 数字
-				$message = preg_match('#^[1-9]\d*$#', $value);
-				break;
-			case 'float': ### 数值
-				$message = preg_match('#^[+-]?\d+(?:\.\d+)?$#', $value);
-				break;
-			case 'letter': ### 英文字母
-				$message = preg_match('#^[a-zA-Z]+$#', $value);
-				break;
-			case 'char': ### 英文字母数字划线
-				$message = preg_match('#^[a-zA-Z0-9_-]+$#', $value);
-				break;
-			case 'mp': ### 移动电话
-				$message = preg_match('#^(?:\+86)?1[358][0-9]{9}$#', $value);
-				break;
-			case 'fax': ### 固话传真
-				$message = preg_match('#^0[0-9]{2,3}-[1-9][0-9]{6,7}$#', $value);
-				break;
-			case 'url': ### 网址
-				$message = preg_match('#^(?:http://)?[a-zA-Z0-9-_./]+(?:\?.+)?$#', $value);
-				break;
-			case 'email': ### 邮箱
-				$message = preg_match('#^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$#', $value);
-				break;
-			case 'date': ### 日期
-				$message = preg_match('#^[0-9]{4}[-./]?(?:0?[1-9]|1[0-2])[-./]?(?:0?[1-9]|[12][0-9]|3[01])$#', $value);
-				break;
-			case 'time': ### 时间
-				$message = preg_match('#^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$#', $value);
-				break;
-			default:
-				$message = true;
+			return Log::logs(__FUNCTION__, __CLASS__);
 		}
-		return $message ? false : $this->log->message(__FUNCTION__, __CLASS__);
-	}
-
-	/**
-	 * 验证码检验
-	 * @param 项目内容： $value
-	 * @param 检验参数:  $params
-	 */
-	public function vcode($value, $params = null)
-	{
-		$message = $this->log->message(__FUNCTION__, __CLASS__);
-		if (empty($value))
-			return false;
-		if (! $params)
-			return $message;
-		if (strtoupper($value) != cRead(__FUNCTION__))
-			return $message;
 		return false;
 	}
 
-	private function __construct($preset)
+	/**
+	 * <b>非空检验</b><br/>
+	 * 
+	 * @param string $item 检验项目
+	 * @param array $params 检验参数
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function required($item, array $params = null)
 	{
-		$this->log = Log::access();
-		if (is_array($preset))
+		if (! $item && $item != '0')
+		{
+			return Log::logs(__FUNCTION__, __CLASS__);
+		}
+		return false;
+	}
+
+	/**
+	 * <b>最小长度检验</b><br/>
+	 * 
+	 * @param string $item 检验项目
+	 * @param array $params 检验参数
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function min($item, array $params = null)
+	{
+		if ((! $item && $item != '0') || ! $params
+				|| mb_strlen($item, 'utf-8') >= $params[0])
+		{
+			return false;
+		}
+		return Log::logf(__FUNCTION__, $params[0], __CLASS__);
+	}
+
+	/**
+	 * <b>最大长度检验</b><br/>
+	 * 
+	 * @param string $item 检验项目
+	 * @param array $params 检验参数
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function max($item, array $params = null)
+	{
+		if ((! $item && $item != '0') || ! $params
+				|| mb_strlen($item, 'utf-8') <= $params[0])
+		{
+			return false;
+		}
+		return Log::logf(__FUNCTION__, $params[0], __CLASS__);
+	}
+
+	/**
+	 * <b>属性检验</b><br/>
+	 * 根据全局配置中的正则表达式检验输入内容
+	 * 
+	 * @param string $item 检验项目
+	 * @param array $params 检验参数
+	 * 
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function type($item, array $params = null)
+	{
+		if ((! $item && $item != '0') || ! $params)
+		{
+			return false;
+		}
+
+		$rule = c('Input', 'Type', $params[0]);
+		if (! $rule || preg_match($rule, $item))
+		{
+			return false;
+		}
+
+		return Log::logs(__FUNCTION__, __CLASS__);
+	}
+	
+	/**
+	 * <b>自动调用外部方法进行检验</b><br/>
+	 * 外部方法参数应声明为：($item：检验内容；array $params：参数列表)
+	 *
+	 * @param string $name 方法名
+	 * @param array $params 检验参数
+	 *
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	public function __call($name, $params)
+	{
+		if (function_exists($name))
+		{
+			return $name($params[0], $params[1]);
+		}
+		return Log::logs(__FUNCTION__, __CLASS__);
+	}
+
+	/**
+	 * <b>检验工场初始化</b><br/>
+	 * 初始化各事件的检验规则
+	 * 
+	 * @param string $preset 预置检验规则
+	 */
+	private function __construct(array $preset)
+	{
+		if ($preset)
+		{
 			$this->preset = $preset;
-		#if (! $this->preset)
-		#	error_log('检验内容为空！');
+		}
 	}
 }
 ?>

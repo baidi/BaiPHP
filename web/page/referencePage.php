@@ -1,5 +1,3 @@
-<?php include 'header.php'; ?>
-<div>
 	<div class="box">
 		<div class="t">文件结构</div>
 		<p><span class="info">/bai/php/system/</span>：系统文件目录，包含系统核心类和配置文件</p>
@@ -26,12 +24,10 @@
 	</div>
 	<div class="box">
 		<div class="t">系统函数列表</div>
-		<p><span class="info">cRequest($event, $source = 'Issue')</span>：请求响应文件</p>
-		<p><span class="info">cImport($pagename, $_param = null, $_css = '', $print = true)</span>：导入页面文件</p>
+		<p><span class="info">cFlow($event, $source = 'Issue')</span>：请求响应文件</p>
+		<p><span class="info">cLoad($pagename, $_param = null, $_css = '', $print = true)</span>：导入页面文件</p>
 		<p><span class="info">cRead($item, $array = null)</span>：读取项目值</p>
 		<p><span class="info">cWrite($item, $array = null)</span>：输出项目值</p>
 		<p><span class="info">cWriteEach()</span>：输出一列项目值</p>
-		<p><span class="info">cHint($event, $item, $print = true)</span>：根据检验内容生成提示信息</p>
+		<p><span class="info">cInput($event, $item, $print = true)</span>：根据检验内容生成提示信息</p>
 	</div>
-</div>
-<?php include 'footer.php'; ?>

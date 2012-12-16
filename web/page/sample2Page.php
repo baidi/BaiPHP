@@ -1,14 +1,3 @@
-<?php 
-global $cSample;
-?>
-<!doctype html>
-<html>
-<head>
-<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="/bai/css/bai.css" />
-<title>BaiPHP - 简单编程</title>
-</head>
-<body>
 	<h2>案例2</h2>
 	<div class="box">
 		<div class="t"><?php echo $cSample;?></div>
@@ -24,5 +13,3 @@ global $cSample;
 			</li>
 		</ul>
 	</div>
-</body>
-</html>

@@ -1,4 +1,4 @@
-DirectoryIndex home.php
+DirectoryIndex home.php index.php
 
 RewriteEngine On
 RewriteRule ^([^./]+)/?(#[^/.?]+)?$ home.php$2?event=$1 [QSA,L]

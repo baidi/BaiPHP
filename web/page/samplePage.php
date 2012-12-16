@@ -1,5 +1,3 @@
-<?php include 'header.php'; ?>
-<div>
 	<div class="box">
 		<div class="t">案例1</div>
 		<p>这个案例非常简单，只有两条echo语句。</p>
@@ -38,5 +36,3 @@
 		<div class="t">说明</div>
 		<p>数据操作需要建立一个Action的子类，并重写data方法，在其中调用Data类进行数据库访问操作。</p>
 	</div>
-</div>
-<?php include 'footer.php'; ?>
