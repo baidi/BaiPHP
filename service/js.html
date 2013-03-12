@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>JS</title>
+<style type="text/css">
+</style>
+<script type="text/javascript" src="js/sizzle.js"></script>
+<script type="text/javascript">
+String.prototype.trim = function() {
+	return this.replace(/^\s+|\s+$/g, '');
+}
+Array.prototype.each = function(action) {
+	if (action == null || action.)
+}
+Document.prototype.pick = Element.prototype.pick = function(item, last) {
+	return Sizzle(item, this, last);
+}
+Element.prototype.get = function(item) {
+	if (item == null || ! item) {
+		return null;
+	}
+	if (this.hasAttribute(item)) {
+		return this.getAttribute(item);
+	}
+	return this[item];
+}
+Element.prototype.set = function(item, value) {
+	if (item == null || ! item) {
+		return null;
+	}
+	return this[item] = value;
+}
+Element.prototype.on = function(item, action) {
+	
+}
+function test() {
+	var m = document.pick("#menu1")[0];
+	m.set('data-c', 'a');
+	alert(m.get('data-b'));
+}
+</script>
+</head>
+<body>
+	<div>
+		<span id="menu1">Menu1</span>
+		<span>Menu2</span>
+		<span>Menu3</span>
+	</div>
+	<br>
+	<div>
+		<button onclick="test();">Test</button>
+	</div>
+</body>
+</html>

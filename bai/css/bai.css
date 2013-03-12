@@ -1,76 +1,58 @@
-
-/*--- HTMLÔªËØ ---*/
+/*--- HTMLå…ƒç´  ---*/
 body {
-	font: $font$; /* È«¾Ö×ÖÌå */
-	color: $color$; /* È«¾Ö×ÖÌåÑÕÉ« */
-	background: $background$; /* È«¾Ö±³¾° */
+	font: $font$;
+	color: $color$;
+	background: $background$;
 }
-
-body>* {
-	margin: 0 auto;
-	width: $width$; /* È«¾Ö¿í¶È */
-}
-
 a {
-	display: inline-block;
-	text-indent: 0;
-	text-decoration: none;
-	text-align: center;
-	vertical-align: bottom;
-	color: $acolor$; /* È«¾ÖÁ´½ÓÑÕÉ« */
+	color: $acolor$;
 	cursor: pointer;
+	text-decoration: underline;
 }
 
-a:hover {
-	font-weight: bold;
-	text-shadow: 0px 0px 4px $shadowcolor$;
-	background: -webkit-linear-gradient(top, #f0f9f0, #fff0f9);
-	background: -moz-linear-gradient(top, #f0f9f0, #fff0f9);
-	background: -ms-linear-gradient(top, #f0f9f0, #fff0f9);
-	background: -o-linear-gradient(top, #f0f9f0, #fff0f9);
-}
-
-div {
-	overflow: hidden;
-}
-
-div.oy {
-	overflow-y: auto;
-}
-
-div.oxy {
-	overflow: visible;
+button {
+	
 }
 
 h1,h2,h3,h4,h5 {
-	margin: 0;
-	line-height: 1.5em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+hr {
+	border: none;
+	border-bottom: 1px solid $linecolor$;
 }
 
 img {
 	margin: 0;
 	border: none;
-	vertical-align: bottom;
+	vertical-align: text-bottom;
+}
+
+input {
+	
 }
 
 p {
-	margin: 0;
-	padding: 0.5em 0.5em 0;
-	text-align: left;
+	margin: 0.5em;
 	text-indent: 2em;
 }
 
 pre {
-	margin: 0 1em;
-	padding: 0.5em 1em;
-	overflow-x: auto;
+	margin: 0.5em;
+	padding: 0.5em;
 	background-color: $areacolor$;
 	border: 1px dashed $linecolor$;
 }
 
+progress {
+	
+}
+
 textarea {
-	display: block;
-	margin: 0 auto;
+	margin: 0.5em;
+	padding: 0.5em;
 }
 
 menu,dl {
@@ -84,25 +66,24 @@ menu>li {
 }
 
 ol,ul {
-	padding-left: 1.5em;
-	padding-right: 1em;
+	margin: 0.5em;
+	padding-left: 2em;
 }
-/*--- HTMLÔªËØ ---*/
+
+span {
+	word-break: break-all;
+}
+/*--- HTMLå…ƒç´  ---*/
 
 
-/*--- ³£ÓÃ ---*/
+/*--- é€šç”¨ ---*/
 .b {
 	font-weight: bold;
 }
 
 .c {
-	margin: 0 auto;
-	text-align: center;
-}
-
-.h {
-	display: none;
-}
+	margin-left: auto;
+	margin-right: auto;}
 
 .fl {
 	float: left;
@@ -112,32 +93,79 @@ ol,ul {
 	float: right;
 }
 
-.fi {
+.h {
+	display: none;
+}
+
+.i {
 	display: inline-block;
+}
+
+.m {
+	margin: 0.5em;
+}
+
+.o {
+	overflow: hidden;
+}
+
+.p {
+	padding: 0.5em;
+}
+
+.q {
+	background-color: $areacolor$;
+	border: 1px dashed $linecolor$;
+}
+
+.r {
+	border-radius: 0.5em;
+}
+
+.t {
+	font-size: 1.25em;
+	font-weight: bold;
+	margin-top: 0.5em;
+	border-bottom: 1px solid $linecolor$;
+}
+
+.tc {
+	text-align: center;
+}
+
+.tl {
+	text-align: left;
 }
 
 .tr {
 	text-align: right;
 }
+/*--- é€šç”¨ ---*/
 
-.m4 {
-	margin: 4px;
+
+/*--- é¡µé¢å¸ƒå±€ ---*/
+#page {
+	margin: 0 auto;
+	width: $width$; /* å…¨å±€å®½åº¦ */
 }
 
-.p4 {
-	padding: 4px;
+header, footer {
+	overflow: hidden;
+	clear: both;
 }
 
-.t { /* ±êÌâ */
-	padding: 0.5em 0.5em 0;
-	font-weight: bold;
-	border-bottom: 1px solid $linecolor$;
+#lside {
+	float: left;
 }
-/*--- ³£ÓÃ ---*/
 
+#rside {
+	float: right;
+}
 
-/*--- Ò³Ãæ²¼¾Ö ---*/
-header nav a { /* Ò³Ê×µ¼º½ */
+#main {
+}
+
+header nav a { /* é¡µé¦–å¯¼èˆª */
 	width: 6em;
 	font: 16px/24px normal;
 	border: 1px solid #ffffff;
@@ -146,32 +174,32 @@ header nav a { /* Ò³Ê×µ¼º½ */
 	border-top-left-radius: 8px;
 }
 
-.box { /* ²¼¾Ö¿é */
+.box { /* å¸ƒå±€å— */
+	position: relative;
+	margin: 0.5em;
+	margin-bottom: 1em;
+	padding: 0.5em;
+	border: 1px solid #99cc99;
+	border-radius: 6px;
+}
+
+.gap { /* å¸ƒå±€æ¡† */
 	position: relative;
 	margin: 4px 8px 8px 4px;
 	padding: 4px;
-	border: 1px solid $linecolor$;
-	border-radius: 8px;
-	box-shadow: 0 0 4px $shadowcolor$;
 }
 
-.gap { /* ²¼¾Ö¿ò */
-	position: relative;
-	margin: 4px 8px 8px 4px;
-	padding: 4px;
-}
-
-footer nav a { /* Ò³½ÅÁ´½Ó */
+footer nav a { /* é¡µè„šé“¾æ¥ */
 	width: 6em;
 	border: 1px solid #ffffff;
 	background: $areacolor$;
 }
-/*--- Ò³Ãæ²¼¾Ö ---*/
+/*--- é¡µé¢å¸ƒå±€ ---*/
 
 
-/*--- ĞÅÏ¢ÌáÊ¾ --*/
+/*--- ä¿¡æ¯æç¤º --*/
 .error {
-	color: $errorcolor$;
+	color: #ff0000;
 }
 
 .notice {
@@ -185,10 +213,10 @@ footer nav a { /* Ò³½ÅÁ´½Ó */
 .required {
 	color: $errorcolor$;
 }
-/*--- ĞÅÏ¢ÌáÊ¾ --*/
+/*--- ä¿¡æ¯æç¤º --*/
 
 
-/*--- ÄÚÈİ¸ñÊ½ ---*/
+/*--- å†…å®¹æ ¼å¼ ---*/
 .label {
 	font-style: italic;
 	text-align: right;
@@ -206,78 +234,65 @@ footer nav a { /* Ò³½ÅÁ´½Ó */
 .text {
 	padding: 0.5em 1em;
 }
-/*--- ÄÚÈİ¸ñÊ½ ---*/
+/*--- å†…å®¹æ ¼å¼ ---*/
 
-/*--- ¿í¶È ---*/
-.w1 {
+
+/*--- å®½åº¦ ---*/
+.w1,.w2,.w3,.w4,.w5,.w6,.w7,.w8,.w9,.w100,.w200,.w300,.w400,.w500,.w600,.w700,.w800,.w900 {
 	display: inline-block;
+}
+.w1 {
 	width: 11%;
 }
 .w2 {
-	display: inline-block;
 	width: 22%;
 }
 .w3 {
-	display: inline-block;
 	width: 33%;
 }
 .w4 {
-	display: inline-block;
 	width: 44%;
 }
 .w5 {
-	display: inline-block;
 	width: 55%;
 }
 .w6 {
-	display: inline-block;
 	width: 66%;
 }
 .w7 {
-	display: inline-block;
 	width: 77%;
 }
 .w8 {
 	width: 88%;
 }
 .w9 {
-	display: inline-block;
 	width: 100%;
 }
 .w100 {
-	display: inline-block;
 	width: 100px;
 }
 .w200 {
-	display: inline-block;
 	width: 200px;
 }
 .w300 {
-	display: inline-block;
 	width: 300px;
 }
 .w400 {
-	display: inline-block;
 	width: 400px;
 }
 .w500 {
-	display: inline-block;
 	width: 500px;
 }
-.w700 {
-	display: inline-block;
+.w600 {
 	width: 600px;
 }
-.w500 {
-	display: inline-block;
+.w700 {
 	width: 700px;
 }
 .w800 {
-	display: inline-block;
 	width: 800px;
 }
 .w900 {
-	display: inline-block;
 	width: 900px;
 }
-/*--- ¿í¶È ---*/
+/*--- å®½åº¦ ---*/
