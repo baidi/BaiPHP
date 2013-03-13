@@ -66,7 +66,7 @@ $config[Flow::PAGE] = array(
 	),
 	'menu'          => array(
 		'home'      => '主页',
-		'design'    => '设计模式',
+		'design'    => '设计',
 		'driver'    => '驱动模式',
 		'sample'    => '案例学习',
 		'reference' => '参考资料',
@@ -80,27 +80,21 @@ $config[Flow::PAGE] = array(
 		'theory'   => '原理',
 		'download' => '下载',
 	),
-);
-
-### 全局配置：页面css样式
-$config['css'] = array(
-	'$width$' => '990px',
-	'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
-	#'$color$' => '#000000',
-	#'$background$' => '#ffffff',
-	'$acolor$' => '#009f3c',
-	'$linecolor$' => '#99cc99',
-	'$areacolor$' => '#f0f9f0',
-	'$shadowcolor$' => '#d0f9d0',
-	'$errorcolor$' => '#ff0000',
-	'$noticecolor$' => '#99cc99',
-	'$lockedcolor$' => '#cccccc',
-);
-
-### 全局配置：页面JS脚本
-$config['js'] = array(
-	'$message$' => $config[Work::LOG][Work::CHECK],
-	'$type$'    => $config['Input']['Type'],
-	'$timeout$' => 3000,
-	'$cipher$'  => '_CIPHER',
+	'format'       => array(
+		'$width$' => '990px',
+		'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
+		#'$color$' => '#000000',
+		#'$background$' => '#ffffff',
+		'$acolor$' => '#009f3c',
+		'$linecolor$' => '#99cc99',
+		'$areacolor$' => '#f0f9f0',
+		'$shadowcolor$' => '#d0f9d0',
+		'$errorcolor$' => '#ff0000',
+		'$noticecolor$' => '#99cc99',
+		'$lockedcolor$' => '#cccccc',
+		'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
+		'$type$'    => json_encode($config['Input']['Type']),
+		'$timeout$' => 3000,
+		'$cipher$'  => '_CIPHER',
+	),
 );

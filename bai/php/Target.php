@@ -31,6 +31,7 @@ class Target extends Bai implements ArrayAccess
 		Log::logf(__FUNCTION__, $event, __CLASS__);
 		Log::logf('start', date('Y-m-d H:m:s', _START), __CLASS__, Log::PERFORM);
 		$this->result = $this->run($setting);
+		echo $this->result;
 		Log::logf('close', microtime(true) - _START, __CLASS__, Log::PERFORM);
 		Log::logf('deliver', $event, __CLASS__);
 		return $this->result;

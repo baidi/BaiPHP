@@ -55,9 +55,8 @@ $config[Flow::FLOW] = array(
         Flow::PAGE    => false,
 	),
 	Flow::PAGE        => array(
-        'css'         => false,
-        'js'          => false,
         'html'        => false,
+        'format'      => false,
 	),
 );
 
@@ -171,13 +170,15 @@ $config[Work::CACHE] = array(
 	'timeout'   => 600,
 );
 
-$config['Template'] = array(
-	'js'  => '<script type="text/javascript" src="%s"></script>',
-	'css' => '<link rel="stylesheet" type="text/css" href="%s" />',
-);
-
 $config[Work::STYLE] = array(
-	'entrust' => array('css', 'js'),
+	'inset'   => array(
+		'css' => true,
+		'js'  => true,
+	),
+	'link'    => array(
+		'css' => '<link rel="stylesheet" type="text/css" href="%s"/>',
+		'js'  => '<script type="text/javascript" src="%s"></script>',
+	),
 );
 
 $config[Work::INPUT] = array(

@@ -1,5 +1,5 @@
 DirectoryIndex home.php index.php
 
-RewriteEngine On
-RewriteRule ^([^./]+)/?(#[^/.?]+)?$ home.php$2?event=$1 [QSA,L]
-RewriteRule ^([^/.]+)/?(#[^/.?]+)?\?([^?]+)$ home.php$2?event=$1&$3 [QSA,L]
+#RewriteEngine On
+#RewriteRule ^([^./]+)/?(#[^/.?]+)?$ home.php$2?event=$1 [QSA,L]
+#RewriteRule ^([^/.]+)/?(#[^/.?]+)?\?([^?]+)$ home.php$2?event=$1&$3 [QSA,L]

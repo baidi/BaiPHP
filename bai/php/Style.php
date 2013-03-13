@@ -44,10 +44,10 @@
  	 * </p>
  	 * @return string 样式内容
  	 */
- 	static public function css($items = null)
+ 	static public function css($items = null, $inset = false)
  	{
  		$style = Style::access();
- 		return $style->entrust($items, '.'.__FUNCTION__);
+ 		return $style->entrust($items, __FUNCTION__, $inset);
  	}
 
  	/**
@@ -57,10 +57,10 @@
  	 * </p>
  	 * @return string 样式内容
  	 */
- 	static public function js($items = null)
+ 	static public function js($items = null, $inset = false)
  	{
  		$style = Style::access();
- 		return $style->entrust($items, '.'.__FUNCTION__);
+ 		return $style->entrust($items, __FUNCTION__, $inset);
  	}
 
  	/**
@@ -73,7 +73,7 @@
  	static public function img($items = null)
  	{
  		$style = Style::access();
- 		return $style->entrust($items, '.'.__FUNCTION__);
+ 		return $style->entrust($items, __FUNCTION__);
  	}
 
 	/**
@@ -81,11 +81,12 @@
 	 * <p>
 	 * 导入样式（css、js）文件并格式化。
 	 * </p>
-	 * @param array $items 导入文件
-	 * @param string $ext 扩展名
+	 * @param array $items 文件名
+	 * @param string $branch 分支名
+	 * @param bool $inset 是否嵌入
 	 * @return string 样式内容
 	 */
- 	public function entrust($items = null, $ext = null)
+ 	public function entrust($items = null, $branch = null, $inset = false)
  	{
  		if ($items == null)
  		{
@@ -95,7 +96,10 @@
  		{
  			$items = array($items);
  		}
- 		//$exts = $this->pick(__FUNCTION__, $this->preset);
+ 		if ($branch == null)
+ 		{
+ 			$branch == get_class($this);
+ 		}
  		$this->result = '';
  		foreach ($items as $item)
  		{
@@ -103,100 +107,80 @@
  			{
  				continue;
  			}
- 			### 判断扩展名
-	 		if ($ext == null)
+	 		$this->runtime['item']   = $item;
+	 		$this->runtime['branch'] = $branch;
+	 		if ($inset)
 	 		{
-	 			$ext = strrchr($item, '.');
-	 		}
-	 		if ($ext == null || $ext === $item || $ext === '.')
-	 		{
+	 			$this->result .= $this->inset();
 	 			continue;
 	 		}
-	 		if (substr($item, - strlen($ext)) !== $ext)
-	 		{
-	 			$item .= $ext;
-	 		}
-	 		### 导入样式文件
-	 		$this->runtime['item'] = $item;
-	 		$this->runtime['ext']  = $ext;
- 			$this->result .= $this->fetch();
+ 			$this->result .= $this->link();
  		}
  		return $this->result;
  	}
 
-	/**
-	 * <h4>导入样式文件</h4>
-	 * <p>
-	 * 导入样式（css、js）文件并格式化。
-	 * </p>
-	 * @return string 样式内容
-	 */
-	protected function fetch()
+ 	/**
+ 	 * <h4>嵌入样式文件</h4>
+ 	 * @return string
+ 	 */
+	protected function inset()
 	{
 		### 执行数据
-		$item = $this->pick('item', $this->runtime);
-		$ext  = $this->pick('ext',  $this->runtime);
- 		### 加载路径
+		$item   = $this->pick('item', $this->runtime);
+		$branch = $this->pick('branch', $this->runtime);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$preset = $this->pick($branch, $preset);
+		if (! $preset)
+		{
+			return null;
+		}
+ 		### 加载文件
  		$bai     = $this->pick(self::BAI,     $this->target);
  		$service = $this->pick(self::SERVICE, $this->target);
- 		$branch  = substr($ext, 1)._DIR;
- 		### 加载文件
- 		ob_start();
- 		if (is_file(_LOCAL.$bai.$branch.$item))
+ 		$content = '';
+ 		if (is_file(_LOCAL.$bai.$branch._DIR.$item))
  		{
- 			include _LOCAL.$bai.$branch.$item;
+ 			$content .= file_get_contents(_LOCAL.$bai.$branch._DIR.$item);
  		}
- 		if (is_file(_LOCAL.$service.$branch.$item))
+ 		if (is_file(_LOCAL.$service.$branch._DIR.$item))
  		{
- 			include _LOCAL.$service.$branch.$item;
+ 			$content .= file_get_contents(_LOCAL.$service.$branch._DIR.$item);
  		}
- 		$content = ob_get_clean();
- 		### 应用配置
- 		$preset = $this->config(substr($ext, 1));
- 		if ($preset == null || ! is_array($preset))
- 		{
- 			return $content;
- 		}
- 		$items = array_keys($preset);
- 		$values = array_values($preset);
- 		foreach ($values as &$value)
- 		{
- 			if (is_array($value) || is_object($value))
- 			{
- 				$value = json_encode($value);
- 			}
- 		}
- 		$content = str_replace($items, $values, $content);
  		return $content;
 	}
 
 	/**
-	 * <h4>解析网络文件</h4>
-	 * <p>
-	 * 文件文件名和分支名，解析文件的网络路径。
-	 * 总是优先使用服务路径。
-	 * </p>
-	 * @param string $file 文件名
-	 * @param string $branch 分支名
-	 * @return string 文件路径
+	 * <h4>外连样式文件</h4>
+	 * @return string
 	 */
-	protected function request($file = null, $branch = null) {
-		if ($file == null) {
-			return null;
-		}
-		if ($branch == null) {
-			$branch  = strrchr($item, '.')._DIR;
-		}
-		### 寻址路径
-		$bai     = $this->pick(self::BAI,     $this->target);
-		$service = $this->pick(self::SERVICE, $this->target);
-		if (is_file(_LOCAL.$service.$branch.$file)) {
-			return _WEB.$service.$branch.$file;
-		}
-		if (is_file(_LOCAL.$bai.$branch.$file)) {
-			return _WEB.$bai.$branch.$file;
-		}
-		return null;
+	protected function link()
+	{
+		### 执行数据
+		$item = $this->pick('item', $this->runtime);
+		$branch = $this->pick('branch',  $this->runtime);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$preset = $this->pick($branch, $preset);
+ 		### 外连文件
+ 		$bai     = $this->pick(self::BAI,     $this->target);
+ 		$service = $this->pick(self::SERVICE, $this->target);
+ 		$content = '';
+ 		if (is_file(_LOCAL.$service.$branch._DIR.$item))
+ 		{
+ 			if (! $preset)
+ 			{
+ 				return _WEB.$service.$branch._DIR.$item;
+ 			}
+ 			$content .= sprintf($preset, _WEB.$service.$branch._DIR.$item);
+ 		}
+ 		if (is_file(_LOCAL.$bai.$branch._DIR.$item))
+ 		{
+ 			if (! $preset)
+ 			{
+ 				return _WEB.$bai.$branch._DIR.$item;
+ 			}
+ 			$content = sprintf($preset, _WEB.$bai.$branch._DIR.$item).$content;
+ 		}
+ 		return $content;
 	}
  }
  

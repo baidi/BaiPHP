@@ -29,13 +29,12 @@ class Page extends Flow implements ArrayAccess
 	 */
 	protected function html()
 	{
-		$this->css = Style::css($this->pick('css', $this->preset));
-		$this->js = Style::js($this->pick('js', $this->preset));
+		$this->css = Style::css($this->pick('css', $this->preset), true);
+		$this->js = Style::js($this->pick('js', $this->preset), true);
 		$this->lang = Lang::access();
-		$this->header = $this->load('_header.php');
-		$this->main = $this->load("$this->target");
-		$this->rside = '&nbsp;';
-		echo $this->load('_layout.php');
+		$this->lside = false;
+		$this->rside = false;
+		return $this->load('_layout.php');
 	}
 
 	/**
@@ -43,8 +42,9 @@ class Page extends Flow implements ArrayAccess
 	 * @param string $event 事件
 	 * @param string $page 页面内容
 	 */
-	protected function format($event, $page)
+	protected function format()
 	{
+		$page = $this->result;
 		### 页面压缩
 		#$search = array(
 		#'/^\s+/m',       #行首空白
@@ -52,12 +52,21 @@ class Page extends Flow implements ArrayAccess
 		#);
 		#$page = preg_replace($search, '', $page);
 
+		### 应用配置
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+ 		if ($preset && is_array($preset))
+ 		{
+	 		$items = array_keys($preset);
+	 		$values = array_values($preset);
+	 		$page = str_replace($items, $values, $page);
+ 		}
+
 		### 页面缓存
-		if (defined('_CACHE'))
-		{
-			$cache = Cache::access();
-			$cache->entrust($event, $page);
-		}
+// 		if (defined('_CACHE'))
+// 		{
+// 			$cache = Cache::access();
+// 			$cache->entrust($event, $page);
+// 		}
 		return $page;
 	}
 

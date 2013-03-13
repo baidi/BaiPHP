@@ -5,10 +5,10 @@
 	<meta name="author" content="<?php echo $this->author; ?>" />
 	<meta name="keywords" content="<?php echo $this->keywords; ?>" />
 	<meta name="description" content="<?php echo $this->description; ?>" />
-	<link rel="icon" href="<?php echo _WEB; ?>favicon.ico" type="image/x-icon" />
+	<link rel="icon" type="image/x-icon" href="<?php echo Style::img('favicon.ico') ?>"/>
 	<title><?php echo $this->title; ?></title>
 	<style type="text/css"><?php echo $this->css; ?></style>
-	<script type="text/javascript" src="<?php echo _WEB; ?>service/js/sizzle.js"></script>
+	<?php echo Style::js('sizzle.js') ?>
 	<script type="text/javascript"><?php echo $this->js; ?></script>
 </head>
 <body>
@@ -28,7 +28,7 @@
 			</aside>
 			<?php } ?>
 			<div id="main"><!-- 主体 -->
-				<?php echo $this->main; ?>
+				<?php echo $this->load("$this->target"); ?>
 			</div>
 		</div>
 		<footer><!-- 页脚 -->

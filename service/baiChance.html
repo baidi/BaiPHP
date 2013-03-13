@@ -113,7 +113,7 @@ body {
 			chanceList.children('.on').removeClass('on');
 			if (!status) {
 				$(this).addClass('on');
-				aPick(this.innerText);
+				aPick(this.innerText || this.textContent);
 			} else {
                 $(this).css('background-color', aRgb());
 			}
@@ -128,7 +128,7 @@ body {
 					return;
 				}
 				$(this).addClass('on');
-				aPick(this.innerText);
+				aPick(this.innerText || this.textContent);
 			}
 		} else if (mode == 'order') {
 			if (!order.length) {
@@ -140,7 +140,6 @@ body {
 			}
 			for ( var i = 0; i < order.length && order[i] == '*'; i++) {
 			}
-			;
 			if (order[i] != this.innerText) {
 				aError.call(this);
 				return;
@@ -154,14 +153,14 @@ body {
 				$(this).css('opacity', '');
 				$(this).css('background-color', aRgb());
 			});
-			aPick(this.innerText);
+			aPick(this.innerText || this.textContent);
 		} else if (mode == 'all') {
 			if (status) {
 				$(this).removeClass('on');
                 $(this).css('background-color', aRgb());
 			} else {
 				$(this).addClass('on');
-				aPick(this.innerText);
+				aPick(this.innerText || this.textContent);
 			}
 		} else {
 			aError.call(this);
@@ -223,7 +222,7 @@ body {
 		chanceList.attr('on', 1);
 		chanceList.children('li.on').removeClass('on');
 		steps = $('.chance-list li').length;
-		steps += Math.floor(Math.random() * steps);
+		steps = Math.floor(Math.random() * steps);
 		aChance();
 	}
 	$(function() {

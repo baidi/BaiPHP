@@ -31,7 +31,7 @@ abstract class Work extends Bai
 	/** 标识：缓存工场 */
 	const CACHE = 'Cache';
 	/** 标识：样式工场 */
-	const STYLE = 'STYLE';
+	const STYLE = 'Style';
 	/** 标识：输入工场 */
 	const INPUT = 'Input';
 	/** 标识：测试工场 */
