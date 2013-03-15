@@ -109,5 +109,6 @@ class Lang extends Work
 		if ($primary != null) {
 			$this->primary = $primary;
 		}
+		$this->load($this->primary, true);
 	}
 }

@@ -58,7 +58,7 @@ class Log extends Work
 		self::PERFORM   => ' [性能] ',
 	);
 	/** 默认日志级别 */
-	protected $level = self::INFO;
+	protected $level = self::ALL;
 
 	/**
 	 * <h4>获取日志工场入口</h4>

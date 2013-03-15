@@ -76,6 +76,19 @@
  		return $style->entrust($items, __FUNCTION__);
  	}
 
+ 	/**
+ 	 * <h4>导入js文件</h4>
+ 	 * <p>
+ 	 * 导入样式js文件并格式化。
+ 	 * </p>
+ 	 * @return string 样式内容
+ 	 */
+ 	static public function file($items = null, $branch = null)
+ 	{
+ 		$style = Style::access();
+ 		return $style->entrust($items, $branch);
+ 	}
+
 	/**
 	 * <h4>导入样式文件</h4>
 	 * <p>

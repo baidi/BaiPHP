@@ -306,16 +306,16 @@ abstract class Bai
 	}
 
 	/**
-	 * <h4>加载页面文件</h4>
+	 * <h4>加载文件</h4>
 	 * <p>
 	 * 根据目标事项或文件名加载页面文件。
 	 * 页面文件中可直接使用外部参数$_params。
 	 * </p>
-	 * @param string $item 页面名
-	 * @param string $_params 页面参数，用于页面文件内
+	 * @param string $item 文件名
+	 * @param bool $all 是否叠加
 	 * @return string 页面内容，页面无效则返回空。
 	 */
-	protected function load($item = null, $_params = null)
+	protected function load($item = null, $all = false)
 	{
 		if ($item == null)
 		{
@@ -329,28 +329,28 @@ abstract class Bai
 		$bai     = $this->pick(self::BAI,     $this->target);
 		$service = $this->pick(self::SERVICE, $this->target);
 		$branch  = get_class($this)._DIR;
-		$page = null;
 		ob_start();
+		if ($all)
+		{
+			if (is_file(_LOCAL.$bai.$branch.$item))
+			{
+				include _LOCAL.$bai.$branch.$item;
+			}
+			if (is_file(_LOCAL.$service.$branch.$item))
+			{
+				include _LOCAL.$service.$branch.$item;
+			}
+			return ob_get_clean();
+		}
 		if (is_file(_LOCAL.$service.$branch.$item))
 		{
-			### 用户页面文件
-			$page = include _LOCAL.$service.$branch.$item;
+			include _LOCAL.$service.$branch.$item;
 		}
 		else if (is_file(_LOCAL.$bai.$branch.$item))
 		{
-			### 系统页面文件
-			$page = include _LOCAL.$bai.$branch.$item;
+			include _LOCAL.$bai.$branch.$item;
 		}
-		else
-		{
-			### 错误页面文件
-		}
-		if ($page === 1)
-		{
-			$page = ob_get_contents();
-		}
-		ob_end_clean();
-		return $page;
+		return ob_get_clean();
 	}
 
 	/**

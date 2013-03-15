@@ -20,10 +20,11 @@
  */
 class Input extends Work
 {
-	protected $check = null;
-
 	/** 输入工场静态入口 */
 	static private $ACCESS = null;
+
+	/** 首选项 */
+	protected $primary = 'text';
 
 	/**
 	 * <h4>获取输入工场入口</h4>
@@ -54,10 +55,44 @@ class Input extends Work
 			return null;
 		}
 		$event = $this->target[self::EVENT];
-		$check = $this->config(self::CHECK, $event, $item);
 		$this->runtime['event'] = $event;
-		$this->runtime['item'] = $item;
-		$this->runtime['check'] = $check;
+		$this->runtime['item']  = $item;
+		$this->runtime['type']  = $this->type();
+		$this->runtime['value'] = $this->value();
+		$this->runtime['check'] = $this->check();
+		$this->runtime['hint']  = $this->hint();
+		$this->result = $this->format();
+		return $this->result;
+	}
+
+	protected function type()
+	{
+		$event = $this->pick('event', $this->runtime);
+		$item  = $this->pick('item',  $this->runtime);
+		$check = $this->config(self::CHECK, $event, $item);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$pattern = $this->pick(_DEFAULT, $preset);
+		if (preg_match($pattern, $check, $type))
+		{
+			$type = $type[1];
+		}
+		if ($type == null)
+		{
+			$type = $this->primary;
+		}
+		$alt = $this->pick($type, $preset);
+		return ($alt == null) ? $type : $alt;
+	}
+
+	protected function value()
+	{
+		$event = $this->pick('event', $this->runtime);
+		$item  = $this->pick('item',  $this->runtime);
+		$result = $this->pick($item, $this->target[$event]);
+		if ($result)
+		{
+				
+		}
 	}
 
 	protected function check()
@@ -70,9 +105,9 @@ class Input extends Work
 
 	protected function hint()
 	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$mode = $this->pick('check', $this->preset);
 		$check = $this->pick('check', $this->runtime);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$mode = $this->pick(_DEFAULT, $this->preset);
 		preg_match_all($mode, $check, $cases);
 		$hints = array();
 		foreach ($cases as $case)
@@ -87,18 +122,21 @@ class Input extends Work
 				$hints[] = $preset[$case['value']];
 			}
 		}
-		$this->runtime[__FUNCTION__] = implode(',', $hints);
+		$this->runtime[__FUNCTION__] = implode(', ', $hints);
 	}
 
 	protected function format()
 	{
-		$event = $this->pick('event', $this->runtime);
-		$item  = $this->pick('item',  $this->runtime);
-		$check = $this->pick('check', $this->runtime);
-		$hint  = $this->pick('hint',  $this->runtime);
-		$holders = array(
-			'id' => $event.'_'.$item,
-			'name' => $event.'['.$item.']'
-		);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		if ($preset == null || ! is_string($preset))
+		{
+			return null;
+		}
+		foreach ($this->runtime as $item => $value)
+		{
+			$preset = str_replace('{$'.$item.'}', $value, $preset);
+		}
+		$preset = preg_replace('/\{\$[^\}]+\}/', '', $preset);
+		return $preset;
 	}
 }

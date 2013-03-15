@@ -88,7 +88,7 @@ $config[Work::DATA] = array(
 
 ### 全局配置：日志信息
 $config[Work::LOG] = array(
-	Work::LOG         => Log::ALL,
+	Work::LOG         => Log::ALL | Log::DEBUG | Log::PERFORM,
 	Work::BAI         => array(
 		'run'         => '->执行方法：%s',
 		'entrust'     => '+>委托目标：%s',
@@ -182,33 +182,33 @@ $config[Work::STYLE] = array(
 );
 
 $config[Work::INPUT] = array(
-	'check' => '/(?<item>[^\s=]+)(?:=(?<value>[^\s=]+))?/',
+	_DEFAULT => 'text',
+	//_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
+	'type'  => array(
+		_DEFAULT => '/type=([a-zA-Z0-9-_]+)/',
+		'primary' => 'text',
+		'float'  => 'number',
+	),
 	'hint'  => array(
-		'required' => '内容非空',
+		'required' => '非空',
 		'max'      => '最大$1位',
 		'min'      => '最小$1位',
-		'number'   => '单纯数字',
-		'float'    => '合法整数或小数',
-		'letter'   => '大小写英文字母',
-		'char'     => '大小写英文字母、数字、划线',
-		'mp'       => '移动电话号码',
-		'fax'      => '固话传真号码（带区号，以-连接）',
+		'number'   => '整数型',
+		'float'    => '数值型',
+		'letter'   => '英文字母',
+		'char'     => '英文字母、数字、划线',
+		'mp'       => '移动电话',
+		'tel'      => '电话号码',
 		'url'      => '合法英文网址',
 		'email'    => '合法英文邮箱',
 		'date'     => '合法日期（年月日无分割或以-、/、空格分割）',
 		'time'     => '合法时间（时分秒无分割或以:、-、空格分割）',
 	),
-	'format' => '<input {$id} {$name} {$type} {$value} {$attr} {$data-check} {$data-title} />',
+	'format' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" type="{$type}" {$value} data-check="{$check}" placeholder="{$hint}"/>',
 );
 
 $config['Lang'] = array(
 	_DEFAULT => Lang::ZH,
-	'zh_cn' => array(
-		'home' => '首页',
-	),
-	'en_us' => array(
-		'home' => 'Home',
-	),
 );
 
 ### 输入项检验条目
