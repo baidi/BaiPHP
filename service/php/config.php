@@ -48,6 +48,9 @@ $config[Work::CHECK] = array(
 		'sampleInt' => 'required min=3 max=5 type=number',
 		'sampleLetter' => 'required min=3 max=10 type=letter',
 	),
+	'hot' => array(
+		'hotin' => 'required min=3 max=5 type=number',
+	),
 );
 
 ### 全局配置：页面流程
@@ -93,7 +96,7 @@ $config[Flow::PAGE] = array(
 		'$noticecolor$' => '#99cc99',
 		'$lockedcolor$' => '#cccccc',
 		'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
-		'$type$'    => json_encode($config['Input']['Type']),
+		//'$type$'    => json_encode($config['Input']['Type']),
 		'$timeout$' => 3000,
 		'$cipher$'  => '_CIPHER',
 	),

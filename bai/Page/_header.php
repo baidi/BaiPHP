@@ -1,4 +1,4 @@
 <div>
-	<img alt="baiphp" src="<?php echo _WEB ?>bai/img/logo.png" />
-	BaiPHP - 简单PHP
+	<img alt="<?php echo $this->logo; ?>" src="<?php echo Style::img('logo.png'); ?>" />
+	BaiPHP - 化简PHP
 </div>

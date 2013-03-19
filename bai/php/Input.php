@@ -35,7 +35,7 @@ class Input extends Work
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
-			self::$ACCESS = new Style($setting);
+			self::$ACCESS = new Input($setting);
 		}
 		return self::$ACCESS;
 	}
@@ -71,8 +71,8 @@ class Input extends Work
 		$item  = $this->pick('item',  $this->runtime);
 		$check = $this->config(self::CHECK, $event, $item);
 		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$pattern = $this->pick(_DEFAULT, $preset);
-		if (preg_match($pattern, $check, $type))
+		$mode = $this->pick(_DEFAULT, $preset);
+		if (preg_match($mode, $check, $type))
 		{
 			$type = $type[1];
 		}
@@ -88,27 +88,50 @@ class Input extends Work
 	{
 		$event = $this->pick('event', $this->runtime);
 		$item  = $this->pick('item',  $this->runtime);
-		$result = $this->pick($item, $this->target[$event]);
-		if ($result)
+		$value = $this->pick($item, $this->target[$event]);
+		if ($value == null)
 		{
-				
+			return null;
 		}
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$type  = $this->pick('type',  $this->runtime);
+		foreach ($preset as $item => $mode)
+		{
+			$alt = preg_replace($item, $mode, $type);
+			if ($alt != $type)
+			{
+				break;
+			}
+		}
+		return sprintf($alt, $value);
 	}
 
 	protected function check()
 	{
+		$event = $this->pick('event', $this->runtime);
+		$item  = $this->pick('item',  $this->runtime);
+		$check = $this->config(self::CHECK, $event, $item);
 		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$check = $this->pick('check', $this->runtime);
-		preg_match_all($preset, $check, $cases);
-		$this->runtime['cases'] = $cases;
+		$result = array();
+		foreach ($preset as $item => $value)
+		{
+			$alt = preg_replace($item, $value, $check);
+			if ($alt !== $check)
+			{
+				$result[] = $alt;
+			}
+		}
+		return implode(' ', $result);
 	}
 
 	protected function hint()
 	{
-		$check = $this->pick('check', $this->runtime);
+		$event = $this->pick('event', $this->runtime);
+		$item  = $this->pick('item',  $this->runtime);
+		$check = $this->config(self::CHECK, $event, $item);
 		$preset = $this->pick(__FUNCTION__, $this->preset);
 		$mode = $this->pick(_DEFAULT, $this->preset);
-		preg_match_all($mode, $check, $cases);
+		preg_match_all($mode, $check, $cases, PREG_SET_ORDER);
 		$hints = array();
 		foreach ($cases as $case)
 		{
@@ -122,7 +145,7 @@ class Input extends Work
 				$hints[] = $preset[$case['value']];
 			}
 		}
-		$this->runtime[__FUNCTION__] = implode(', ', $hints);
+		return implode(', ', $hints);
 	}
 
 	protected function format()

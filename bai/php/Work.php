@@ -38,5 +38,7 @@ abstract class Work extends Bai
 	const TEST = 'Test';
 	/** 标识：语言工场 */
 	const LANG = 'Lang';
+	/** 标识：过滤工场 */
+	const FILTER = 'Filter';
 }
 ?>

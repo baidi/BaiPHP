@@ -121,6 +121,7 @@ class Page extends Flow implements ArrayAccess
 		{
 			$result = $this->pick($item, $this->preset);
 		}
+		$this->$item = $result;
 		return $result;
 	}
 }

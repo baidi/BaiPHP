@@ -110,5 +110,7 @@ class Lang extends Work
 			$this->primary = $primary;
 		}
 		$this->load($this->primary, true);
+		$this->stuff($this->config(__CLASS__), $this->preset);
+		$this->stuff($setting, $this->preset);
 	}
 }

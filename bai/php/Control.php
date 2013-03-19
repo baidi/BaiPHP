@@ -58,24 +58,6 @@ class Control extends Flow
 	}
 
 	/**
-	 * <h4>访问过滤</h4>
-	 * <p>
-	 * 过滤非法访问与非法数据。
-	 * </p>
-	 * @return void
-	 */
-	protected function filter()
-	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		if ($preset == null || ! is_array($preset))
-		{
-			return true;
-		}
-		### 访问地址过滤
-		return true;
-	}
-
-	/**
 	 * <h4>访客识别</h4>
 	 * <p>
 	 * 用户及权限识别。

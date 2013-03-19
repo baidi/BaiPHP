@@ -34,6 +34,21 @@ input {
 	
 }
 
+menu,dl {
+	margin: 0;
+	padding: 0;
+}
+
+menu>li {
+	list-style-type: none;
+	float: left;
+}
+
+ol,ul {
+	margin: 0.5em;
+	padding-left: 2em;
+}
+
 p {
 	margin: 0.5em;
 	text-indent: 2em;
@@ -50,28 +65,20 @@ progress {
 	
 }
 
+span {
+	word-break: break-all;
+}
+
+table, table td, table th {
+	border: 1px solid $linecolor$;
+}
+table tr:nth-child(even) {
+	background-color: $areacolor$;
+}
+
 textarea {
 	margin: 0.5em;
 	padding: 0.5em;
-}
-
-menu,dl {
-	margin: 0;
-	padding: 0;
-}
-
-menu>li {
-	list-style-type: none;
-	float: left;
-}
-
-ol,ul {
-	margin: 0.5em;
-	padding-left: 2em;
-}
-
-span {
-	word-break: break-all;
 }
 /*--- HTML元素 ---*/
 

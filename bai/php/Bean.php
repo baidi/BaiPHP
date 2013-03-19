@@ -20,4 +20,3 @@ class Bean extends Work
 		
 	}
 }
-?>

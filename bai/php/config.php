@@ -25,7 +25,7 @@ global $config;
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
 	'Event'       => 'home',                ### 目标事项
-	'Lang'        => 'zh_cn',
+	'Lang'        => 'zh_CN',
 	Work::LOG     => 'log'._DIR,            ### 日志路径
 	Work::CACHE   => 'cache'._DIR,          ### 缓存路径
 	'Upload'      => 'upload'._DIR,         ### 上传路径
@@ -43,7 +43,7 @@ $config[Flow::FLOW] = array(
 	),
 	Flow::CONTROL     => array(
         'checkin'     => false,
-        'filter'      => false,
+        Work::FILTER  => false,
         'identify'    => false,
         Flow::ACTION  => false,
 	),
@@ -61,11 +61,14 @@ $config[Flow::FLOW] = array(
 );
 
 ### 全局配置：调度流程
-$config[Flow::CONTROL] = array(
-	'filter' => array(
-		'/127.0.0.1/' => true,
+$config['Filter'] = array(
+	'address' => array(
+		'192.168.9' => Filter::LOW,
+		'192.168.100' => Filter::UP,
+		'192.168.125.234' => false,
 	),
-	'filter' => array(
+	'ip' => '/^(\d{1,3})(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?$/',
+	'data' => array(
 		'admin' => 'admin',
 	),
 );
@@ -182,12 +185,20 @@ $config[Work::STYLE] = array(
 );
 
 $config[Work::INPUT] = array(
-	_DEFAULT => 'text',
-	//_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
+	//_DEFAULT => 'text',
+	_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?P<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
 	'type'  => array(
-		_DEFAULT => '/type=([a-zA-Z0-9-_]+)/',
-		'primary' => 'text',
+		_DEFAULT => '/type=([a-zA-Z0-9-_]+)/i',
 		'float'  => 'number',
+	),
+	'value' => array(
+		'/^checkbox|radio$/i' => 'checked="checked"',
+		'/^[a-zA-Z0-9-_]+$/' => 'value="%s"',
+	),
+	'check' => array(
+		'/^.*required.*$/i' => 'required="required"',
+		'/^.*max=(\d+).*$/i' => 'maxlength="$1"',
+		'/^(.+)$/' => 'data-check="$1"',
 	),
 	'hint'  => array(
 		'required' => '非空',
@@ -204,63 +215,76 @@ $config[Work::INPUT] = array(
 		'date'     => '合法日期（年月日无分割或以-、/、空格分割）',
 		'time'     => '合法时间（时分秒无分割或以:、-、空格分割）',
 	),
-	'format' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" type="{$type}" {$value} data-check="{$check}" placeholder="{$hint}"/>',
+	'format' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" type="{$type}" {$value} {$check} placeholder="{$hint}"/>',
 );
 
 $config['Lang'] = array(
 	_DEFAULT => Lang::ZH,
 );
 
+$config['Filter'] = array(
+	'ip' => array(
+		'/127.0.0.1/' => true,
+	),
+	'data' => array(
+		'/<script[^>]*>.*</script>/' => '',
+		
+	),
+	'event' => array(
+		
+	),
+);
+
 ### 输入项检验条目
-$config['Input']['Items'] = array(
-		'/required/i',
-		'/\smax=(\d+)/i',
-		'/\smin=(\d+)/i',
-		'/\stype=number/i',
-		'/\stype=float/i',
-		'/\stype=letter/i',
-		'/\stype=char/i',
-		'/\stype=mp/i',
-		'/\stype=fax/i',
-		'/\stype=url/i',
-		'/\stype=email/i',
-		'/\stype=date/i',
-		'/\stype=time/i',
-		'/\s\w+=([^\s"]+)/',
-);
+// $config['Input']['Items'] = array(
+// 		'/required/i',
+// 		'/\smax=(\d+)/i',
+// 		'/\smin=(\d+)/i',
+// 		'/\stype=number/i',
+// 		'/\stype=float/i',
+// 		'/\stype=letter/i',
+// 		'/\stype=char/i',
+// 		'/\stype=mp/i',
+// 		'/\stype=fax/i',
+// 		'/\stype=url/i',
+// 		'/\stype=email/i',
+// 		'/\stype=date/i',
+// 		'/\stype=time/i',
+// 		'/\s\w+=([^\s"]+)/',
+// );
 
-### 提示信息头
-$config['Input']['Gap'] = '，';
+// ### 提示信息头
+// $config['Input']['Gap'] = '，';
 
-### 输入项HTML片段
-$config['Input']['Htmls'] = array(
-		' required="required"',
-		' maxlength="$1"',
-);
+// ### 输入项HTML片段
+// $config['Input']['Htmls'] = array(
+// 		' required="required"',
+// 		' maxlength="$1"',
+// );
 
-$config['Input']['Template'] = '<input id="" name="" type="" class="" data-check="" title="" value="" />';
+// $config['Input']['Template'] = '<input id="" name="" type="" class="" data-check="" title="" value="" />';
 
-### 类型检验：正则
-$config['Input']['Type'] = array(
-		### 数字
-		'number' => '/^[1-9]\d*$/',
-		### 数值
-		'float'  => '/^[+-]?\d+(?:\.\d+)?$/',
-		### 英文字母
-		'letter' => '/^[a-zA-Z]+$/',
-		### 英文字母数字划线
-		'char'   => '/^[a-zA-Z0-9_-]+$/',
-		### 移动电话
-		'mp'     => '/^(?:\+86)?1[358][0-9]{9}$/',
-		### 固话传真
-		'fax'    => '/^0[0-9]{2,3}-[1-9][0-9]{6,7}$/',
-		### 网址
-		'url'    => '/^(?:https?:\/\/)?[a-zA-Z0-9-_.\/]+(?:\?.+)?$/',
-		### 邮箱
-		'email'  => '/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$/',
-		### 日期
-		'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/',
-		### 时间
-		'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/',
+// ### 类型检验：正则
+// $config['Input']['Type'] = array(
+// 		### 数字
+// 		'number' => '/^[1-9]\d*$/',
+// 		### 数值
+// 		'float'  => '/^[+-]?\d+(?:\.\d+)?$/',
+// 		### 英文字母
+// 		'letter' => '/^[a-zA-Z]+$/',
+// 		### 英文字母数字划线
+// 		'char'   => '/^[a-zA-Z0-9_-]+$/',
+// 		### 移动电话
+// 		'mp'     => '/^(?:\+86)?1[358][0-9]{9}$/',
+// 		### 固话传真
+// 		'fax'    => '/^0[0-9]{2,3}-[1-9][0-9]{6,7}$/',
+// 		### 网址
+// 		'url'    => '/^(?:https?:\/\/)?[a-zA-Z0-9-_.\/]+(?:\?.+)?$/',
+// 		### 邮箱
+// 		'email'  => '/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$/',
+// 		### 日期
+// 		'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/',
+// 		### 时间
+// 		'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/',
 
-);
+// );

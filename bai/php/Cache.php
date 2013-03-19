@@ -64,7 +64,7 @@ class Cache extends Work
 		}
 
 		### 执行数据
-		$this->runtime['item'] = $this->name($item);
+		$this->runtime['item'] = $this->rename($item);
 		$this->runtime['data'] = $data;
 		$this->runtime['hard'] = $hard;
 
@@ -189,7 +189,7 @@ class Cache extends Work
 	 * @param string $item 缓存项目
 	 * @return string 转换名
 	 */
-	protected function name($item)
+	protected function rename($item)
 	{
 		$item = md5($_SERVER['REQUEST_URI'].'-'.$item);
 		return $item;
