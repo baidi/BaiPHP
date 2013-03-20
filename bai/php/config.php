@@ -60,17 +60,11 @@ $config[Flow::FLOW] = array(
 	),
 );
 
-### 全局配置：调度流程
-$config['Filter'] = array(
-	'address' => array(
-		'192.168.9' => Filter::LOW,
-		'192.168.100' => Filter::UP,
-		'192.168.125.234' => false,
+$config[Flow::CONTROL] = array(
+	'reject' => array(
+		'/192\.168\.0.*/' => true,
 	),
-	'ip' => '/^(\d{1,3})(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?(?:\.(\d{1,3}))?$/',
-	'data' => array(
-		'admin' => 'admin',
-	),
+	'shelve' => 10,  ### 每秒10次
 );
 
 ### 全局配置：数据工场
@@ -95,9 +89,9 @@ $config[Work::LOG] = array(
 	Work::BAI         => array(
 		'run'         => '->执行方法：%s',
 		'entrust'     => '+>委托目标：%s',
-		'instance'    => '::对象未知：%s',
-		'__get'       => '::属性未知：%s',
-		'__call'      => '::方法未知：%s',
+		'instance'    => '对象未知：%s',
+		'__get'       => '属性未知：%s',
+		'__call'      => '方法未知：%s',
 	),
 	Work::TARGET      => array(
 		'entrust'     => '>>目标启动：%s<<',
@@ -110,7 +104,9 @@ $config[Work::LOG] = array(
 		'client'      => '访问来源：%s(%s:%d)@%s [%s]',
 		'server'      => '访问目标：%s(%s:%d)@%s:%s [%s]',
 		'script'      => '实际响应：%s?%s',
-		'filter'      => '::访问被拒绝：%s@%s',
+		'filter'      => '访问被拒绝：%s@%s',
+		'reject'     => '你伤害了我，我不让你过。要是弄错了，就快告诉我。',
+		'shelve'     => '你的浏览器可能被劫持了，给它放一小会儿假吧……',
 	),
 	Flow::ACTION      => array(
 		Flow::ACTION  => '--处理流程--',
@@ -131,11 +127,11 @@ $config[Work::LOG] = array(
 	),
 	Work::DATA        => array(
 		Work::DATA    => '--数据工场--',
-		'connect'     => '::数据库连接失败……',
-		'entrust'     => '::SQL语句执行出错……',
-		'table'       => '::SQL数据表未指定……',
-		'values'      => '::SQL字段值未指定……',
-		'where'       => '::SQL条件未指定……',
+		'connect'     => '数据库连接失败……',
+		'entrust'     => 'SQL语句执行出错……',
+		'table'       => 'SQL数据表未指定……',
+		'values'      => 'SQL字段值未指定……',
+		'where'       => 'SQL条件未指定……',
 		'count'       => 'SQL统计<%d>条数据',
 		'read'        => 'SQL检索<%d>条数据',
 		'create'      => 'SQL追加<%d>条数据',
@@ -146,17 +142,17 @@ $config[Work::LOG] = array(
 		Work::CACHE   => '--缓存工场--',
 		'fetch'       => '提取缓存数据：%s',
 		'push'        => '更新缓存数据：%s',
-		'file'        => '::缓存文件写入失败：%s',
+		'file'        => '缓存文件写入失败：%s',
 	),
 	Work::TEST        => array(
 		Work::TEST    => '--测试工场--',
-		'testee'      => '::测试对象无效：%s',
-		'tester'      => '::测试文件无效：%s',
+		'testee'      => '测试对象无效：%s',
+		'tester'      => '测试文件无效：%s',
 		'buildCase'   => '构建对象无效：%s',
 		'||'          => '跳过测试：%s',
 		'testCase'    => '执行测试场景：%s',
 		'testResult'  => '测试场景：%s',
-		'error'       => '::执行测试出错：',
+		'error'       => '执行测试出错：',
 	),
 );
 
@@ -220,19 +216,6 @@ $config[Work::INPUT] = array(
 
 $config['Lang'] = array(
 	_DEFAULT => Lang::ZH,
-);
-
-$config['Filter'] = array(
-	'ip' => array(
-		'/127.0.0.1/' => true,
-	),
-	'data' => array(
-		'/<script[^>]*>.*</script>/' => '',
-		
-	),
-	'event' => array(
-		
-	),
 );
 
 ### 输入项检验条目

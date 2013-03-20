@@ -25,7 +25,7 @@ class Control extends Flow
 	 * <p>
 	 * 记录访问来源、访问目标和实际响应。
 	 * </p>
-	 * @return void
+	 * @return boolean
 	 */
 	protected function checkin()
 	{
@@ -54,6 +54,58 @@ class Control extends Flow
 		$_SERVER['QUERY_STRING'],    ### 访问参数
 		);
 		$this->target->script = Log::logf('script', $script, __CLASS__);
+		return true;
+	}
+
+	/**
+	 * <h4>访问地址过滤</h4>
+	 * @return boolean
+	 */
+	protected function reject()
+	{
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		if ($preset == null || ! is_array($preset))
+		{
+			return true;
+		}
+		### 访问地址过滤
+		foreach ($preset as $item => $mode)
+		{
+			if ($preg_match($item, $_SERVER['REMOTE_ADDR']))
+			{
+				if ($mode)
+				{
+					return true;
+				}
+				$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::NOTICE);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * <h4>访问频度过滤</h4>
+	 * <p>利用会话实现访问频度过滤。</p>
+	 * @return boolean
+	 */
+	protected function shelve()
+	{
+		$preset = (int) $this->pick(__FUNCTION__, $this->preset);
+		$count = (int) $this->pick(__FUNCTION__.'count', $_SESSION);
+		if ($preset > 0 && $count >= $preset)
+		{
+			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::NOTICE);
+			return false;
+		}
+		$time  = $this->pick(__FUNCTION__.'time',  $_SESSION);
+		if ($time != $_SERVER['REQUEST_TIME'])
+		{
+			$_SESSION[__FUNCTION__.'time']  = $_SERVER['REQUEST_TIME'];
+			$_SESSION[__FUNCTION__.'count'] = 1;
+			return true;
+		}
+		$_SESSION[__FUNCTION__.'count'] = $count + 1;
 		return true;
 	}
 

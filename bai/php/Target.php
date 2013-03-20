@@ -84,8 +84,8 @@ class Target extends Bai implements ArrayAccess
 		$this->stuff($this->config(self::TARGET));
 		### 应用全局数据
 		$this->stuff($_SESSION);
-		$this->stuff($_GET);
-		$this->stuff($_POST);
+		$this->stuff($this->filter($_GET));
+		$this->stuff($this->filter($_POST));
 		### 应用目标事项
 		if ($this->event != null)
 		{
@@ -97,6 +97,35 @@ class Target extends Bai implements ArrayAccess
 			$this->Service = $this->service;
 		}
 		$this->target = $this;
+	}
+
+	/**
+	 * <h4>访问数据过滤</h4>
+	 * @param string $input
+	 * @return mixed 过滤后数据
+	 */
+	protected function filter($input = null)
+	{
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		if ($preset == null || ! is_array($preset))
+		{
+			return $input;
+		}
+		### 过滤文字
+		if (! is_array($input))
+		{
+			foreach ($preset as $item => $mode)
+			{
+				$input = preg_replace($item, $mode, $input);
+			}
+			return $input;
+		}
+		### 过滤数组
+		foreach ($input as $item => &$value)
+		{
+			$value = $this->filter($value);
+		}
+		return $input;
 	}
 
 	/**
