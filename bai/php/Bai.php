@@ -19,7 +19,7 @@
  * </p>
  * @author 白晓阳
  */
-abstract class Bai
+abstract class Bai implements ArrayAccess
 {
 	/** 标识：元类 */
 	const BAI     = 'Bai';
@@ -53,7 +53,7 @@ abstract class Bai
 	 * （外部）委托当前对象完成目标并交付结果。
 	 * 所有子对象必须以该行为作为非静态单一开放入口。
 	 * </p>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return mixed 交付结果
 	 */
 	public function entrust($setting = null)
@@ -67,7 +67,7 @@ abstract class Bai
 	 * （流程或工场）根据预置流程执行目标以实现交付。
 	 * 预置流程由全局配置：$config[self::FLOW][__CLASS__]设定。
 	 * </p>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return mixed 执行结果
 	 */
 	protected function run($setting = null)
@@ -112,7 +112,7 @@ abstract class Bai
 			}
 			if ($this->error == null)
 			{
-				if ($mode === null)
+				if ($mode === false)
 				{
 					break;
 				}
@@ -120,15 +120,26 @@ abstract class Bai
 				continue;
 			}
 			$this->target->error = $this->error;
-			if ($mode && is_string($mode))
+			$this->target->anchor = $this;
+			if (is_string($mode) && $mode)
 			{
 				### 进入跳转模式
 				$jump = $mode;
 				continue;
 			}
 			### 错误处理
+			$jump = 'error';
 		}
 		return $this->result;
+	}
+
+	/**
+	 * <h4>输出错误页面</h4>
+	 * @return string 错误页面
+	 */
+	protected function error()
+	{
+		return $this->load(_DEFAULT.__FUNCTION__, false, Flow::PAGE._DIR);
 	}
 
 	/**
@@ -274,7 +285,7 @@ abstract class Bai
 	 * 根据对象名检测并构建对象。
 	 * </p>
 	 * @param string $class 对象名
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return mixed 对象实例，对象未知则返回空（null）。
 	 */
 	protected function build($class = null, $setting = null)
@@ -315,7 +326,7 @@ abstract class Bai
 	 * @param bool $all 是否叠加
 	 * @return string 页面内容，页面无效则返回空。
 	 */
-	protected function load($item = null, $all = false)
+	protected function load($item = null, $all = false, $branch = null)
 	{
 		if ($item == null)
 		{
@@ -328,7 +339,10 @@ abstract class Bai
 		### 加载路径
 		$bai     = $this->pick(self::BAI,     $this->target);
 		$service = $this->pick(self::SERVICE, $this->target);
-		$branch  = get_class($this)._DIR;
+		if ($branch == null)
+		{
+			$branch  = get_class($this)._DIR;
+		}
 		ob_start();
 		if ($all)
 		{
@@ -354,12 +368,58 @@ abstract class Bai
 	}
 
 	/**
+	 * <h3>判断项目是否存在</h3>
+	 * @param string $item 项目名
+	 * @return bool 是否存在
+	 */
+	public function offsetExists($item)
+	{
+		return isset($this->$item);
+	}
+
+	/**
+	 * <h3>读取项目</h3>
+	 * @param string $item 项目名
+	 * @return mixed 项目值
+	 */
+	public function offsetGet($item)
+	{
+		if (! $this->offsetExists($item))
+		{
+			$this->$item = null;
+		}
+		return $this->$item;
+	}
+
+	/**
+	 * <h3>设定项目</h3>
+	 * @param string $item 项目名
+	 * @param mixed $value 项目值
+	 * @return void
+	 */
+	public function offsetSet($item, $value)
+	{
+		$this->$item = $value;
+	}
+
+	/**
+	 * <h3>清除项目</h3>
+	 * @param string $item 项目名
+	 * @return void
+	 */
+	public function offsetUnset($item)
+	{
+		unset($this->$item);
+	}
+
+	/**
 	 * 属性未知时，返回空（null）。
 	 */
 	public function __get($item)
 	{
-		# Log::logf(__FUNCTION__, get_class($this).'->'.$item, __CLASS__, Log::WARING);
-		return null;
+		Log::logf(__FUNCTION__, get_class($this).'->'.$item, __CLASS__, Log::NOTICE);
+		$this->$item = null;
+		return $this->$item;
 	}
 
 	/**
@@ -384,7 +444,7 @@ abstract class Bai
 	 * <p>
 	 * 设置当前目标和预置数据。
 	 * </p>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 */
 	protected function __construct($setting = null)
 	{

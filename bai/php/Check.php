@@ -25,7 +25,7 @@ class Check extends Work
 
 	/**
 	 * <h4>获取检验工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Check 检验工场
 	 */
 	static public function access($setting = null)
@@ -49,7 +49,7 @@ class Check extends Work
 	 * </ul>
 	 * 各规则可以任意组合，规则之间以空格分隔
 	 * 检验规则在用户配置文件（config.php）中的self::Check下设置
-	 * @param array $specific 自定义配置
+	 * @param array $specific 即时配置
 	 * @return mixed false：检验通过；string：提示信息
 	 */
 	public function entrust($specific = null)

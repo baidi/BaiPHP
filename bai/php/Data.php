@@ -33,7 +33,7 @@ class Data extends Work
 
 	/**
 	 * <h4>获取数据工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Data 数据工场
 	 */
 	static public function access($setting = null)
@@ -436,7 +436,7 @@ class Data extends Work
 
 	/**
 	 * <h4>构建数据工场</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 */
 	protected function __construct($setting = null)
 	{

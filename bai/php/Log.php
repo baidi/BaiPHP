@@ -62,7 +62,7 @@ class Log extends Work
 
 	/**
 	 * <h4>获取日志工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Log 日志工场
 	 */
 	static public function access($setting = null)
@@ -213,7 +213,7 @@ class Log extends Work
 	 * <p>
 	 * 设置日志信息和日志级别
 	 * </p>
-	 * @param array $setting 自定义配置文件
+	 * @param array $setting 即时配置
 	 */
 	protected function __construct($setting = null)
 	{

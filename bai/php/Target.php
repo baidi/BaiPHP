@@ -18,16 +18,19 @@
  * </p>
  * @author 白晓阳
  */
-class Target extends Bai implements ArrayAccess
+class Target extends Bai
 {
+	/** 抛锚点 */
+	protected $anchor = null;
+
 	/**
 	 * <h4>委托当前目标到流程</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return mixed
 	 */
 	public function entrust($setting = null)
 	{
-		$event = $this->Service.$this->Event;
+		$event = $this[self::SERVICE].$this[self::EVENT];
 		Log::logf(__FUNCTION__, $event, __CLASS__);
 		Log::logf('start', date('Y-m-d H:m:s', _START), __CLASS__, Log::PERFORM);
 		$this->result = $this->run($setting);
@@ -43,13 +46,14 @@ class Target extends Bai implements ArrayAccess
 	 * 根据$_SESSION、$_GET、$_POST、预置数据、自定义数据构建当前目标。
 	 * 优先级依次提升，但预置数据中的当前事项和服务路径会被提交的数据覆盖。
 	 * </p>
-	 * @param array $setting 自定义配置文件
+	 * @param array $setting 即时配置
 	 */
 	public function __construct($setting = null)
 	{
 		### 启动会话
 		if (! isset($_SESSION))
 		{
+			//session_id(md5($_SERVER['REMOTE_HOST'].$_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']));
 			session_start();
 		}
 		### 加载配置文件
@@ -87,14 +91,14 @@ class Target extends Bai implements ArrayAccess
 		$this->stuff($this->filter($_GET));
 		$this->stuff($this->filter($_POST));
 		### 应用目标事项
-		if ($this->event != null)
+		if ($this[lcfirst(self::EVENT)] != null)
 		{
-			$this->Event = $this->event;
+			$this[self::EVENT] = $this[lcfirst(self::EVENT)];
 		}
 		### 应用目标入口
-		if ($this->service != null)
+		if ($this[lcfirst(self::SERVICE)] != null)
 		{
-			$this->Service = $this->service;
+			$this[self::SERVICE] = $this[lcfirst(self::SERVICE)];
 		}
 		$this->target = $this;
 	}
@@ -129,30 +133,6 @@ class Target extends Bai implements ArrayAccess
 	}
 
 	/**
-	 * <h3>判断项目是否存在</h3>
-	 * @param string $item 项目名
-	 * @return bool 是否存在
-	 */
-	public function offsetExists($item)
-	{
-		return isset($this->$item);
-	}
-
-	/**
-	 * <h3>读取项目值</h3>
-	 * @param string $item 项目名
-	 * @return mixed 项目值
-	 */
-	public function offsetGet($item)
-	{
-		if (! $this->offsetExists($item))
-		{
-			$this->$item = null;
-		}
-		return $this->$item;
-	}
-
-	/**
 	 * <h3>设定项目值</h3>
 	 * @param string $item 项目名
 	 * @param mixed $value 项目值
@@ -168,20 +148,10 @@ class Target extends Bai implements ArrayAccess
 	}
 
 	/**
-	 * <h3>清除项目</h3>
-	 * @param string $item 项目名
-	 * @return void
-	 */
-	public function offsetUnset($item)
-	{
-		unset($this->$item);
-	}
-
-	/**
 	 * 用作字符串时，使用当前目标名。
 	 */
 	public function __toString()
 	{
-		return $this->Event;
+		return $this[self::EVENT];
 	}
 }

@@ -32,7 +32,7 @@ class Cache extends Work
 
 	/**
 	 * <h4>获取缓存工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Cache 缓存工场
 	 */
 	public static function access($setting = null)
@@ -197,7 +197,7 @@ class Cache extends Work
 
 	/**
 	 * <h4>构建缓存工场</h4>
-	 * @param array $setting 自定义配置文件
+	 * @param array $setting 即时配置
 	 */
 	protected function __construct($setting = null)
 	{

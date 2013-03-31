@@ -33,7 +33,7 @@ class Lang extends Work
 
 	/**
 	 * <h4>获取语言工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Style 输入工场
 	 */
 	static public function access($setting = null)
@@ -96,7 +96,7 @@ class Lang extends Work
 
 	/**
 	 * <h4>构建语言工场</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 */
 	protected function __construct($setting = null)
 	{

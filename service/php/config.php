@@ -60,10 +60,6 @@ $config[Work::CHECK] = array(
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
 	'layout'      => '_layout.php',
-	'title'       => 'BaiPHP-简单PHP',
-	'author'      => 'baidi-白晓阳',
-	'keywords'    => 'BaiPHP-简单PHP',
-	'description' => 'BaiPHP-简单PHP',
 	'copyright'   => 'Copyright '.date('Y').', All Rights Reserved. 版权('.date('Y').')所有，保留一切权力。',
 	'css'         => array(
 		'bai.css',

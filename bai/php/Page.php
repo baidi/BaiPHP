@@ -20,7 +20,7 @@
  * </p>
  * @author 白晓阳
  */
-class Page extends Flow implements ArrayAccess
+class Page extends Flow
 {
 
 	/**
@@ -71,44 +71,13 @@ class Page extends Flow implements ArrayAccess
 	}
 
 	/**
-	 * <h3>判断项目是否存在</h3>
-	 * @param string $item 项目名
-	 * @return bool 是否存在
-	 */
-	public function offsetExists($item)
-	{
-		return isset($this->$item);
-	}
-
-	/**
-	 * <h3>读取项目值</h3>
+	 * <h3>读取项目</h3>
 	 * @param string $item 项目名
 	 * @return mixed 项目值
 	 */
 	public function offsetGet($item)
 	{
 		return $this->$item;
-	}
-
-	/**
-	 * <h3>设定项目值</h3>
-	 * @param string $item 项目名
-	 * @param mixed $value 项目值
-	 * @return void
-	 */
-	public function offsetSet($item, $value)
-	{
-		$this->$item = $value;
-	}
-
-	/**
-	 * <h3>清除项目</h3>
-	 * @param string $item 项目名
-	 * @return void
-	 */
-	public function offsetUnset($item)
-	{
-		unset($this->$item);
 	}
 
 	/**

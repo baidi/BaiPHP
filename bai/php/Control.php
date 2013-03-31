@@ -31,27 +31,40 @@ class Control extends Flow
 	{
 		### 访问来源
 		$client = array(
-		$_SERVER['REMOTE_HOST'],               ### 客户主机名
-		$_SERVER['REMOTE_ADDR'],               ### 客户IP地址
-		$_SERVER['REMOTE_PORT'],               ### 客户端口
-		$this->pick('HTTP_REFERER', $_SERVER), ### 访问起始页（空为URL直连）
-		$_SERVER['HTTP_USER_AGENT'],           ### 客户环境
+			### 客户主机名
+			$_SERVER['REMOTE_HOST'],
+			### 客户IP地址
+			$_SERVER['REMOTE_ADDR'],
+			### 客户端口
+			$_SERVER['REMOTE_PORT'],
+			### 访问起始页（空为URL直连）
+			$this->pick('HTTP_REFERER', $_SERVER),
+			### 客户环境
+			$_SERVER['HTTP_USER_AGENT'],
 		);
 		$this->target->client = Log::logf('client', $client, __CLASS__);
 		### 访问目标
 		$server = array(
-		$_SERVER['SERVER_NAME'],     ### 服务器主机名
-		$_SERVER['SERVER_ADDR'],     ### 服务器IP地址
-		$_SERVER['SERVER_PORT'],     ### 服务器端口
-		$_SERVER['REQUEST_METHOD'],  ### 访问方式
-		$_SERVER['REQUEST_URI'],     ### 访问地址
-		$_SERVER['SERVER_SOFTWARE'], ### 服务器环境
+			### 服务器主机名
+			$_SERVER['SERVER_NAME'],
+			### 服务器IP地址
+			$_SERVER['SERVER_ADDR'],
+			### 服务器端口
+			$_SERVER['SERVER_PORT'],
+			### 访问方式
+			$_SERVER['REQUEST_METHOD'],
+			### 访问地址
+			$_SERVER['REQUEST_URI'],
+			### 服务器环境
+			$_SERVER['SERVER_SOFTWARE'],
 		);
 		$this->target->server = Log::logf('server', $server, __CLASS__);
 		### 响应文件
 		$script = array(
-		$_SERVER['SCRIPT_FILENAME'], ### 响应文件
-		$_SERVER['QUERY_STRING'],    ### 访问参数
+			### 响应文件
+			$_SERVER['SCRIPT_FILENAME'],
+			### 访问参数
+			$_SERVER['QUERY_STRING'],
 		);
 		$this->target->script = Log::logf('script', $script, __CLASS__);
 		return true;
@@ -61,7 +74,7 @@ class Control extends Flow
 	 * <h4>访问地址过滤</h4>
 	 * @return boolean
 	 */
-	protected function reject()
+	protected function filter()
 	{
 		$preset = $this->pick(__FUNCTION__, $this->preset);
 		if ($preset == null || ! is_array($preset))
@@ -71,7 +84,7 @@ class Control extends Flow
 		### 访问地址过滤
 		foreach ($preset as $item => $mode)
 		{
-			if ($preg_match($item, $_SERVER['REMOTE_ADDR']))
+			if (preg_match($item, $_SERVER['REMOTE_ADDR']))
 			{
 				if ($mode)
 				{
@@ -85,44 +98,29 @@ class Control extends Flow
 	}
 
 	/**
-	 * <h4>访问频度过滤</h4>
-	 * <p>利用会话实现访问频度过滤。</p>
+	 * <h4>访问频度限制</h4>
+	 * <p>利用会话实现访问频度限制。</p>
 	 * @return boolean
 	 */
-	protected function shelve()
+	protected function limit()
 	{
-		$preset = (int) $this->pick(__FUNCTION__, $this->preset);
-		$count = (int) $this->pick(__FUNCTION__.'count', $_SESSION);
+		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$keyCount = __FUNCTION__.'_count';
+		$keyTime = __FUNCTION__.'_time';
+		$count = (int) $this->pick($keyCount, $_SESSION);
 		if ($preset > 0 && $count >= $preset)
 		{
 			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::NOTICE);
 			return false;
 		}
-		$time  = $this->pick(__FUNCTION__.'time',  $_SESSION);
+		$time  = $this->pick($keyTime,  $_SESSION);
 		if ($time != $_SERVER['REQUEST_TIME'])
 		{
-			$_SESSION[__FUNCTION__.'time']  = $_SERVER['REQUEST_TIME'];
-			$_SESSION[__FUNCTION__.'count'] = 1;
+			$_SESSION[$keyTime]  = $_SERVER['REQUEST_TIME'];
+			$_SESSION[$keyCount] = 1;
 			return true;
 		}
-		$_SESSION[__FUNCTION__.'count'] = $count + 1;
-		return true;
-	}
-
-	/**
-	 * <h4>访客识别</h4>
-	 * <p>
-	 * 用户及权限识别。
-	 * </p>
-	 * @return void
-	 */
-	protected function identify()
-	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		if ($preset == null || ! is_array($preset))
-		{
-			return true;
-		}
+		$_SESSION[$keyCount] = $count + 1;
 		return true;
 	}
 }

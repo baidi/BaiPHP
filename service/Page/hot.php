@@ -1,7 +1,12 @@
 <?php
-$a = explode('-', 'abc - 123');
-var_dump($a);
-echo 1<<8;
+if (!empty($_SESSION['limit_count'])) echo $_SESSION['limit_count'],'<br/>';
+if (!empty($_SESSION['limit_time'])) echo $_SESSION['limit_time'],'<br/>';
+if (empty($_SESSION['hot_count'])) {
+	$_SESSION['hot_count'] = 1;
+} else {
+	$_SESSION['hot_count'] ++;
+}
+echo $_SESSION['hot_count'];
 ?>
 <table>
 <tr>

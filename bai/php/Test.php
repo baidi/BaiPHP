@@ -304,7 +304,7 @@ class Test extends Work
 
 	/**
 	 * <h4>构建测试工场</h4>
-	 * @param array $setting 自定义配置文件
+	 * @param array $setting 即时配置
 	 */
 	public function __construct($setting = null)
 	{

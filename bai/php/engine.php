@@ -72,8 +72,8 @@ $config[_DEFAULT] = array(
 	'Service'  => 'service'._DIR,       ### 服务路径，存放用户响应文件
 	'Root'     => substr(_EXT, 1)._DIR, ### 首要路径，相对于系统路径和服务路径，存放核心文件
 	'Branches' => array(),              ### 分支路径，相对于系统路径和服务路径，存放扩展文件
-	'Error'    => '<p>一个不注意，就会出问题。回头多努力，做出好程序。</p><p>:)%s</p>',
-	'Notice'   => '<p>虽然没有大问题，但小地方要留意。</p><p>:)%s</p>',
+	'Error'    => '<hr/><p>一个不注意，就会出问题。回头多努力，做出好程序。</p><p>:-)%s</p>',
+	'Notice'   => '<hr/><p>虽然没有大问题，但小地方要留意。</p><p>:-)%s</p>',
 );
 if (! empty($_REQUEST['service']))
 {
@@ -99,14 +99,17 @@ function __autoload($class)
 	}
 	$bai     = _LOCAL.$target['Bai'];
 	$service = _LOCAL.$target['Service'];
-	$main    = $target['Root'];
+	$root    = $target['Root'];
 	$branch  = null;
-	foreach ($target['Branches'] as $item => $mode)
+	if (is_array($target['Branches']))
 	{
-		if (preg_match($item, $class))
+		foreach ($target['Branches'] as $item => $mode)
 		{
-			$branch = $mode;
-			break;
+			if (preg_match($item, $class))
+			{
+				$branch = $mode;
+				break;
+			}
 		}
 	}
 	$file = $class._EXT;
@@ -126,15 +129,15 @@ function __autoload($class)
 		}
 	}
 	### 加载用户核心文件
-	if (is_file($service.$main.$file))
+	if (is_file($service.$root.$file))
 	{
-		require_once $service.$main.$file;
+		require_once $service.$root.$file;
 		return true;
 	}
 	### 加载系统核心文件
-	if (is_file($bai.$main.$file))
+	if (is_file($bai.$root.$file))
 	{
-		require_once $bai.$main.$file;
+		require_once $bai.$root.$file;
 		return true;
 	}
 	return false;

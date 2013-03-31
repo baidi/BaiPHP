@@ -28,7 +28,7 @@ class Input extends Work
 
 	/**
 	 * <h4>获取输入工场入口</h4>
-	 * @param array $setting 自定义配置
+	 * @param array $setting 即时配置
 	 * @return Style 输入工场
 	 */
 	static public function access($setting = null)

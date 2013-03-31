@@ -42,29 +42,32 @@ $config[Flow::FLOW] = array(
 		Flow::CONTROL => false,
 	),
 	Flow::CONTROL     => array(
-        'checkin'     => false,
-        Work::FILTER  => false,
-        'identify'    => false,
+        'checkin'     => true,
+        'filter'      => true,
+        'limit'       => true,
         Flow::ACTION  => false,
+        'error'       => false,
 	),
 	Flow::ACTION      => array(
         'check'       => Flow::PAGE,
-        //'Cache'      => false,
-        'data'        => false,
-        'engage'      => false,
+        //'Cache'      => true,
+        'data'        => true,
+        'engage'      => true,
         Flow::PAGE    => false,
+        'error'       => false,
 	),
 	Flow::PAGE        => array(
-        'html'        => false,
+        'html'        => true,
         'format'      => false,
+        'error'       => false,
 	),
 );
 
 $config[Flow::CONTROL] = array(
-	'reject' => array(
-		'/192\.168\.0.*/' => true,
+	'filter' => array(
+		'/127\.0\.0\..*/' => true,
 	),
-	'shelve' => 10,  ### 每秒10次
+	'limit' => 10,  ### 每秒10次
 );
 
 ### 全局配置：数据工场
@@ -104,9 +107,8 @@ $config[Work::LOG] = array(
 		'client'      => '访问来源：%s(%s:%d)@%s [%s]',
 		'server'      => '访问目标：%s(%s:%d)@%s:%s [%s]',
 		'script'      => '实际响应：%s?%s',
-		'filter'      => '访问被拒绝：%s@%s',
-		'reject'     => '你伤害了我，我不让你过。要是弄错了，就快告诉我。',
-		'shelve'     => '你的浏览器可能被劫持了，给它放一小会儿假吧……',
+		'filter'      => '访问被拒绝：可能是由于你试图攻击网站或者你的浏览器被劫持',
+		'limit'       => '你的浏览器可能被劫持了，给它放一小会儿假吧……',
 	),
 	Flow::ACTION      => array(
 		Flow::ACTION  => '--处理流程--',
