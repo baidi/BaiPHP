@@ -25,7 +25,7 @@ global $config;
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
 	'Event'       => 'home',                ### 目标事项
-	'Lang'        => 'zh_CN',
+	Work::LANG    => 'zh_CN',               ### 当前语言
 	Work::LOG     => 'log'._DIR,            ### 日志路径
 	Work::CACHE   => 'cache'._DIR,          ### 缓存路径
 	'Upload'      => 'upload'._DIR,         ### 上传路径
@@ -33,13 +33,17 @@ $config[Bai::BAI] = array(
 	'Branches'    => array(                 ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
 		// '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => 'Work'._DIR,
-	)
+	),
+	'Error'    => '<hr/><p>一个不注意，就会出问题。回头多努力，做出好程序。</p><p>:-)%s</p>',
+	'Notice'   => '<hr/><p>虽然没有大问题，但小地方要留意。</p><p>:-)%s</p>',
 );
 
 ### 全局配置：流程
 $config[Flow::FLOW] = array(
 	Flow::TARGET      => array(
-		Flow::CONTROL => false,
+		'start'       => true,
+		Flow::CONTROL => true,
+		'close'       => false,
 	),
 	Flow::CONTROL     => array(
         'checkin'     => true,
@@ -65,9 +69,13 @@ $config[Flow::FLOW] = array(
 
 $config[Flow::CONTROL] = array(
 	'filter' => array(
-		'/127\.0\.0\..*/' => true,
+		'#127\.0\.0\..*#' => true,
 	),
-	'limit' => 10,  ### 每秒10次
+	'limit' => array(
+		'limit' => 10,  ### 每秒10次
+		'count' => 'limit_count',
+		'time'  => 'limit_time',
+	),
 );
 
 ### 全局配置：数据工场
@@ -88,6 +96,10 @@ $config[Work::DATA] = array(
 
 ### 全局配置：日志信息
 $config[Work::LOG] = array(
+	_DEFAULT          => array(
+		'primary'     => Log::ALL | Log::DEBUG | Log::PERFORM,
+		'branch'      => Work::LOG._DIR,
+	),
 	Work::LOG         => Log::ALL | Log::DEBUG | Log::PERFORM,
 	Work::BAI         => array(
 		'run'         => '->执行方法：%s',

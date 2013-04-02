@@ -82,19 +82,19 @@ class Control extends Flow
 			return true;
 		}
 		### 访问地址过滤
+		$result = true;
 		foreach ($preset as $item => $mode)
 		{
 			if (preg_match($item, $_SERVER['REMOTE_ADDR']))
 			{
-				if ($mode)
-				{
-					return true;
-				}
-				$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::NOTICE);
-				return false;
+				$result = $mode;
 			}
 		}
-		return true;
+		if (! $result)
+		{
+			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
+		}
+		return $result;
 	}
 
 	/**
@@ -105,12 +105,13 @@ class Control extends Flow
 	protected function limit()
 	{
 		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$keyCount = __FUNCTION__.'_count';
-		$keyTime = __FUNCTION__.'_time';
+		$limit  = (int) $this->pick(__FUNCTION__, $preset);
+		$keyCount = $this->pick('count', $preset);
+		$keyTime  = $this->pick('time',  $preset);
 		$count = (int) $this->pick($keyCount, $_SESSION);
-		if ($preset > 0 && $count >= $preset)
+		if ($limit > 0 && $count >= $limit)
 		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::NOTICE);
+			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
 			return false;
 		}
 		$time  = $this->pick($keyTime,  $_SESSION);

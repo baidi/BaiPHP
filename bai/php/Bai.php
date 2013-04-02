@@ -101,13 +101,13 @@ abstract class Bai implements ArrayAccess
 			}
 			else
 			{
-				### 委托其他对象执行目标
+				### 委托外部对象
 				$flow = $this->build($item);
 				if ($flow != null)
 				{
 					Log::logf('entrust', "$flow", __CLASS__);
 					$this->result = $flow->entrust();
-					$this->error = $flow->error;
+					#$this->error = $flow->error;
 				}
 			}
 			if ($this->error == null)
@@ -156,9 +156,9 @@ abstract class Bai implements ArrayAccess
 	*/
 	protected function config()
 	{
+		### 项目名
 		$items = func_get_args();
 		$preset = $GLOBALS[__FUNCTION__];
-		### 项目名
 		if ($items == null)
 		{
 			return $preset;
@@ -183,12 +183,12 @@ abstract class Bai implements ArrayAccess
 	 * 如果未检索到指定项目，则返回空（null）。
 	 * </p>
 	 * @param string $item 项目名
-	 * @param array $list 自定义列表
+	 * @param array $source 数据源
 	 * @param bool $limit 是否限定列表
 	 * @param bool $print 是否输出
 	 * @return mixed 项目值
 	 */
-	protected function pick($item = null, $list = null, $limit = true, $print = false)
+	protected function pick($item = null, $source = null, $limit = true, $print = false)
 	{
 		### 项目名
 		if ($item == null)
@@ -197,9 +197,13 @@ abstract class Bai implements ArrayAccess
 		}
 		$value = null;
 		### 从自定义列表中检值
-		if ((is_array($list) || $list instanceof ArrayAccess) && isset($list[$item]))
+		if (is_array($source) && isset($source[$item]))
 		{
-			$value = $list[$item];
+			$value = $source[$item];
+		}
+		else if (is_object($source) && isset($source->$item))
+		{
+			$value = $source->$item;
 		}
 		if (! $limit)
 		{
@@ -215,7 +219,7 @@ abstract class Bai implements ArrayAccess
 		}
 		if ($print)
 		{
-			print $value;
+			echo $value;
 		}
 		return $value;
 	}
@@ -255,9 +259,13 @@ abstract class Bai implements ArrayAccess
 		### 填充到当前对象
 		if ($master === null)
 		{
+			$master = $this;
+		}
+		if (is_object($master))
+		{
 			foreach ($list as $item => $value)
 			{
-				$this->$item = $value;
+				$master->$item = $value;
 			}
 			return true;
 		}
@@ -296,11 +304,11 @@ abstract class Bai implements ArrayAccess
 		}
 		$event = ucfirst("$this->target");
 		### 优先加载扩展对象
-		if (class_exists($event.$class, true))
+		if (class_exists($event.$class))
 		{
 			$class = $event.$class;
 		}
-		else if (! class_exists($class, true))
+		else if (! class_exists($class))
 		{
 			### 对象未知
 			$error = Log::logf(__FUNCTION__, $class, __CLASS__, Log::EXCEPTION);
@@ -337,8 +345,8 @@ abstract class Bai implements ArrayAccess
 			$item .= _EXT;
 		}
 		### 加载路径
-		$bai     = $this->pick(self::BAI,     $this->target);
-		$service = $this->pick(self::SERVICE, $this->target);
+		$bai     = _LOCAL.$this->target[self::BAI];
+		$service = _LOCAL.$this->target[self::SERVICE];
 		if ($branch == null)
 		{
 			$branch  = get_class($this)._DIR;
@@ -346,23 +354,23 @@ abstract class Bai implements ArrayAccess
 		ob_start();
 		if ($all)
 		{
-			if (is_file(_LOCAL.$bai.$branch.$item))
+			if (is_file($bai.$branch.$item))
 			{
-				include _LOCAL.$bai.$branch.$item;
+				include $bai.$branch.$item;
 			}
-			if (is_file(_LOCAL.$service.$branch.$item))
+			if (is_file($service.$branch.$item))
 			{
-				include _LOCAL.$service.$branch.$item;
+				include $service.$branch.$item;
 			}
 			return ob_get_clean();
 		}
-		if (is_file(_LOCAL.$service.$branch.$item))
+		if (is_file($service.$branch.$item))
 		{
-			include _LOCAL.$service.$branch.$item;
+			include $service.$branch.$item;
 		}
-		else if (is_file(_LOCAL.$bai.$branch.$item))
+		else if (is_file($bai.$branch.$item))
 		{
-			include _LOCAL.$bai.$branch.$item;
+			include $bai.$branch.$item;
 		}
 		return ob_get_clean();
 	}

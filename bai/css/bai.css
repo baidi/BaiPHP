@@ -41,7 +41,6 @@ menu,dl {
 
 menu>li {
 	list-style-type: none;
-	float: left;
 }
 
 ol,ul {
@@ -106,6 +105,10 @@ textarea {
 
 .i {
 	display: inline-block;
+}
+
+.l {
+	position: relative;
 }
 
 .m {

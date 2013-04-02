@@ -58,7 +58,7 @@ class Log extends Work
 		self::PERFORM   => ' [性能] ',
 	);
 	/** 默认日志级别 */
-	protected $level = self::ALL;
+	protected $primary = self::ALL;
 
 	/**
 	 * <h4>获取日志工场入口</h4>
@@ -198,7 +198,7 @@ class Log extends Work
 	protected function store()
 	{
 		$level = $this->pick('level', $this->runtime);
-		if (($level & $this->level) == 0)
+		if (($level & $this->primary) == 0)
 		{
 			return $this->result;
 		}
@@ -222,7 +222,7 @@ class Log extends Work
 		$level = $this->pick(__CLASS__, $this->preset);
 		if (is_int($level))
 		{
-			$this->level = $level;
+			$this->primary = $level;
 		}
 		### 日志目录
 		$dir = _LOCAL;

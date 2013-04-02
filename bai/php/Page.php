@@ -71,16 +71,6 @@ class Page extends Flow
 	}
 
 	/**
-	 * <h3>读取项目</h3>
-	 * @param string $item 项目名
-	 * @return mixed 项目值
-	 */
-	public function offsetGet($item)
-	{
-		return $this->$item;
-	}
-
-	/**
 	 * 属性未知时，返回对应语言项或预置内容。
 	 */
 	public function __get($item)

@@ -24,8 +24,8 @@ global $config;
 ### 全局配置：目标，可覆盖系统配置
 $config[Work::TARGET] = array(
 	'filter' => array(
-		'/<script.*>.*</script\s*>/' => '',
-		'/javascript\s*:/' => '',
+		'#<script.*>.*</script\s*>#i' => '',
+		'#javascript\s*:#i' => '',
 	),
 );
 

@@ -50,4 +50,4 @@ require 'bai/php/engine.php';
 
 ### 启动目标并交付结果
 $target = new Target(array('config.php', 'ready.php'));
-return $target->entrust();
+echo $target->entrust();
