@@ -1,12 +1,6 @@
 <?php
-if (!empty($_SESSION['limit_count'])) echo $_SESSION['limit_count'],'<br/>';
-if (!empty($_SESSION['limit_time'])) echo $_SESSION['limit_time'],'<br/>';
-if (empty($_SESSION['hot_count'])) {
-	$_SESSION['hot_count'] = 1;
-} else {
-	$_SESSION['hot_count'] ++;
-}
-echo $_SESSION['hot_count'];
+$t = 'abcdef';
+echo $t, ' > ', substr($t, 3);
 ?>
 <table>
 <tr>

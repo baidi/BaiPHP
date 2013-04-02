@@ -25,11 +25,11 @@ class Lang extends Work
 	/** 语言标识：英文（美国） */
 	const EN = 'en_US';
 
-	/** 语言工场静态入口 */
-	static private $ACCESS = null;
-
 	/** 首选语言 */
 	protected $primary = self::ZH;
+
+	/** 语言工场静态入口 */
+	static private $ACCESS = null;
 
 	/**
 	 * <h4>获取语言工场入口</h4>
@@ -51,12 +51,18 @@ class Lang extends Work
 	 * 获取语言项的内容，并即时输出。
 	 * </p>
 	 * @param string $item 语言项
+	 * @param boolean $print 是否输出
 	 * @return string
 	 */
-	static public function fetch($item = null)
+	static public function fetch($item = null, $print = true)
 	{
 		$lang = Lang::access();
-		return print($lang->entrust($item));
+		$result = $lang->entrust($item);
+		if ($print)
+		{
+			echo $result;
+		}
+		return $result;
 	}
 
 	/**
@@ -73,11 +79,10 @@ class Lang extends Work
 		{
 			return null;
 		}
-		$event = $this->target[self::EVENT];
 		$preset = $this->pick($this->primary, $this->preset);
-		$eventLang = $this->pick($event, $preset);
 		### 事件语言配置
-		$this->result = $this->pick($item, $eventLang);
+		$event = $this->pick($this->target[self::EVENT], $preset);
+		$this->result = $this->pick($item, $event);
 		if ($this->result === null)
 		{
 			### 全局语言配置
@@ -91,7 +96,8 @@ class Lang extends Work
 	 */
 	public function __get($item)
 	{
-		return $this->entrust($item);
+		$this->$item = $this->entrust($item);
+		return $this->$item;
 	}
 
 	/**
@@ -101,12 +107,9 @@ class Lang extends Work
 	protected function __construct($setting = null)
 	{
 		parent::__construct($setting);
-		### 首选语言
-		$primary = $this->target[__CLASS__];
-		if ($primary == null) {
-			$primary = $this->pick(_DEFAULT, $this->preset);
-		}
-		if ($primary != null) {
+		$primary = $this->target[self::LANG];
+		if ($primary != null)
+		{
 			$this->primary = $primary;
 		}
 		$this->load($this->primary, true);

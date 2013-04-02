@@ -25,11 +25,11 @@ class Data extends Work
 	/** 数据标识：记录 */
 	//const RECORD = 'Record';
 
-	/** 数据工场静态入口 */
-	static private $ACCESS = null;
-
 	/** 数据库访问入口 */
 	protected $pdo = null;
+
+	/** 数据工场静态入口 */
+	static private $ACCESS = null;
 
 	/**
 	 * <h4>获取数据工场入口</h4>
@@ -43,43 +43,6 @@ class Data extends Work
 	    	return new Data($setting);
 	    }
 	    return self::$ACCESS;
-	}
-
-	/**
-	 * <h4>执行SQL语句</h4>
-	 * <p>
-	 * SQL语句中以<:field>作为占位符，参数列表中以<field>作为键名。
-	 * </p>
-	 * @param string $sql SQL语句
-	 * @param array $params SQL参数
-	 * @return mixed 执行结果：影响件数或检索结果
-	 */
-	public function entrust($sql = null, $params = null)
-	{
-		if ($sql == null || $this->pdo == null)
-		{
-			return false;
-		}
-
-		### SQL语句
-		Log::logs($sql);
-
-		### 执行SQL语句
-		$stm = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		if (! $stm || ! $stm->execute($params))
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
-			Log::logs($this->pick(2, $this->pdo->errorInfo()), null, Log::EXCEPTION);
-			return false;
-		}
-
-		### 执行结果
-		$column = $stm->columnCount();
-		if ($column > 0)
-		{
-			return $stm->fetchAll(PDO::FETCH_ASSOC);
-		}
-		return $stm->rowCount();
 	}
 
 	/**
@@ -346,6 +309,43 @@ class Data extends Work
 	}
 
 	/**
+	 * <h4>执行SQL语句</h4>
+	 * <p>
+	 * SQL语句中以<:field>作为占位符，参数列表中以<field>作为键名。
+	 * </p>
+	 * @param string $sql SQL语句
+	 * @param array $params SQL参数
+	 * @return mixed 执行结果：影响件数或检索结果
+	 */
+	public function entrust($sql = null, $params = null)
+	{
+		if ($sql == null || $this->pdo == null)
+		{
+			return false;
+		}
+
+		### SQL语句
+		Log::logs($sql);
+
+		### 执行SQL语句
+		$stm = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		if (! $stm || ! $stm->execute($params))
+		{
+			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+			Log::logs($this->pick(2, $this->pdo->errorInfo()), null, Log::EXCEPTION);
+			return false;
+		}
+
+		### 执行结果
+		$column = $stm->columnCount();
+		if ($column > 0)
+		{
+			return $stm->fetchAll(PDO::FETCH_ASSOC);
+		}
+		return $stm->rowCount();
+	}
+
+	/**
 	 * <h4>连结SQL参数</h4>
 	 * @param array $params SQL参数
 	 * @param string $gap 间隔符
@@ -398,31 +398,31 @@ class Data extends Work
 	protected function connect()
 	{
 		### 连接信息
-		$dsn        = $this->pick('dsn',        $this->preset);
-		$user       = $this->pick('user',       $this->preset);
-		$password   = $this->pick('password',   $this->preset);
-		$collation  = $this->pick('collation',  $this->preset);
-		$persistent = $this->pick('persistent', $this->preset);
+		$dsn       = $this->pick('dsn',       $this->preset);
+		$user      = $this->pick('user',      $this->preset);
+		$password  = $this->pick('password',  $this->preset);
+		$charset   = $this->pick('charset',   $this->preset);
+		$temporary = $this->pick('temporary', $this->preset);
 		if ($dsn == null || $user == null)
 		{
 			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			return false;
 		}
-		### 通过PDO连接数据库
+		### 连接数据库
 		try
 		{
 			$this->pdo = new PDO($dsn, $user, $password);
-			if ($collation != null)
+			if ($charset != null)
 			{
-				$this->pdo->query('set character set '.$this->field($collation));
+				$this->pdo->query('set character set '.$this->field($charset));
 			}
-			if ($persistent)
+			if ($temporary)
 			{
-				self::$ACCESS = $this;
+				self::$ACCESS = $this->preset;
 			}
 			else
 			{
-				self::$ACCESS = $this->preset;
+				self::$ACCESS = $this;
 			}
 		}
 		catch (PDOException $e)
@@ -441,12 +441,13 @@ class Data extends Work
 	protected function __construct($setting = null)
 	{
 		parent::__construct($setting);
+		### 连接数据库
 		$this->stuff(self::$ACCESS, $this->preset);
 		$this->stuff($setting, $this->preset);
 		if (! $this->connect())
 		{
 			$this->target->error = $this->error;
-			#trigger_error($this->error, E_USER_ERROR);
+			trigger_error($this->error, E_USER_ERROR);
 		}
 	}
 }

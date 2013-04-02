@@ -71,6 +71,8 @@ $config[_DEFAULT] = array(
 	'Root'     => substr(_EXT, 1)._DIR,
 	### 分支路径，相对于系统路径和服务路径，存放扩展文件
 	'Branches' => array(),
+	'Error'    => '<hr/><p>一个不注意，就会出问题。回头多努力，做出好程序。</p><p>:-)%s</p>',
+	'Notice'   => '<hr/><p>虽然没有大问题，但小地方要留意。</p><p>:-)%s</p>',
 );
 if (! empty($_REQUEST['service']))
 {

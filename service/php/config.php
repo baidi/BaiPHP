@@ -21,14 +21,6 @@
 
 global $config;
 
-### 全局配置：目标，可覆盖系统配置
-$config[Work::TARGET] = array(
-	'filter' => array(
-		'#<script.*>.*</script\s*>#i' => '',
-		'#javascript\s*:#i' => '',
-	),
-);
-
 ### 全局配置：检验工场
 $config[Work::CHECK] = array(
 	Work::CHECK   => array(
@@ -60,28 +52,11 @@ $config[Work::CHECK] = array(
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
 	'layout'      => '_layout.php',
-	'copyright'   => 'Copyright '.date('Y').', All Rights Reserved. 版权('.date('Y').')所有，保留一切权力。',
 	'css'         => array(
 		'bai.css',
 	),
 	'js'          => array(
 		'bai.js',
-	),
-	'menu'          => array(
-		'home'      => '主页',
-		'design'    => '设计',
-		'driver'    => '驱动模式',
-		'sample'    => '案例学习',
-		'reference' => '参考资料',
-		'contact'   => '联系方式',
-	),
-	'link'         => array(
-		'home'     => '首页',
-		'version'  => '版本',
-		'manual'   => '手册',
-		'example'  => '示例',
-		'theory'   => '原理',
-		'download' => '下载',
 	),
 	'format'       => array(
 		'$width$' => '990px',

@@ -457,9 +457,10 @@ abstract class Bai implements ArrayAccess
 	protected function __construct($setting = null)
 	{
 		global $target;
-		$this->target = $target;
 		$class = get_class($this);
+		$this->target = $target;
 		$this->stuff($this->config($class), $this->preset);
 		$this->stuff($setting, $this->preset);
+		$this->stuff($this->pick(_DEFAULT, $this->preset));
 	}
 }

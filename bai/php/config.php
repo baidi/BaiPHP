@@ -18,24 +18,15 @@
  * </p>
  * @author 白晓阳
  */
-
-
 global $config;
 
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
-	'Event'       => 'home',                ### 目标事项
-	Work::LANG    => 'zh_CN',               ### 当前语言
-	Work::LOG     => 'log'._DIR,            ### 日志路径
-	Work::CACHE   => 'cache'._DIR,          ### 缓存路径
-	'Upload'      => 'upload'._DIR,         ### 上传路径
-	'Download'    => 'download'._DIR,       ### 下载路径
+	Work::EVENT   => 'home',                ### 目标事项
 	'Branches'    => array(                 ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
-		// '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => 'Work'._DIR,
+		# '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => Work::WORK._DIR,
 	),
-	'Error'    => '<hr/><p>一个不注意，就会出问题。回头多努力，做出好程序。</p><p>:-)%s</p>',
-	'Notice'   => '<hr/><p>虽然没有大问题，但小地方要留意。</p><p>:-)%s</p>',
 );
 
 ### 全局配置：流程
@@ -67,14 +58,52 @@ $config[Flow::FLOW] = array(
 	),
 );
 
+### 全局配置：目标
+$config[Work::TARGET] = array(
+	'filter' => array(
+		'#<script.*>.*</script\s*>#i' => '',
+		'#javascript\s*:#i' => '',
+	),
+);
+
+### 全局配置：调度流程
 $config[Flow::CONTROL] = array(
 	'filter' => array(
 		'#127\.0\.0\..*#' => true,
 	),
 	'limit' => array(
-		'limit' => 10,  ### 每秒10次
+		### 最大访问频度：每秒10次
+		'limit' => 10,
 		'count' => 'limit_count',
 		'time'  => 'limit_time',
+	),
+);
+
+### 全局配置：页面流程
+$config[Flow::PAGE] = array(
+	'layout'      => '_page.php',
+	'css'         => array(
+		'bai.css',
+	),
+	'js'          => array(
+		'bai.js',
+	),
+	'format'       => array(
+		'$width$' => '990px',
+		'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
+		#'$color$' => '#000000',
+		#'$background$' => '#ffffff',
+		'$acolor$' => '#009f3c',
+		'$linecolor$' => '#99cc99',
+		'$areacolor$' => '#f0f9f0',
+		'$shadowcolor$' => '#d0f9d0',
+		'$errorcolor$' => '#ff0000',
+		'$noticecolor$' => '#99cc99',
+		'$lockedcolor$' => '#cccccc',
+		//'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
+		//'$type$'    => json_encode($config['Input']['Type']),
+		'$timeout$' => 3000,
+		'$cipher$'  => '_CIPHER',
 	),
 );
 
@@ -83,8 +112,8 @@ $config[Work::DATA] = array(
 	'dsn'        => 'mysql:host=localhost;dbname=bai',
 	'user'       => 'root',
 	'password'   => '',
-	'collation'  => 'utf8',
-	'persistent' => false,
+	'charset'    => 'utf8',
+	'temporary'  => true,
 	'dbtype'     => 'mysql',
 	'_dbhost'    => 'localhost',
 	'_dbport'    => '',
@@ -97,14 +126,17 @@ $config[Work::DATA] = array(
 ### 全局配置：日志信息
 $config[Work::LOG] = array(
 	_DEFAULT          => array(
+		### 首选级别
 		'primary'     => Log::ALL | Log::DEBUG | Log::PERFORM,
-		'branch'      => Work::LOG._DIR,
+		### 首选目录
+		'root'        => Work::LOG._DIR,
+		### 首选结束符
+		'ending'      => "\r\n",
 	),
-	Work::LOG         => Log::ALL | Log::DEBUG | Log::PERFORM,
 	Work::BAI         => array(
 		'run'         => '->执行方法：%s',
 		'entrust'     => '+>委托目标：%s',
-		'instance'    => '对象未知：%s',
+		'build'       => '对象未知：%s',
 		'__get'       => '属性未知：%s',
 		'__call'      => '方法未知：%s',
 	),
@@ -229,7 +261,9 @@ $config[Work::INPUT] = array(
 );
 
 $config['Lang'] = array(
-	_DEFAULT => Lang::ZH,
+	_DEFAULT => array(
+		'primary' => Lang::ZH,
+	),
 );
 
 ### 输入项检验条目

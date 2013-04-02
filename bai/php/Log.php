@@ -41,11 +41,8 @@ class Log extends Work
 	/** 日志级别: 全部 */
 	const ALL       = 127;
 
-	/** 日志工场静态入口 */
-	static private $ACCESS = null;
-
 	/** 日志级别名 */
-	protected $levelInfo = array
+	protected $ranks = array
 	(
 		self::FATAL     => ' [致命] ',
 		self::ERROR     => ' [错误] ',
@@ -57,8 +54,15 @@ class Log extends Work
 		self::DEBUG     => ' [调试] ',
 		self::PERFORM   => ' [性能] ',
 	);
-	/** 默认日志级别 */
+	/** 首选级别 */
 	protected $primary = self::ALL;
+	/** 首选目录 */
+	protected $root = 'Log/';
+	/** 首选结束符 */
+	protected $ending = "\r\n";
+
+	/** 日志工场静态入口 */
+	static private $ACCESS = null;
 
 	/**
 	 * <h4>获取日志工场入口</h4>
@@ -72,39 +76,6 @@ class Log extends Work
 			self::$ACCESS = new Log($setting);
 		}
 		return self::$ACCESS;
-	}
-
-	/**
-	 * <h4>获取日志信息并记录日志</h4>
-	 * <p>
-	 * 日志记录内容根据日志级别进行过滤，但日志信息总是会返回。
-	 * 如果未指定日志类别，则作为即时信息直接输出。
-	 * </p>
-	 * @param string $item 日志项目
-	 * @param string $type 日志类别
-	 * @param mixed $params 日志参数
-	 * @param integer $level 日志级别
-	 * @return string 日志信息
-	 */
-	public function entrust($item = null, $type = null, $params = null, $level = self::INFO)
-	{
-		if ($item == null)
-		{
-			return null;
-		}
-		### 执行数据
-		$this->runtime['item']    = "$item";
-		$this->runtime['type']    = "$type";
-		$this->runtime['params']  = $params;
-		$this->runtime['level']   = $level;
-		### 处理日志
-		$this->result = $this->fetch();
-		if ($this->result != null)
-		{
-			$this->result = $this->format();
-			$this->result = $this->store();
-		}
-		return $this->result;
 	}
 
 	/**
@@ -135,6 +106,36 @@ class Log extends Work
 	}
 
 	/**
+	 * <h4>获取日志信息并记录日志</h4>
+	 * <p>
+	 * 日志记录内容根据日志级别进行过滤，但日志信息总是会返回。
+	 * 如果未指定日志类别，则作为即时信息直接输出。
+	 * </p>
+	 * @param string $item 日志项目
+	 * @param string $type 日志类别
+	 * @param mixed $params 日志参数
+	 * @param integer $primary 首选级别
+	 * @return string 日志信息
+	 */
+	public function entrust($item = null, $type = null, $params = null, $primary = self::INFO)
+	{
+		if ($item == null)
+		{
+			return null;
+		}
+		### 执行数据
+		$this->runtime['item']    = "$item";
+		$this->runtime['type']    = "$type";
+		$this->runtime['params']  = $params;
+		$this->runtime['primary'] = $primary;
+		### 处理日志
+		$this->result = $this->fetch();
+		$this->result = $this->format();
+		$this->result = $this->record();
+		return $this->result;
+	}
+
+	/**
 	 * <h4>读取日志信息</h4>
 	 * <p>
 	 * 从预置日志信息中读取日志类别下的日志项目内容。
@@ -146,20 +147,14 @@ class Log extends Work
 		### 执行数据
 		$item = $this->pick('item', $this->runtime);
 		$type = $this->pick('type', $this->runtime);
-		### 即时信息直接输出
+		### 即时日志
 		if ($type == null)
 		{
 			return $item;
 		}
-		### 读取预置日志信息
+		### 读取预置日志
 		$message = $this->pick($type, $this->preset);
 		$message = $this->pick($item, $message);
-		### 如果日志信息未设置，则读取默认信息
-		#if ($message == null)
-		#{
-		#	$message = $this->pick(_DEFAULT, $this->preset);
-		#	$message = sprintf($message, $type, $item);
-		#}
 		return $message;
 	}
 
@@ -172,6 +167,10 @@ class Log extends Work
 	 */
 	protected function format()
 	{
+		if ($this->result == null)
+		{
+			return $this->result;
+		}
 		### 执行数据
 		$params = $this->pick('params', $this->runtime);
 		if ($params == null)
@@ -195,15 +194,26 @@ class Log extends Work
 	 * </p>
 	 * @return string 日志信息
 	 */
-	protected function store()
+	protected function record()
 	{
-		$level = $this->pick('level', $this->runtime);
-		if (($level & $this->primary) == 0)
+		if ($this->result == null)
 		{
 			return $this->result;
 		}
-		$message = date('[Y-m-d H:i:s]').$this->levelInfo[$level].$this->result."\r\n";
-		$filename = _LOCAL.$this->target[__CLASS__].self::BAI.'-'.date('Y-m-d').'.log';
+		### 执行数据
+		$primary = $this->pick('primary', $this->runtime);
+		if (($primary & $this->primary) == 0)
+		{
+			return $this->result;
+		}
+		### 记录日志
+		$rank = $this->pick($primary, $this->ranks);
+		if ($rank == null)
+		{
+			$rank = $this->pick(self::UNKNOWN, $this->ranks);
+		}
+		$message = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
+		$filename = _LOCAL.$this->root.self::BAI._DEFAULT.date('Y-m-d').'.log';
 		error_log($message, 3, $filename);
 		return $this->result;
 	}
@@ -218,23 +228,21 @@ class Log extends Work
 	protected function __construct($setting = null)
 	{
 		parent::__construct($setting);
-		### 日志级别
-		$level = $this->pick(__CLASS__, $this->preset);
-		if (is_int($level))
+		### 构建日志目录
+		$root = _LOCAL;
+		foreach (explode(_DIR, $this->root) as $dir)
 		{
-			$this->primary = $level;
-		}
-		### 日志目录
-		$dir = _LOCAL;
-		$pathes = explode(_DIR, $this->target[__CLASS__]);
-		foreach ($pathes as $path)
-		{
-			$dir .= $path._DIR;
-			if (! is_dir($dir))
+			if ($dir == null)
 			{
-				mkdir($dir);
+				break;
 			}
+			if (! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
+			{
+				break;
+			}
+			$root .= $dir._DIR;
 		}
+		$this->root = substr($root, strlen(_LOCAL));
 	}
 }
 ?>
