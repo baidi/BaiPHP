@@ -22,57 +22,7 @@
 global $config;
 
 ### 全局配置：检验工场
-$config[Work::CHECK] = array(
-	Work::CHECK   => array(
-		'case'    => '/(?<call>[^\s=]+)(?:=(?<params>[^\s=]+))?/',
-		'param'   => ',',
-		'risk'    => '/[<>&%\'\\\]+/',                 ### 风险字符
-		'integer' => '/^[1-9]\d*$/',                   ### 整数
-		'float'   => '/^[+-]?\d+(?:\.\d+)?$/',         ### 小数
-		'letter'  => '/^[a-zA-Z]+$/',                  ### 英文字母
-		'char'    => '/^[a-zA-Z0-9_-]+$/',             ### 英文字符
-		'mobile'  => '/^(?:\+86)?1[358][0-9]{9}$/',    ### 移动电话
-		'fax'    => '/^0[0-9]{2,3}-[1-9][0-9]{6,7}$/', ### 固话传真
-		'url'    => '/^(?:https?:\/\/)?[a-zA-Z0-9-_.\/]+(?:\?.+)?$/', ### 网址
-		'email'  => '/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$/',            ### 邮箱
-		'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/', ### 日期
-		'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/', ### 时间
-	),
-	_DEFAULT      => array(
-	),
-	'sampleCheck' => array(
-		'sampleInt' => 'required min=3 max=5 type=number',
-		'sampleLetter' => 'required min=3 max=10 type=letter',
-	),
-	'hot' => array(
-		'hotin' => 'required min=3 max=5 type=number',
-	),
-);
-
-### 全局配置：页面流程
-$config[Flow::PAGE] = array(
-	'layout'      => '_layout.php',
-	'css'         => array(
-		'bai.css',
-	),
-	'js'          => array(
-		'bai.js',
-	),
-	'format'       => array(
-		'$width$' => '990px',
-		'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
-		#'$color$' => '#000000',
-		#'$background$' => '#ffffff',
-		'$acolor$' => '#009f3c',
-		'$linecolor$' => '#99cc99',
-		'$areacolor$' => '#f0f9f0',
-		'$shadowcolor$' => '#d0f9d0',
-		'$errorcolor$' => '#ff0000',
-		'$noticecolor$' => '#99cc99',
-		'$lockedcolor$' => '#cccccc',
-		'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
-		//'$type$'    => json_encode($config['Input']['Type']),
-		'$timeout$' => 3000,
-		'$cipher$'  => '_CIPHER',
-	),
+$config[Work::CHECK]['sample'] = array(
+	'sampleInt' => 'required min=3 max=5 type=number',
+	'sampleLetter' => 'required min=3 max=10 type=letter',
 );

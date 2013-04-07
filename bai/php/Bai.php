@@ -248,9 +248,10 @@ abstract class Bai implements ArrayAccess
 	 * </p>
 	 * @param array $list 数据列表
 	 * @param array $master 目标列表
+	 * @param bool $force 是否更新空项
 	 * @return bool 填充结果
 	 */
-	protected function stuff($list = null, &$master = null)
+	protected function stuff($list = null, &$master = null, $force = true)
 	{
 		if (! is_array($list))
 		{
@@ -265,7 +266,10 @@ abstract class Bai implements ArrayAccess
 		{
 			foreach ($list as $item => $value)
 			{
-				$master->$item = $value;
+				if ($force || $value != null || ! isset($master->$item))
+				{
+					$master->$item = $value;
+				}
 			}
 			return true;
 		}
@@ -277,12 +281,15 @@ abstract class Bai implements ArrayAccess
 		### 填充到目标列表
 		foreach ($list as $item => $value)
 		{
-			if (isset($master[$item]) && is_array($master[$item]) && is_array($value))
+			if (isset($master[$item]) && is_array($master[$item]))
 			{
-				$master[$item] = $value + $master[$item];
+				$this->stuff($value, $master[$item]);
 				continue;
 			}
-			$master[$item] = $value;
+			if ($force || $value != null || ! isset($master[$item]))
+			{
+				$master[$item] = $value;
+			}
 		}
 		return true;
 	}
@@ -461,6 +468,6 @@ abstract class Bai implements ArrayAccess
 		$this->target = $target;
 		$this->stuff($this->config($class), $this->preset);
 		$this->stuff($setting, $this->preset);
-		$this->stuff($this->pick(_DEFAULT, $this->preset));
+		$this->stuff($this->pick(_DEFAULT, $this->preset), $this, false);
 	}
 }

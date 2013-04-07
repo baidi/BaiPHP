@@ -81,7 +81,9 @@ $config[Flow::CONTROL] = array(
 
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
-	'layout'      => '_page.php',
+	_DEFAULT      => array(
+		'layout'      => '_page.php',
+	),
 	'css'         => array(
 		'bai.css',
 	),
@@ -109,11 +111,13 @@ $config[Flow::PAGE] = array(
 
 ### 全局配置：数据工场
 $config[Work::DATA] = array(
-	'dsn'        => 'mysql:host=localhost;dbname=bai',
-	'user'       => 'root',
-	'password'   => '',
-	'charset'    => 'utf8',
-	'temporary'  => true,
+	_DEFAULT     => array(
+		'dsn'        => 'mysql:host=localhost;dbname=bai',
+		'user'       => 'root',
+		'password'   => '',
+		'charset'    => 'utf8',
+		'lasting'    => false,
+	),
 	'dbtype'     => 'mysql',
 	'_dbhost'    => 'localhost',
 	'_dbport'    => '',
@@ -123,14 +127,14 @@ $config[Work::DATA] = array(
 	'sqlite'     => 'sqlite:_dbhost',
 );
 
-### 全局配置：日志信息
+### 全局配置：日志工场
 $config[Work::LOG] = array(
 	_DEFAULT          => array(
-		### 首选级别
-		'primary'     => Log::ALL | Log::DEBUG | Log::PERFORM,
-		### 首选目录
+		### 日志级别
+		'level'       => Log::ALL | Log::DEBUG | Log::PERFORM,
+		### 日志目录
 		'root'        => Work::LOG._DIR,
-		### 首选结束符
+		### 日志结束符
 		'ending'      => "\r\n",
 	),
 	Work::BAI         => array(
@@ -162,7 +166,7 @@ $config[Work::LOG] = array(
 	),
 	Work::CHECK       => array(
 		Work::CHECK   => '--检验工场--',
-		'checkItem'   => '输入项目检验：%s[%s]',
+		'item'   => '输入项目检验：%s[%s]',
 		'cipher'      => '安全暗号不符或已过期，请刷新页面后重试……',
 		'risk'        => '输入项不能包含&lt; &gt; &amp; \' " ; % \ 等非法字符……',
 		'required'    => '输入项不能为空……',
@@ -202,7 +206,78 @@ $config[Work::LOG] = array(
 	),
 );
 
-### 测试工场
+### 全局配置：检验工场
+$config[Work::CHECK] = array(
+	_DEFAULT      => array(
+		### 字符编码
+		'charset'     => 'utf-8',
+		### 参数分割符
+		'delimiter'   => ',',
+		### 检验模式
+		'mode'        => '/(?<check>[^\s=]+)(?:=(?<params>[^\s]+))?/',
+		### 类型模式
+		'types'       => array(
+			### 风险字符
+			'risk'    => '/[<>&%\'\\\]+/',
+			### 整数
+			'integer' => '/^[1-9]\d*$/',
+			### 小数
+			'float'   => '/^[+-]?\d+(?:\.\d+)?$/',
+			### 英文字母
+			'letter'  => '/^[a-zA-Z]+$/',
+			### 英文字符
+			'char'    => '/^[a-zA-Z0-9_-]+$/',
+			### 移动电话
+			'mobile'  => '/^(?:\+86)?1[358][0-9]{9}$/',
+			### 固话传真
+			'fax'    => '/^0[0-9]{2,3}-[1-9][0-9]{6,7}$/',
+			### 网址
+			'url'    => '/^(?:https?:\/\/)?[a-zA-Z0-9-_.\/]+(?:\?.+)?$/',
+			### 邮箱
+			'email'  => '/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$/',
+			### 日期
+			'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/',
+			### 时间
+			'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/',
+		),
+	),
+);
+
+### 全局配置：缓存工场
+$config[Work::CACHE] = array(
+	_DEFAULT => array(
+		### 是否开启
+		'valid'     => false,
+		### 缓存时间：秒
+		'timeout'   => 600,
+		### 缓存目录
+		'root'      => Work::CACHE._DIR,
+		### 缓存项目
+		'items'     => array(
+			'home'  => true,
+		),
+	),
+);
+
+### 全局配置：样式工场
+$config[Work::STYLE] = array(
+	_DEFAULT  => array(
+		### 默认图片（原图无效时使用）
+		'img' => '_blank.png',
+		### 可内嵌类型
+		'insets'   => array(
+			'css' => true,
+			'js'  => true,
+		),
+		### 外链模板
+		'links'    => array(
+			'css' => '<link rel="stylesheet" type="text/css" href="%s"/>',
+			'js'  => '<script type="text/javascript" src="%s"></script>',
+		),
+	),
+);
+
+### 全局配置：测试工场
 $config[Work::TEST] = array(
 	'success'   => '过',
 	'failure'   => '挂',
@@ -210,24 +285,7 @@ $config[Work::TEST] = array(
 	'error'     => '错',
 );
 
-$config[Work::CACHE] = array(
-	Work::CACHE => false,
-	'timeout'   => 600,
-);
-
-$config[Work::STYLE] = array(
-	'inset'   => array(
-		'css' => true,
-		'js'  => true,
-	),
-	'link'    => array(
-		'css' => '<link rel="stylesheet" type="text/css" href="%s"/>',
-		'js'  => '<script type="text/javascript" src="%s"></script>',
-	),
-);
-
 $config[Work::INPUT] = array(
-	//_DEFAULT => 'text',
 	_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?P<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
 	'type'  => array(
 		_DEFAULT => '/type=([a-zA-Z0-9-_]+)/i',

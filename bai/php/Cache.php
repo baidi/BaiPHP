@@ -24,11 +24,17 @@ class Cache extends Work
 	/** 标识：清空缓存 */
 	const CLEAR = '_CLEAR';
 
+	/** 是否开启 */
+	protected $valid   = false;
+	/** 缓存时间：秒 */
+	protected $timeout = 600;
+	/** 缓存目录 */
+	protected $root    = 'Cache/';
+	/** 缓存项目 */
+	protected $items   = null;
+
 	/** 缓存静态入口 */
 	static private $ACCESS = null;
-
-	/** 缓存时间：秒 */
-	protected $timeout = 300;
 
 	/**
 	 * <h4>获取缓存工场入口</h4>
@@ -57,8 +63,7 @@ class Cache extends Work
 	 */
 	public function entrust($item = null, $data = null, $hard = false)
 	{
-		$cached = $this->pick(__CLASS__, $this->preset);
-		if ($item == null)
+		if (! $this->valid || $item == null || ! $this->pick($item, $this->items))
 		{
 			return false;
 		}
@@ -77,7 +82,7 @@ class Cache extends Work
 		### 提取缓存
 		if ($data === null)
 		{
-			$this->result = $this->store();
+			$this->result = $this->fetch();
 			return $this->result;
 		}
 		### 更新缓存
@@ -97,12 +102,12 @@ class Cache extends Work
 
 		### 提取缓存
 		$data = apc_fetch($item, $result);
-		if (! $result)
+		if ($result === false)
 		{
-			return false;
+			return $result;
 		}
 
-		if (! is_string($data) || substr($data, -6) !== '.'.__CLASS__)
+		if (! is_string($data) || substr($data, - strlen(__CLASS__)) !== __CLASS__)
 		{
 			### 内存缓存
 			return $data;
@@ -113,11 +118,6 @@ class Cache extends Work
 		{
 			return false;
 		}
-		### 文件过期
-		//if (time() - filemtime($data) > $this->timeout)
-		//{
-		//	return false;
-		//}
 		### 读取缓存文件
 		ob_start();
 		include $data;
@@ -128,7 +128,7 @@ class Cache extends Work
 	 * <h4>更新缓存数据</h4>
 	 * @return bool 缓存结果
 	 */
-	protected function store()
+	protected function push()
 	{
 		### 执行数据
 		$item = $this->pick('item', $this->runtime);
@@ -143,7 +143,7 @@ class Cache extends Work
 		}
 
 		### 写入文件
-		$filename = _LOCAL.$this->target[__CLASS__].$item.'.'.__CLASS__;
+		$filename = _LOCAL.$this->root.$item.'.'.__CLASS__;
 		$file = fopen($filename, 'w');
 		if (! $file)
 		{
@@ -167,13 +167,13 @@ class Cache extends Work
 		### 清空缓存
 		apc_clear_cache();
 		### 缓存文件
-		$files = scandir(_LOCAL.$this->target[__CLASS__]);
+		$root = _LOCAL.$this->root;
+		$files = scandir($root);
 		if ($files == null)
 		{
 			return self::CLEAR;
 		}
 		### 清空缓存文件
-		$path = _LOCAL.$this->target[__CLASS__];
 		foreach ($files as $file)
 		{
 			if (substr($file, - strlen(__CLASS__)) === __CLASS__ && ! unlink($path.$file))
@@ -191,7 +191,8 @@ class Cache extends Work
 	 */
 	protected function rename($item)
 	{
-		$item = md5($_SERVER['REQUEST_URI'].'-'.$item);
+		$item = $this->target[self::SERVICE].$this->target[self::EVENT]._DEFAULT.$item;
+		$item = urlencode($item);
 		return $item;
 	}
 
@@ -202,18 +203,17 @@ class Cache extends Work
 	protected function __construct($setting = null)
 	{
 		parent::__construct($setting);
-		### 缓存时间
-		$timeout = $this->pick('timeout', $this->preset);
-		if ($timeout > 60)
+		### 构建缓存目录
+		$root = _LOCAL;
+		foreach (explode(_DIR, $this->root) as $dir)
 		{
-			$this->timeout = (int)$timeout;
+			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
+			{
+				break;
+			}
+			$root .= $dir._DIR;
 		}
-		### 缓存目录
-		$path = _LOCAL.$this->target[__CLASS__];
-		if ($path != null && ! is_dir($path))
-		{
-			mkdir($path);
-		}
+		$this->root = substr($root, strlen(_LOCAL));
 	}
 }
 ?>

@@ -18,15 +18,18 @@
  */
 class Data extends Work
 {
-	/** 数据标识：数据 */
-	//const DATA = 'Data';
-	/** 数据标识：表头 */
-	//const TITLE = 'Title';
-	/** 数据标识：记录 */
-	//const RECORD = 'Record';
-
 	/** 数据库访问入口 */
 	protected $pdo = null;
+	/** 数据库 */
+	protected $dsn = null;
+	/** 用户 */
+	protected $user = null;
+	/** 密码 */
+	protected $password = null;
+	/** 字符集 */
+	protected $charset = 'utf8';
+	/** 是否保持 */
+	protected $lasting = false;
 
 	/** 数据工场静态入口 */
 	static private $ACCESS = null;
@@ -332,7 +335,7 @@ class Data extends Work
 		if (! $stm || ! $stm->execute($params))
 		{
 			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
-			Log::logs($this->pick(2, $this->pdo->errorInfo()), null, Log::EXCEPTION);
+			Log::logs($this->pick(2, $stm->errorInfo()), null, Log::EXCEPTION);
 			return false;
 		}
 
@@ -398,12 +401,7 @@ class Data extends Work
 	protected function connect()
 	{
 		### 连接信息
-		$dsn       = $this->pick('dsn',       $this->preset);
-		$user      = $this->pick('user',      $this->preset);
-		$password  = $this->pick('password',  $this->preset);
-		$charset   = $this->pick('charset',   $this->preset);
-		$temporary = $this->pick('temporary', $this->preset);
-		if ($dsn == null || $user == null)
+		if ($this->dsn == null || $this->user == null)
 		{
 			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			return false;
@@ -411,18 +409,18 @@ class Data extends Work
 		### 连接数据库
 		try
 		{
-			$this->pdo = new PDO($dsn, $user, $password);
-			if ($charset != null)
+			$this->pdo = new PDO($this->dsn, $this->user, $this->password);
+			if ($this->charset != null)
 			{
-				$this->pdo->query('set character set '.$this->field($charset));
+				$this->pdo->query('set character set '.$this->field($this->charset));
 			}
-			if ($temporary)
+			if ($this->lasting)
 			{
-				self::$ACCESS = $this->preset;
+				self::$ACCESS = $this;
 			}
 			else
 			{
-				self::$ACCESS = $this;
+				self::$ACCESS = $this->preset;
 			}
 		}
 		catch (PDOException $e)
@@ -444,6 +442,7 @@ class Data extends Work
 		### 连接数据库
 		$this->stuff(self::$ACCESS, $this->preset);
 		$this->stuff($setting, $this->preset);
+		$this->stuff($this->pick(_DEFAULT, $this->preset));
 		if (! $this->connect())
 		{
 			$this->target->error = $this->error;

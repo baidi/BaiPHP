@@ -54,11 +54,11 @@ class Log extends Work
 		self::DEBUG     => ' [调试] ',
 		self::PERFORM   => ' [性能] ',
 	);
-	/** 首选级别 */
-	protected $primary = self::ALL;
-	/** 首选目录 */
+	/** 日志级别 */
+	protected $level = self::ALL;
+	/** 日志目录 */
 	protected $root = 'Log/';
-	/** 首选结束符 */
+	/** 日志结束符 */
 	protected $ending = "\r\n";
 
 	/** 日志工场静态入口 */
@@ -114,24 +114,27 @@ class Log extends Work
 	 * @param string $item 日志项目
 	 * @param string $type 日志类别
 	 * @param mixed $params 日志参数
-	 * @param integer $primary 首选级别
+	 * @param integer $level 首选级别
 	 * @return string 日志信息
 	 */
-	public function entrust($item = null, $type = null, $params = null, $primary = self::INFO)
+	public function entrust($item = null, $type = null, $params = null, $level = self::INFO)
 	{
 		if ($item == null)
 		{
 			return null;
 		}
 		### 执行数据
-		$this->runtime['item']    = "$item";
-		$this->runtime['type']    = "$type";
-		$this->runtime['params']  = $params;
-		$this->runtime['primary'] = $primary;
+		$this->runtime['item']   = "$item";
+		$this->runtime['type']   = "$type";
+		$this->runtime['params'] = $params;
+		$this->runtime['level']  = $level;
 		### 处理日志
 		$this->result = $this->fetch();
-		$this->result = $this->format();
-		$this->result = $this->record();
+		if ($this->result != null)
+		{
+			$this->result = $this->format();
+			$this->result = $this->record();
+		}
 		return $this->result;
 	}
 
@@ -167,10 +170,10 @@ class Log extends Work
 	 */
 	protected function format()
 	{
-		if ($this->result == null)
-		{
-			return $this->result;
-		}
+		#if ($this->result == null)
+		#{
+		#	return $this->result;
+		#}
 		### 执行数据
 		$params = $this->pick('params', $this->runtime);
 		if ($params == null)
@@ -196,18 +199,18 @@ class Log extends Work
 	 */
 	protected function record()
 	{
-		if ($this->result == null)
-		{
-			return $this->result;
-		}
+		#if ($this->result == null)
+		#{
+		#	return $this->result;
+		#}
 		### 执行数据
-		$primary = $this->pick('primary', $this->runtime);
-		if (($primary & $this->primary) == 0)
+		$level = $this->pick('level', $this->runtime);
+		if (($level & $this->level) == 0)
 		{
 			return $this->result;
 		}
 		### 记录日志
-		$rank = $this->pick($primary, $this->ranks);
+		$rank = $this->pick($level, $this->ranks);
 		if ($rank == null)
 		{
 			$rank = $this->pick(self::UNKNOWN, $this->ranks);
@@ -232,11 +235,7 @@ class Log extends Work
 		$root = _LOCAL;
 		foreach (explode(_DIR, $this->root) as $dir)
 		{
-			if ($dir == null)
-			{
-				break;
-			}
-			if (! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
+			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
 			{
 				break;
 			}

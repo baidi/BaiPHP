@@ -52,7 +52,7 @@ class Test extends Work
 	protected $success = '-';
 	/** 测试结果：失败 */
 	protected $failure = '/';
-	/** 测试结果：略过 */
+	/** 测试结果：忽略 */
 	protected $skip    = '.';
 	/** 测试结果：出错 */
 	protected $error   = '|';

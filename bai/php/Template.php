@@ -12,9 +12,9 @@
 
 /**
  * <h2>BaiPHP（简单PHP）开发框架</h2>
- * <h3>Html工场</h3>
+ * <h3>模板工场</h3>
  * <p>
- * 生成Html标签。
+ * 根据模板生成Html页面。
  * </p>
  * @author 白晓阳
  */
@@ -32,7 +32,7 @@ class Template extends Work
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
-			self::$ACCESS = new Style($setting);
+			self::$ACCESS = new Template($setting);
 		}
 		return self::$ACCESS;
 	}

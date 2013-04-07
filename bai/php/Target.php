@@ -84,13 +84,12 @@ class Target extends Bai
 	 * @param mixed $value 项目值
 	 * @return void
 	 */
-	public function offsetSet($item, $value, $session = false)
+	static public function session($item, $value)
 	{
-		if ($session && isset($_SESSION))
-		{
-			$_SESSION[$item] = $value;
-		}
-		$this->$item = $value;
+		global $target;
+		$_SESSION[$item] = $value;
+		$target->$item = $value;
+		return $value;
 	}
 
 	/**
@@ -117,14 +116,10 @@ class Target extends Bai
 		### 加载配置
 		if ($setting != null)
 		{
-			if (! is_array($setting))
-			{
-				$setting = array($setting);
-			}
 			$bai     = _LOCAL.$this->config(_DEFAULT, self::BAI);
 			$service = _LOCAL.$this->config(_DEFAULT, self::SERVICE);
 			$root    = $this->config(_DEFAULT, 'Root');
-			foreach ($setting as $item)
+			foreach ((array)$setting as $item)
 			{
 				if ($item == null || ! is_string($item))
 				{

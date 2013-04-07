@@ -20,6 +20,15 @@
  */
 class Check extends Work
 {
+	/** 字符编码 */
+	protected $charset   = 'utf-8';
+	/** 参数分割符 */
+	protected $delimiter = ',';
+	/** 检验模式 */
+	protected $mode  = '/(?<check>[^\s=]+)(?:=(?<params>[^\s]+))?/';
+	/** 类型模式 */
+	protected $types = null;
+
 	/** 检验工场静态入口 */
 	static private $ACCESS = null;
 
@@ -49,14 +58,20 @@ class Check extends Work
 	 * </ul>
 	 * 各规则可以任意组合，规则之间以空格分隔
 	 * 检验规则在用户配置文件（config.php）中的self::Check下设置
-	 * @param array $specific 即时配置
+	 * @param array $setting 即时配置
 	 * @return mixed false：检验通过；string：提示信息
 	 */
-	public function entrust($specific = null)
+	public function entrust($setting = null)
 	{
+		if ($this->mode == null || ! is_string($this->mode))
+		{
+			return true;
+		}
+
 		### 读取检验设置
-		$preset = $this->pick("$this->target", $this->preset);
-		$this->stuff($specific, $preset);
+		$event = $this->target[self::EVENT];
+		$preset = $this->pick($event, $this->preset);
+		$this->stuff($setting, $preset);
 		if ($preset == null || ! is_array($preset))
 		{
 			return true;
@@ -65,9 +80,13 @@ class Check extends Work
 		### 检验输入项目
 		foreach ($preset as $item => $mode)
 		{
+			if ($item == null || $mode == null || ! is_string($mode))
+			{
+				continue;
+			}
 			$this->runtime['item']  = $item;
 			$this->runtime['mode']  = $mode;
-			$this->runtime['value'] = $this->target[$item];
+			$this->runtime['value'] = $this->pick($item, $this->target[$event]);
 			$this->error = $this->item();
 			if ($this->error)
 			{
@@ -84,34 +103,28 @@ class Check extends Work
 	 */
 	protected function item()
 	{
+		### 执行数据
 		$item = $this->runtime['item'];
 		$mode = $this->runtime['mode'];
 		Log::logf(__FUNCTION__, array($item, $mode), __CLASS__);
-		### 分离检验场景
-		$preset = $this->pick(__CLASS__, $this->preset);
-		$case = $this->pick('case', $preset);
-		$param = $this->pick('param', $preset);
-		preg_match_all($case, $mode, $cases, PREG_SET_ORDER);
+		### 解析检验模式
+		preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER);
 		foreach ($cases as $case)
 		{
-			$call = $this->pick('call', $case);
+			$check  = $this->pick('check',  $case);
 			$params = $this->pick('params', $case);
-			if ($params != null && is_string($params))
+			if ($params != null)
 			{
-				$params = explode($param, $params);
+				$params = explode($this->delimiter, $params);
 			}
 			### 执行检验场景
 			if ($params === null)
 			{
-				$message = $this->$call();
-			}
-			else if (! is_array($params))
-			{
-				$message = $this->$call($params);
+				$message = $this->$check();
 			}
 			else
 			{
-				$message = call_user_func_array(array($this, $call), $params);
+				$message = call_user_func_array(array($this, $check), $params);
 			}
 			if ($message)
 			{
@@ -128,8 +141,7 @@ class Check extends Work
 	protected function risk()
 	{
 		$value = $this->pick('value', $this->runtime);
-		$preset = $this->pick(__CLASS__, $this->preset);
-		$mode = $this->pick(__FUNCTION__, $preset);
+		$mode  = $this->pick(__FUNCTION__, $this->types);
 		if ($value != null && preg_match($mode, $value))
 		{
 			return Log::logs(__FUNCTION__, __CLASS__);
@@ -159,7 +171,7 @@ class Check extends Work
 	protected function min($length)
 	{
 		$value = $this->pick('value', $this->runtime);
-		if ($value == null || mb_strlen($value, 'utf-8') >= $length)
+		if ($value == null || mb_strlen($value, $this->charset) >= $length)
 		{
 			return false;
 		}
@@ -174,7 +186,7 @@ class Check extends Work
 	protected function max($length)
 	{
 		$value = $this->pick('value', $this->runtime);
-		if ($value == null || mb_strlen($value, 'utf-8') <= $length)
+		if ($value == null || mb_strlen($value, $this->charset) <= $length)
 		{
 			return false;
 		}
@@ -192,8 +204,7 @@ class Check extends Work
 	protected function type($type)
 	{
 		$value = $this->pick('value', $this->runtime);
-		$preset = $this->pick(__CLASS__, $this->preset);
-		$mode = $this->pick($type, $preset);
+		$mode  = $this->pick($type, $this->types);
 		if ($value == null || $mode == null || preg_match($mode, $value))
 		{
 			return false;
@@ -213,7 +224,7 @@ class Check extends Work
 		{
 			return call_user_func_array($name, $params);
 		}
-		return cLog(__FUNCTION__, __CLASS__);
+		return Log::logs(__FUNCTION__, __CLASS__);
 	}
 }
 ?>

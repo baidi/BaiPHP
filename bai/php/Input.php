@@ -20,11 +20,11 @@
  */
 class Input extends Work
 {
-	/** 输入工场静态入口 */
-	static private $ACCESS = null;
-
 	/** 首选项 */
 	protected $primary = 'text';
+
+	/** 输入工场静态入口 */
+	static private $ACCESS = null;
 
 	/**
 	 * <h4>获取输入工场入口</h4>
