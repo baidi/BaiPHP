@@ -7,9 +7,8 @@
 	<meta name="description" content="<?php echo $this->description; ?>" />
 	<link rel="icon" type="image/x-icon" href="<?php echo Style::img('favicon.ico') ?>"/>
 	<title><?php echo $this->title; ?></title>
-	<style type="text/css"><?php echo $this->css; ?></style>
-	<?php echo Style::js('sizzle.js') ?>
-	<script type="text/javascript"><?php echo $this->js; ?></script>
+	<?php echo Style::css($this->css, true); ?>
+	<?php echo Style::js($this->js, true) ?>
 </head>
 <body>
 	<div id="page">

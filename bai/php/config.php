@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2011 - 2012, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
- *            2.0.0 2012/07/01 首版
+ *		    2.0.0 2012/07/01 首版
  * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
  * <p>欢迎提供捐助。任何捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授权。</p>
  */
@@ -22,8 +22,8 @@ global $config;
 
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
-	Work::EVENT   => 'home',                ### 目标事项
-	'Branches'    => array(                 ### 扩展路径
+	Work::EVENT   => 'home',				### 目标事项
+	'Branches'    => array(				 ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
 		# '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => Work::WORK._DIR,
 	),
@@ -37,24 +37,24 @@ $config[Flow::FLOW] = array(
 		'close'       => false,
 	),
 	Flow::CONTROL     => array(
-        'checkin'     => true,
-        'filter'      => true,
-        'limit'       => true,
-        Flow::ACTION  => false,
-        'error'       => false,
+		'checkin'     => true,
+		'filter'      => true,
+		'limit'       => true,
+		Flow::ACTION  => false,
+		'error'       => false,
 	),
 	Flow::ACTION      => array(
-        'check'       => Flow::PAGE,
-        //'Cache'      => true,
-        'data'        => true,
-        'engage'      => true,
-        Flow::PAGE    => false,
-        'error'       => false,
+		'check'       => Flow::PAGE,
+		//'Cache'      => true,
+		'data'        => true,
+		'engage'      => true,
+		Flow::PAGE    => false,
+		'error'       => false,
 	),
 	Flow::PAGE        => array(
-        'html'        => true,
-        'format'      => false,
-        'error'       => false,
+		'html'        => true,
+		'format'      => false,
+		'error'       => false,
 	),
 );
 
@@ -81,38 +81,43 @@ $config[Flow::CONTROL] = array(
 
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
-	_DEFAULT      => array(
-		'layout'      => '_page.php',
-	),
-	'css'         => array(
-		'bai.css',
-	),
-	'js'          => array(
-		'bai.js',
-	),
-	'format'       => array(
-		'$width$' => '990px',
-		'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
-		#'$color$' => '#000000',
-		#'$background$' => '#ffffff',
-		'$acolor$' => '#009f3c',
-		'$linecolor$' => '#99cc99',
-		'$areacolor$' => '#f0f9f0',
-		'$shadowcolor$' => '#d0f9d0',
-		'$errorcolor$' => '#ff0000',
-		'$noticecolor$' => '#99cc99',
-		'$lockedcolor$' => '#cccccc',
-		//'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
-		//'$type$'    => json_encode($config['Input']['Type']),
-		'$timeout$' => 3000,
-		'$cipher$'  => '_CIPHER',
+    _DEFAULT      => array(
+		'layout'  => '_page.php',
+		'css'     => array(
+			'bai.css',
+		),
+		'js'      => array(
+			'sizzle.js',
+			'bai.js',
+		),
+		'formats'       => array(
+			'$width$' => '990px',
+			'$font$'  => '14px/20px "verdana", "helvetica", "arial", sans-serif',
+			#'$color$' => '#000000',
+			#'$background$' => '#ffffff',
+			'$acolor$' => '#009f3c',
+			'$linecolor$' => '#99cc99',
+			'$areacolor$' => '#f0f9f0',
+			'$shadowcolor$' => '#d0f9d0',
+			'$errorcolor$' => '#ff0000',
+			'$noticecolor$' => '#99cc99',
+			'$lockedcolor$' => '#cccccc',
+			//'$message$' => json_encode($config[Work::LOG][Work::CHECK]),
+			//'$type$'    => json_encode($config['Input']['Type']),
+		),
+		'trims' => array(
+			### 空白
+			'#^\s+|\s+$|^\s*$#m'  => '',
+			### 注释
+			'#^<!--.*-->$#'       => '',
+		),
 	),
 );
 
 ### 全局配置：数据工场
 $config[Work::DATA] = array(
 	_DEFAULT     => array(
-		'dsn'        => 'mysql:host=localhost;dbname=bai',
+		'dsn'		=> 'mysql:host=localhost;dbname=bai',
 		'user'       => 'root',
 		'password'   => '',
 		'charset'    => 'utf8',
@@ -194,6 +199,11 @@ $config[Work::LOG] = array(
 		'push'        => '更新缓存数据：%s',
 		'file'        => '缓存文件写入失败：%s',
 	),
+	Work::STYLE       => array(
+		Work::STYLE   => '--样式工场--',
+		'inset'       => '内嵌样式：%s',
+		'link'        => '外链样式：%s',
+	),
 	Work::TEST        => array(
 		Work::TEST    => '--测试工场--',
 		'testee'      => '测试对象无效：%s',
@@ -266,8 +276,8 @@ $config[Work::STYLE] = array(
 		'img' => '_blank.png',
 		### 可内嵌类型
 		'insets'   => array(
-			'css' => true,
-			'js'  => true,
+			'css' => '<style type="text/css">%s</style>',
+			'js'  => '<script type="text/javascript">%s</script>',
 		),
 		### 外链模板
 		'links'    => array(

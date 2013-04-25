@@ -1,6 +1,6 @@
 <?php
-$t = 'abcdef';
-echo $t, ' > ', substr($t, 3);
+$a = array('qwer', '1234');
+echo (string)$a;
 ?>
 <table>
 <tr>

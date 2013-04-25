@@ -22,6 +22,10 @@ class Style extends Work
 {
 	/** 默认图片（原图无效时使用） */
 	protected $img = '_blank.png';
+	/** 内嵌模板 */
+	protected $insets = null;
+	/** 外链模板 */
+	protected $links = null;
 
 	/** 样式工场静态入口 */
 	static private $ACCESS = null;
@@ -97,25 +101,42 @@ class Style extends Work
 	 * <p>
 	 * 导入样式（css、js）文件并格式化。
 	 * </p>
-	 * @param string $item 项目名
+	 * @param string $items 项目名
 	 * @param string $branch 分支名
 	 * @param bool $inset 是否嵌入
 	 * @return string 样式内容
 	 */
-	public function entrust($item = null, $branch = null, $inset = false)
+	public function entrust($items = null, $branch = null, $inset = false)
 	{
-		if ($item == null || ! is_string($item) || $branch == null)
+		if ($items == null)
 		{
 			return null;
 		}
-		$this->runtime['item']   = $item;
-		$this->runtime['branch'] = $branch._DIR;
-		$this->result = $inset ? $this->inset() : $this->link();
+		if ($branch == null)
+		{
+			$branch == get_class($this)._DIR;
+		}
+		$this->result = '';
+		foreach ((array)$items as $item)
+		{
+			if ($item == null || ! is_string($item))
+			{
+				continue;
+			}
+			$this->runtime['item']   = $item;
+			$this->runtime['branch'] = $branch;
+			if (! $inset)
+			{
+				$this->result = $this->link();
+				break;
+			}
+			$this->result .= $this->inset();
+		}
 		return $this->result;
 	}
 
 	/**
-	 * <h4>嵌入样式文件</h4>
+	 * <h4>内嵌样式文件</h4>
 	 * @return string
 	 */
 	protected function inset()
@@ -123,27 +144,31 @@ class Style extends Work
 		### 执行数据
 		$item   = $this->pick('item',   $this->runtime);
 		$branch = $this->pick('branch', $this->runtime);
-		if (! $this->pick($item, $this->insets))
+		$template = $this->pick($branch, $this->insets);
+		if (! $template)
 		{
 			return null;
 		}
 		### 加载文件
-		$bai     = _LOCAL.$this->target[self::BAI];
-		$service = _LOCAL.$this->target[self::SERVICE];
+		$bai     = _LOCAL.$this->target[self::BAI].$branch._DIR;
+		$service = _LOCAL.$this->target[self::SERVICE].$branch._DIR;
 		$content = '';
-		if (is_file($bai.$branch.$item))
+		if (is_file($bai.$item))
 		{
-			$content .= file_get_contents($bai.$branch.$item);
+		    Log::logf(__FUNCTION__, $bai.$item, __CLASS__);
+			$content .= file_get_contents($bai.$item);
 		}
-		if (is_file($service.$branch.$item))
+		if (is_file($service.$item))
 		{
-			$content .= file_get_contents($service.$branch.$item);
+		    Log::logf(__FUNCTION__, $service.$item, __CLASS__);
+			$content .= file_get_contents($service.$item);
 		}
+		$content = sprintf($template, $content);
 		return $content;
 	}
 
 	/**
-	 * <h4>外连样式文件</h4>
+	 * <h4>外链样式文件</h4>
 	 * @return string
 	 */
 	protected function link()
@@ -151,26 +176,28 @@ class Style extends Work
 		### 执行数据
 		$item   = $this->pick('item',   $this->runtime);
 		$branch = $this->pick('branch', $this->runtime);
-		$template = $this->pick($item, $this->links);
-		### 外连文件
-		$bai     = $this->target[self::BAI];
-		$service = $this->target[self::SERVICE];
+		$template = $this->pick($branch, $this->links);
+		### 外链文件
+		$bai     = $this->target[self::BAI].$branch._DIR;
+		$service = $this->target[self::SERVICE].$branch._DIR;
 		$content = '';
-		if (is_file(_LOCAL.$service.$branch.$item))
+		if (is_file(_LOCAL.$service.$item))
 		{
+		    Log::logf(__FUNCTION__, _WEB.$service.$item, __CLASS__);
 			if ($template == null)
 			{
-				return _WEB.$service.$branch.$item;
+				return _WEB.$service.$item;
 			}
-			$content .= sprintf($template, _WEB.$service.$branch.$item);
+			$content .= sprintf($template, _WEB.$service.$item);
 		}
-		if (is_file(_LOCAL.$bai.$branch.$item))
+		if (is_file(_LOCAL.$bai.$item))
 		{
+		    Log::logf(__FUNCTION__, _WEB.$bai.$item, __CLASS__);
 			if ($template == null)
 			{
-				return _WEB.$bai.$branch.$item;
+				return _WEB.$bai.$item;
 			}
-			$content .= sprintf($template, _WEB.$bai.$branch.$item).$content;
+			$content = sprintf($template, _WEB.$bai.$item).$content;
 		}
 		return $content;
 	}
