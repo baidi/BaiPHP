@@ -22,25 +22,21 @@ class Target extends Bai
 {
 	/** 抛锚点 */
 	protected $anchor = null;
+	/** 内容过滤 */
+	protected $filters = null;
 
 	/**
-	 * <h4>记录开始时间</h4>
+	 * <h4>委托当前目标到流程</h4>
+	 * @param array $setting 即时配置
+	 * @return mixed 交付结果
 	 */
-	protected function start()
+	public function entrust($setting = null)
 	{
 		$event = $this[self::SERVICE].$this[self::EVENT];
-		Log::logf('entrust', $event, __CLASS__);
-		Log::logf(__FUNCTION__, date('Y-m-d H:m:s', _START), __CLASS__, Log::PERFORM);
-		return $this->result;
-	}
-
-	/**
-	 * <h4>记录结束时间</h4>
-	 */
-	protected function close()
-	{
-		$event = $this[self::SERVICE].$this[self::EVENT];
-		Log::logf(__FUNCTION__, microtime(true) - _START, __CLASS__, Log::PERFORM);
+		Log::logf(__FUNCTION__, $event, __CLASS__);
+		Log::logf('start', date('Y-m-d H:m:s', _START), __CLASS__, Log::PERFORM);
+		$this->result = $this->run($setting);
+		Log::logf('close', microtime(true) - _START, __CLASS__, Log::PERFORM);
 		Log::logf('deliver', $event, __CLASS__);
 		return $this->result;
 	}
@@ -56,15 +52,14 @@ class Target extends Bai
 		{
 			return $inputs;
 		}
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		if ($preset == null || ! is_array($preset))
+		if ($this->filters == null || ! is_array($this->filters))
 		{
 			return $inputs;
 		}
 		### 过滤文字
 		if (! is_array($inputs))
 		{
-			foreach ($preset as $item => $mode)
+			foreach ($this->filters as $item => $mode)
 			{
 				$inputs = preg_replace($item, $mode, $inputs);
 			}

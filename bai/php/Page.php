@@ -23,15 +23,15 @@
 class Page extends Flow
 {
     /** 页面布局 */
-    protected $layout = '_page.php';
+    protected $layout  = '_page.php';
     /** 页面样式 */
-    protected $css    = null;
+    protected $css     = null;
     /** 页面脚本 */
-    protected $js     = null;
+    protected $js      = null;
     /** 页面版式 */
     protected $formats = null;
     /** 页面整理 */
-    protected $trims = null;
+    protected $trims   = null;
 
 	/**
 	 * <h4>生成页面HTML</h4>
@@ -39,9 +39,8 @@ class Page extends Flow
 	 */
 	protected function html()
 	{
-		$this->lang = Lang::access();
-		$this->lside = false;
-		$this->rside = false;
+		$this->lside = null;
+		$this->rside = null;
 		return $this->load($this->layout);
 	}
 
@@ -53,13 +52,6 @@ class Page extends Flow
 	protected function format()
 	{
 		$page = $this->result;
-		### 页面整理
-// 		if ($this->trims && is_array($this->trims))
-// 		{
-// 			$items = array_keys($this->trims);
-// 			$values = array_values($this->trims);
-// 			$page = str_replace($items, $values, $page);
-// 		}
 
 		### 应用页面版式
 		if ($this->formats && is_array($this->formats))
@@ -67,6 +59,14 @@ class Page extends Flow
 			$items = array_keys($this->formats);
 			$values = array_values($this->formats);
 			$page = str_replace($items, $values, $page);
+		}
+
+		### 页面整理
+		if ($this->trims && is_array($this->trims))
+		{
+			$items = array_keys($this->trims);
+			$values = array_values($this->trims);
+			$page = preg_replace($items, $values, $page);
 		}
 
 		### 页面缓存
@@ -80,12 +80,7 @@ class Page extends Flow
 	 */
 	public function __get($item)
 	{
-		$result = $this->lang->entrust($item);
-		if ($result === null)
-		{
-			$result = $this->pick($item, $this->preset);
-		}
-		$this->$item = $result;
-		return $result;
+		$this->$item = Lang::fetch($item, false);
+		return $this->$item;
 	}
 }
