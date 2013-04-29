@@ -32,9 +32,8 @@ $config[Bai::BAI] = array(
 ### 全局配置：流程
 $config[Flow::FLOW] = array(
 	Flow::TARGET      => array(
-		'start'       => true,
-		Flow::CONTROL => true,
-		'close'       => false,
+		Flow::CONTROL => false,
+		'error'       => false,
 	),
 	Flow::CONTROL     => array(
 		'checkin'     => true,
@@ -60,10 +59,12 @@ $config[Flow::FLOW] = array(
 
 ### 全局配置：目标
 $config[Work::TARGET] = array(
-	'filter' => array(
-		'#<script.*>.*</script\s*>#i' => '',
-		'#javascript\s*:#i' => '',
-	),
+    _DEFAULT => array(
+        'filters' => array(
+            '#<script.*>.*</script\s*>#i' => '',
+            '#javascript\s*:#i' => '',
+        ),
+    ),
 );
 
 ### 全局配置：调度流程
@@ -107,9 +108,13 @@ $config[Flow::PAGE] = array(
 		),
 		'trims' => array(
 			### 空白
-			'#^\s+|\s+$|^\s*$#m'  => '',
+			'#^\s+|\s+$#m' => '',
 			### 注释
-			'#^<!--.*-->$#'       => '',
+			'#/\*.*\*/#'         => '',
+			### 注释
+			'#//.*$#m'         => '',
+			### HTML注释
+			'#<!--.*-->#'        => '',
 		),
 	),
 );
@@ -289,10 +294,12 @@ $config[Work::STYLE] = array(
 
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
-	'success'   => '过',
-	'failure'   => '挂',
-	'skip'      => '略',
-	'error'     => '错',
+    _DEFAULT => array(
+        'success'   => '过',
+        'failure'   => '挂',
+        'skip'      => '略',
+        'error'     => '错',
+    ),
 );
 
 $config[Work::INPUT] = array(

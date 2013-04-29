@@ -205,7 +205,7 @@ class Test extends Work
 		$item     = $this->pick(self::ITEM,     $case);
 		$params   = $this->pick(self::PARAMS,   $case);
 		$expected = $this->pick(self::EXPECTED, $case);
-// 		$params   = $this->testHolder($params);
+		// 		$params   = $this->testHolder($params);
 		### 执行测试
 		if ($this->$testee == null || ! method_exists($this->$testee, $item))
 		{
@@ -300,35 +300,6 @@ class Test extends Work
 			$this->name = __CLASS__;
 		}
 		return $this->name;
-	}
-
-	/**
-	 * <h4>构建测试工场</h4>
-	 * @param array $setting 即时配置
-	 */
-	public function __construct($setting = null)
-	{
-		parent::__construct($setting);
-		$success = $this->pick('success', $this->preset);
-		$failure = $this->pick('failure', $this->preset);
-		$skip    = $this->pick('skip',    $this->preset);
-		$error   = $this->pick('error',   $this->preset);
-		if ($success != null)
-		{
-			$this->success = $success;
-		}
-		if ($failure != null)
-		{
-			$this->failure = $failure;
-		}
-		if ($skip != null)
-		{
-			$this->skip = $skip;
-		}
-		if ($error != null)
-		{
-			$this->error = $error;
-		}
 	}
 }
 ?>
