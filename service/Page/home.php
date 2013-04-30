@@ -54,3 +54,14 @@ $extensions = array(
 		<li>响应完成</li>
 	</ol>
 </div>
+<div class="box">
+	<div class="t">目录结构</div>
+	<div class="b">系统文件</div>
+	<ul>
+		<li>/bai/php/ ... 核心目录：存放系统核心文件</li>
+		<li>/bai/js/ ... 脚本目录</li>
+		<li>/bai/css/ ... 样式目录</li>
+		<li>/bai/img/ ... 图像目录</li>
+		<li>/log/ ... 日志目录，可自定义</li>
+	</ul>
+</div>
