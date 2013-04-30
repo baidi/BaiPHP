@@ -71,9 +71,9 @@ class Style extends Work
 	}
 
 	/**
-	 * <h4>导入js文件</h4>
+	 * <h4>导入图片文件</h4>
 	 * <p>
-	 * 导入样式js文件并格式化。
+	 * 导入样式图片文件并格式化。
 	 * </p>
 	 * @return string 样式内容
 	 */

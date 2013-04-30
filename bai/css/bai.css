@@ -3,6 +3,7 @@ body {
 	font: $font$;
 	color: $color$;
 	background: $background$;
+	background-color: $bgcolor$;
 }
 a {
 	color: $acolor$;
@@ -89,7 +90,12 @@ textarea {
 
 .c {
 	margin-left: auto;
-	margin-right: auto;}
+	margin-right: auto;
+}
+
+.cl {
+	clear: both;
+}
 
 .fl {
 	float: left;
@@ -154,7 +160,7 @@ textarea {
 
 
 /*--- 页面布局 ---*/
-#page {
+.page {
 	margin: 0 auto;
 	width: $width$; /* 全局宽度 */
 }
@@ -164,15 +170,18 @@ header, footer {
 	clear: both;
 }
 
-#lside {
-	float: left;
+.lside {
+	display: inline-block;
+	clear: left;
 }
 
-#rside {
+.rside {
 	float: right;
+	clear: right;
 }
 
-#main {
+.main {
+	display: inline-block;
 }
 
 header nav a { /* 页首导航 */
@@ -189,7 +198,7 @@ header nav a { /* 页首导航 */
 	margin: 0.5em;
 	margin-bottom: 1em;
 	padding: 0.5em;
-	border: 1px solid #99cc99;
+	border: 1px solid $linecolor$;
 	border-radius: 6px;
 }
 

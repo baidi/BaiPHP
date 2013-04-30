@@ -8,13 +8,6 @@ $extensions = array(
 );
 ?>
 <div class="box">
-<button >button</button>
-<q>1234</q>
-<progress value="22" max="100"></progress>
-<textarea rows="" cols="">123456</textarea>
-<hr>
-</div>
-<div class="box">
 	<div class="t">依赖模块</div>
 	<ul>
 	<?php
