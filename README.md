@@ -3,9 +3,7 @@ BaiPHP - 化简PHP
 
 __化繁为简  四两拨千__
 
-__Tobe Simple & Smart__
-
-声明
+简介
 ----
 
 BaiPHP - 化简PHP，依据"面向目标"的设计思想，基于"服务-流程-工场"的设计模式，以简洁灵活为方向，由白晓阳设计和开发的一套PHP应用框架。
@@ -15,6 +13,11 @@ BaiPHP - 化简PHP，核心是完全基于配置并即时可控的流程走向�
 BaiPHP - 化简PHP，完全开放源代码，任何人都可以复制、修改和使用，但未经授权，不得用于商业目的。任何人都可对该项目提供捐助，捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授权。
 
 BaiPHP - 化简PHP，由白晓阳持有版权，并保留一切权利。
+
+安装步骤
+--------
+
+...
 
 面向目标
 --------
@@ -59,23 +62,23 @@ __系统文件__
 -   /bai/php/ ... 核心目录：存放系统核心文件
 	+   config.php ... 全局配置：系统运行时的各项配置
 	+   engine.php ... 启动引擎:启动系统的最简环境
-	+   Bai.php ... 元始虚类：定义公共标识、属性和行为
+	+   __Bai.php ... 元始虚类：定义公共标识、属性和行为__
 	+   Target.php ... 目标：接收请求并组织数据
-	+   Flow.php ... 流程虚类_
-	+   _Control.php ... 调度流程：_
-	+   _Action.php ... 处理流程：_
-	+   _Page.php ... 页面流程：_
-	+   Work.php ... 工场虚类
-	+   _Check.php ... 检验工场：_
-	+   _Cache.php ... 缓存工场：_
-	+   _Data.php ... 数据工场：_
-	+   _Input.php ... 输入工场：_
-	+   _Lang.php ... 语言工场：_
-	+   _Log.php ... 日志工场：_
-	+   _Style.php ... 样式工场：_
-	+   _Template.php ... 模板工场：_
-	+   _Test.php ... 测试工场：_
-	+   Service.php ... 服务虚类
+	+   __Flow.php ... 流程虚类__
+	+   Control.php ... 调度流程：
+	+   Action.php ... 处理流程：
+	+   Page.php ... 页面流程：
+	+   __Work.php ... 工场虚类__
+	+   Check.php ... 检验工场：
+	+   Cache.php ... 缓存工场：
+	+   Data.php ... 数据工场：
+	+   Input.php ... 输入工场：
+	+   Lang.php ... 语言工场：
+	+   Log.php ... 日志工场：
+	+   Style.php ... 样式工场：
+	+   Template.php ... 模板工场：
+	+   Test.php ... 测试工场：
+	+   __Service.php ... 服务虚类__
 -   /bai/js/ ... 脚本目录
 	+   bai.js ... 系统脚本
 -   /bai/css/ ... 样式目录

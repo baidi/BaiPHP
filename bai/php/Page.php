@@ -22,16 +22,16 @@
  */
 class Page extends Flow
 {
-    /** 页面布局 */
-    protected $layout  = '_page.php';
-    /** 页面样式 */
-    protected $css     = null;
-    /** 页面脚本 */
-    protected $js      = null;
-    /** 页面版式 */
-    protected $formats = null;
-    /** 页面整理 */
-    protected $trims   = null;
+	/** 页面布局 */
+	protected $layout  = '_page.php';
+	/** 页面样式 */
+	protected $css     = null;
+	/** 页面脚本 */
+	protected $js      = null;
+	/** 页面版式 */
+	protected $formats = null;
+	/** 页面整理 */
+	protected $trims   = null;
 
 	/**
 	 * <h4>生成页面HTML</h4>
@@ -70,8 +70,8 @@ class Page extends Flow
 		}
 
 		### 页面缓存
-// 		$cache = Cache::access();
-// 		$cache->entrust($event, $page);
+		// $cache = Cache::access();
+		// $cache->entrust($event, $page);
 		return $page;
 	}
 

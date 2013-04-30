@@ -155,12 +155,12 @@ class Style extends Work
 		$content = '';
 		if (is_file($bai.$item))
 		{
-		    Log::logf(__FUNCTION__, $bai.$item, __CLASS__);
+			Log::logf(__FUNCTION__, $bai.$item, __CLASS__);
 			$content .= file_get_contents($bai.$item);
 		}
 		if (is_file($service.$item))
 		{
-		    Log::logf(__FUNCTION__, $service.$item, __CLASS__);
+			Log::logf(__FUNCTION__, $service.$item, __CLASS__);
 			$content .= file_get_contents($service.$item);
 		}
 		$content = sprintf($template, $content);
@@ -183,7 +183,7 @@ class Style extends Work
 		$content = '';
 		if (is_file(_LOCAL.$service.$item))
 		{
-		    Log::logf(__FUNCTION__, _WEB.$service.$item, __CLASS__);
+			Log::logf(__FUNCTION__, _WEB.$service.$item, __CLASS__);
 			if ($template == null)
 			{
 				return _WEB.$service.$item;
@@ -192,7 +192,7 @@ class Style extends Work
 		}
 		if (is_file(_LOCAL.$bai.$item))
 		{
-		    Log::logf(__FUNCTION__, _WEB.$bai.$item, __CLASS__);
+			Log::logf(__FUNCTION__, _WEB.$bai.$item, __CLASS__);
 			if ($template == null)
 			{
 				return _WEB.$bai.$item;

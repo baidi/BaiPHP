@@ -205,7 +205,7 @@ class Test extends Work
 		$item     = $this->pick(self::ITEM,     $case);
 		$params   = $this->pick(self::PARAMS,   $case);
 		$expected = $this->pick(self::EXPECTED, $case);
-// 		$params   = $this->testHolder($params);
+		// 		$params   = $this->testHolder($params);
 		### 执行测试
 		if ($this->$testee == null || ! method_exists($this->$testee, $item))
 		{

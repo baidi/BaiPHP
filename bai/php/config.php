@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2011 - 2012, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
- *		    2.0.0 2012/07/01 首版
+ *            2.0.0 2012/07/01 首版
  * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
  * <p>欢迎提供捐助。任何捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授权。</p>
  */
@@ -59,12 +59,12 @@ $config[Flow::FLOW] = array(
 
 ### 全局配置：目标
 $config[Work::TARGET] = array(
-    _DEFAULT => array(
-        'filters' => array(
-            '#<script.*>.*</script\s*>#i' => '',
-            '#javascript\s*:#i' => '',
-        ),
-    ),
+	_DEFAULT => array(
+		'filters' => array(
+			'#<script.*>.*</script\s*>#i' => '',
+			'#javascript\s*:#i' => '',
+		),
+	),
 );
 
 ### 全局配置：调度流程
@@ -82,7 +82,7 @@ $config[Flow::CONTROL] = array(
 
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
-    _DEFAULT      => array(
+	_DEFAULT      => array(
 		'layout'  => '_page.php',
 		'css'     => array(
 			'bai.css',
@@ -114,9 +114,9 @@ $config[Flow::PAGE] = array(
 			'#/\*.*\*/#Us'      => '',
 			### 单行注释
 			'#\s*(?<!:)//.*$#m' => '',
-			### 空白
+			### 行空白
 			'#^\s+|\s+$#m'      => '',
-			### 空白
+			### 连续空白
 			'#\s{2,}#'          => ' ',
 			### 空行
 			'#\n[\r\n]+#'       => '\n',
@@ -299,12 +299,12 @@ $config[Work::STYLE] = array(
 
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
-    _DEFAULT => array(
-        'success'   => '过',
-        'failure'   => '挂',
-        'skip'      => '略',
-        'error'     => '错',
-    ),
+	_DEFAULT => array(
+		'success'   => '过',
+		'failure'   => '挂',
+		'skip'      => '略',
+		'error'     => '错',
+	),
 );
 
 $config[Work::INPUT] = array(
