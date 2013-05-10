@@ -307,6 +307,22 @@ $config[Work::TEST] = array(
 	),
 );
 
+### 全局配置：测试工场
+$config[Work::TEMPLATE] = array(
+	_DEFAULT        => array(
+	    'param'     => '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#',
+	    'handler'   => array(
+    	    '?'     => 'choose',
+    	    '!'     => 'loop',
+	    ),
+	    'peg'       => '$',
+	    'looper'    => array('$value', '$key'),
+		'templates' => array(
+	        'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$content}</div>',
+	    ),
+	),
+);
+
 $config[Work::INPUT] = array(
 	_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?P<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
 	'type'  => array(
