@@ -114,7 +114,7 @@ class Style extends Work
 		}
 		if ($branch == null)
 		{
-			$branch == get_class($this)._DIR;
+			$branch == get_class($this);
 		}
 		$this->result = '';
 		foreach ((array)$items as $item)
@@ -142,26 +142,28 @@ class Style extends Work
 	protected function inset()
 	{
 		### 执行数据
-		$item   = $this->pick('item',   $this->runtime);
-		$branch = $this->pick('branch', $this->runtime);
-		$template = $this->pick($branch, $this->insets);
+		$item     = $this->pick('item',   $this->runtime);
+		$branch   = $this->pick('branch', $this->runtime);
+		$template = $this->pick($branch,  $this->insets);
 		if (! $template)
 		{
 			return null;
 		}
+		### 路径
+		$path    = $this->locate($item, $branch);
+		$bai     = $this->pick(self::BAI,     $path);
+		$service = $this->pick(self::SERVICE, $path);
 		### 加载文件
-		$bai     = _LOCAL.$this->target[self::BAI].$branch._DIR;
-		$service = _LOCAL.$this->target[self::SERVICE].$branch._DIR;
 		$content = '';
-		if (is_file($bai.$item))
+		if ($bai != null)
 		{
-			Log::logf(__FUNCTION__, $bai.$item, __CLASS__);
-			$content .= file_get_contents($bai.$item);
+			Log::logf(__FUNCTION__, $bai, __CLASS__);
+			$content .= file_get_contents(_LOCAL.$bai);
 		}
-		if (is_file($service.$item))
+		if ($service != null)
 		{
-			Log::logf(__FUNCTION__, $service.$item, __CLASS__);
-			$content .= file_get_contents($service.$item);
+			Log::logf(__FUNCTION__, $service, __CLASS__);
+			$content .= file_get_contents(_LOCAL.$service);
 		}
 		$content = sprintf($template, $content);
 		return $content;
@@ -174,31 +176,40 @@ class Style extends Work
 	protected function link()
 	{
 		### 执行数据
-		$item   = $this->pick('item',   $this->runtime);
-		$branch = $this->pick('branch', $this->runtime);
-		$template = $this->pick($branch, $this->links);
+		$item     = $this->pick('item',   $this->runtime);
+		$branch   = $this->pick('branch', $this->runtime);
+		$template = $this->pick($branch,  $this->links);
+		### 路径
+		$path    = $this->locate($item, $branch);
+		$bai     = $this->pick(self::BAI,     $path);
+		$service = $this->pick(self::SERVICE, $path);
 		### 外链文件
-		$bai     = $this->target[self::BAI].$branch._DIR;
-		$service = $this->target[self::SERVICE].$branch._DIR;
-		$content = '';
-		if (is_file(_LOCAL.$service.$item))
+		if ($template != null)
 		{
-			Log::logf(__FUNCTION__, _WEB.$service.$item, __CLASS__);
-			if ($template == null)
+			$content = '';
+			if ($service != null)
 			{
-				return _WEB.$service.$item;
+				Log::logf(__FUNCTION__, $service, __CLASS__);
+				$content .= sprintf($template, _WEB.$service);
 			}
-			$content .= sprintf($template, _WEB.$service.$item);
+			if ($bai != null)
+			{
+				Log::logf(__FUNCTION__, $bai, __CLASS__);
+				$content .= sprintf($template, _WEB.$bai);
+			}
+			return $content;
 		}
-		if (is_file(_LOCAL.$bai.$item))
+		### 外链文件名
+		if ($service != null)
 		{
-			Log::logf(__FUNCTION__, _WEB.$bai.$item, __CLASS__);
-			if ($template == null)
-			{
-				return _WEB.$bai.$item;
-			}
-			$content = sprintf($template, _WEB.$bai.$item).$content;
+			Log::logf(__FUNCTION__, $service, __CLASS__);
+			return _WEB.$service;
 		}
-		return $content;
+		if ($bai != null)
+		{
+			Log::logf(__FUNCTION__, $bai, __CLASS__);
+			return _WEB.$bai;
+		}
+		return null;
 	}
 }

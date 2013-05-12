@@ -153,7 +153,7 @@ abstract class Bai implements ArrayAccess
 	 * @param string $item1 项目1
 	 * @param string $item... 项目...
 	 * @return mixed 项目值
-	*/
+	 */
 	protected function config()
 	{
 		### 项目名
@@ -332,6 +332,47 @@ abstract class Bai implements ArrayAccess
 	}
 
 	/**
+	 * <h4>定位文件</h4>
+	 * <p>
+	 * 根据文件名确定文件基于根目录的相对路径。
+	 * </p>
+	 * @param string $item 文件名
+	 * @param string $branch 分支
+	 * @return array 文件路径
+	 */
+	protected function locate($item = null, $branch = null)
+	{
+		### 文件名
+		if ($item == null || ! is_string($item))
+		{
+			return null;
+		}
+		### 分支
+		if ($branch == null)
+		{
+			$branch  = get_class($this)._DIR;
+		}
+		if (substr($branch, -1) !== _DIR)
+		{
+			$branch .= _DIR;
+		}
+		$bai     = $this->target[self::BAI].$branch.$item;
+		$service = $this->target[self::SERVICE].$branch.$item;
+		$result = array();
+		### 系统文件
+		if (is_file(_LOCAL.$bai))
+		{
+			$result[self::BAI] = $bai;
+		}
+		### 服务文件
+		if (is_file(_LOCAL.$service))
+		{
+			$result[self::SERVICE] = $service;
+		}
+		return $result;
+	}
+
+	/**
 	 * <h4>加载文件</h4>
 	 * <p>
 	 * 根据目标事项或文件名加载页面文件。
@@ -343,7 +384,8 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected function load($item = null, $all = false, $branch = null)
 	{
-		if ($item == null)
+		### 文件名
+		if ($item == null || ! is_string($item))
 		{
 			return null;
 		}
@@ -351,35 +393,36 @@ abstract class Bai implements ArrayAccess
 		{
 			$item .= _EXT;
 		}
-		### 加载路径
-		$bai     = _LOCAL.$this->target[self::BAI];
-		$service = _LOCAL.$this->target[self::SERVICE];
-		if ($branch == null)
-		{
-			$branch  = get_class($this)._DIR;
-		}
-		ob_start();
+		### 路径
+		$path    = $this->locate($item, $branch);
+		$bai     = $this->pick(self::BAI,     $path);
+		$service = $this->pick(self::SERVICE, $path);
+		### 加载文件
 		if ($all)
 		{
-			if (is_file($bai.$branch.$item))
+			ob_start();
+			if ($bai != null)
 			{
-				include $bai.$branch.$item;
+				include _LOCAL.$bai;
 			}
-			if (is_file($service.$branch.$item))
+			if ($service != null)
 			{
-				include $service.$branch.$item;
+				include _LOCAL.$service;
 			}
 			return ob_get_clean();
 		}
-		if (is_file($service.$branch.$item))
+		if ($service != null)
 		{
-			include $service.$branch.$item;
+			ob_start();
+			include _LOCAL.$service;
+			return ob_get_clean();
 		}
-		else if (is_file($bai.$branch.$item))
+		if ($bai != null)
 		{
-			include $bai.$branch.$item;
+			ob_start();
+			include _LOCAL.$bai;
+			return ob_get_clean();
 		}
-		return ob_get_clean();
 	}
 
 	/**
