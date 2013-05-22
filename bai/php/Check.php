@@ -25,19 +25,19 @@ class Check extends Work
 	/** 参数分割符 */
 	protected $delimiter = ',';
 	/** 检验模式 */
-	protected $mode  = '/(?<check>[^\s=]+)(?:=(?<params>[^\s]+))?/';
+	protected $mode  = '/(?<item>[^\s=]+)(?:=(?<params>[^\s]+))?/';
 	/** 类型模式 */
 	protected $types = null;
 
 	/** 检验工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取检验工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Check 检验工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || ! self::$ACCESS instanceof Check)
 		{
@@ -108,10 +108,13 @@ class Check extends Work
 		$mode = $this->runtime['mode'];
 		Log::logf(__FUNCTION__, array($item, $mode), __CLASS__);
 		### 解析检验模式
-		preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER);
+		if (! preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER))
+		{
+			return false;
+		}
 		foreach ($cases as $case)
 		{
-			$check  = $this->pick('check',  $case);
+			$check  = $this->pick('item',  $case);
 			$params = $this->pick('params', $case);
 			if ($params != null)
 			{

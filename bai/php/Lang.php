@@ -29,14 +29,14 @@ class Lang extends Work
 	protected $primary = self::ZH;
 
 	/** 语言工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取语言工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Style 输入工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
@@ -54,7 +54,7 @@ class Lang extends Work
 	 * @param boolean $print 是否输出
 	 * @return string
 	 */
-	static public function fetch($item = null, $print = true)
+	public static function fetch($item = null, $print = true)
 	{
 		$lang = Lang::access();
 		$result = $lang->entrust($item);

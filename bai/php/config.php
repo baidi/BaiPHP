@@ -22,8 +22,8 @@ global $config;
 
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
-	Work::EVENT   => 'home',				### 目标事项
-	'Branches'    => array(				 ### 扩展路径
+	Work::EVENT   => 'home',  ### 目标事项
+	'Branches'    => array(   ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
 		# '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => Work::WORK._DIR,
 	),
@@ -127,19 +127,21 @@ $config[Flow::PAGE] = array(
 ### 全局配置：数据工场
 $config[Work::DATA] = array(
 	_DEFAULT     => array(
-		'dsn'		=> 'mysql:host=localhost;dbname=bai',
-		'user'       => 'root',
-		'password'   => '',
-		'charset'    => 'utf8',
-		'lasting'    => false,
+		'dsn'      => 'mysql:host=localhost;dbname=baiphp',
+		'dbhost'   => 'localhost',
+		'dbtype'   => 'mysql',
+		'dbname'   => 'bai',
+		'user'     => 'root',
+		'password' => '',
+		'charset'  => 'utf8',
+		'lasting'  => false,
 	),
+	'dbhost'     => 'localhost',
 	'dbtype'     => 'mysql',
-	'_dbhost'    => 'localhost',
-	'_dbport'    => '',
-	'_dbname'    => 'bai',
-	'mysql'      => 'mysql:host=_dbhost;port=_dbport;dbname=_dbname',
-	'pgsql'      => 'pgsql:host=_dbhost;port=_dbport;dbname=_dbname',
-	'sqlite'     => 'sqlite:_dbhost',
+	'dbname'     => 'bai',
+	'mysql'      => 'mysql:host={$dbhost};port={$dbport};dbname={$dbname}',
+	'pgsql'      => 'pgsql:host={$dbhost};port={$dbport};dbname={$dbname}',
+	'sqlite'     => 'sqlite:{$dbhost}',
 );
 
 ### 全局配置：日志工场
@@ -181,7 +183,7 @@ $config[Work::LOG] = array(
 	),
 	Work::CHECK       => array(
 		Work::CHECK   => '--检验工场--',
-		'item'   => '输入项目检验：%s[%s]',
+		'item'        => '输入项目检验：%s[%s]',
 		'cipher'      => '安全暗号不符或已过期，请刷新页面后重试……',
 		'risk'        => '输入项不能包含&lt; &gt; &amp; \' " ; % \ 等非法字符……',
 		'required'    => '输入项不能为空……',
@@ -197,11 +199,16 @@ $config[Work::LOG] = array(
 		'table'       => 'SQL数据表未指定……',
 		'values'      => 'SQL字段值未指定……',
 		'where'       => 'SQL条件未指定……',
+		'sql'         => '执行SQL语句：%s',
 		'count'       => 'SQL统计<%d>条数据',
 		'read'        => 'SQL检索<%d>条数据',
 		'create'      => 'SQL追加<%d>条数据',
 		'update'      => 'SQL更新<%d>条数据',
 		'delete'      => 'SQL删除<%d>条数据',
+		'show'        => 'SQL描述<%d>条数据',
+	),
+	'Record'          => array(
+		'show'        => '',
 	),
 	Work::CACHE       => array(
 		Work::CACHE   => '--缓存工场--',
@@ -310,50 +317,50 @@ $config[Work::TEST] = array(
 ### 全局配置：测试工场
 $config[Work::TEMPLATE] = array(
 	_DEFAULT        => array(
-	    'param'     => '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#',
-	    'handler'   => array(
-    	    '?'     => 'choose',
-    	    '!'     => 'loop',
-	    ),
-	    'peg'       => '$',
-	    'looper'    => array('$value', '$key'),
+		'mode'      => '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#',
+		'handler'   => array(
+			'?'     => 'choose',
+			'!'     => 'loop',
+		),
+		'peg'       => '$',
+		'looper'    => array('$value', '$key'),
 		'templates' => array(
-	        'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$content}</div>',
-	    ),
+		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
+		),
 	),
 );
 
 $config[Work::INPUT] = array(
-	_DEFAULT => '/(?P<item>[^\s=]+)(?:=(?P<value>"[^"]+"|\'[^\']+\'|[^\s=]+))?/',
-	'type'  => array(
-		_DEFAULT => '/type=([a-zA-Z0-9-_]+)/i',
-		'float'  => 'number',
+	_DEFAULT => array(
+		'primary' => 'text',
+		'check'    => $config[Work::CHECK][_DEFAULT]['mode'],
+		'templates' => array(
+			'text' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" {$type ? type="$type" | type="text"} {$value} {$class ? class="$class"} {$style ? style="$style"} {$check ? data-check="$check"} {$hint ? placeholder="$hint"} />',
+		),
+		'types'  => array(
+			'float'  => 'number',
+		),
+		'checks' => array(
+			'required' => 'required="required"',
+			'max' => 'maxlength="%d"',
+			_DEFAULT => 'data-check="%s"',
+		),
+		'hints'  => array(
+			'required' => '非空',
+			'max'      => '最大%d位',
+			'min'      => '最小%d位',
+			'number'   => '整数型',
+			'float'    => '数值型',
+			'letter'   => '英文字母',
+			'char'     => '英文字母、数字、划线',
+			'mp'       => '移动电话',
+			'tel'      => '电话号码',
+			'url'      => '合法英文网址',
+			'email'    => '合法英文邮箱',
+			'date'     => '合法日期（年月日无分割或以-、/、空格分割）',
+			'time'     => '合法时间（时分秒无分割或以:、-、空格分割）',
+		),
 	),
-	'value' => array(
-		'/^checkbox|radio$/i' => 'checked="checked"',
-		'/^[a-zA-Z0-9-_]+$/' => 'value="%s"',
-	),
-	'check' => array(
-		'/^.*required.*$/i' => 'required="required"',
-		'/^.*max=(\d+).*$/i' => 'maxlength="$1"',
-		'/^(.+)$/' => 'data-check="$1"',
-	),
-	'hint'  => array(
-		'required' => '非空',
-		'max'      => '最大$1位',
-		'min'      => '最小$1位',
-		'number'   => '整数型',
-		'float'    => '数值型',
-		'letter'   => '英文字母',
-		'char'     => '英文字母、数字、划线',
-		'mp'       => '移动电话',
-		'tel'      => '电话号码',
-		'url'      => '合法英文网址',
-		'email'    => '合法英文邮箱',
-		'date'     => '合法日期（年月日无分割或以-、/、空格分割）',
-		'time'     => '合法时间（时分秒无分割或以:、-、空格分割）',
-	),
-	'format' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" type="{$type}" {$value} {$check} placeholder="{$hint}"/>',
 );
 
 $config['Lang'] = array(
@@ -362,56 +369,8 @@ $config['Lang'] = array(
 	),
 );
 
-### 输入项检验条目
-// $config['Input']['Items'] = array(
-// 		'/required/i',
-// 		'/\smax=(\d+)/i',
-// 		'/\smin=(\d+)/i',
-// 		'/\stype=number/i',
-// 		'/\stype=float/i',
-// 		'/\stype=letter/i',
-// 		'/\stype=char/i',
-// 		'/\stype=mp/i',
-// 		'/\stype=fax/i',
-// 		'/\stype=url/i',
-// 		'/\stype=email/i',
-// 		'/\stype=date/i',
-// 		'/\stype=time/i',
-// 		'/\s\w+=([^\s"]+)/',
-// );
-
-// ### 提示信息头
-// $config['Input']['Gap'] = '，';
-
-// ### 输入项HTML片段
-// $config['Input']['Htmls'] = array(
-// 		' required="required"',
-// 		' maxlength="$1"',
-// );
-
-// $config['Input']['Template'] = '<input id="" name="" type="" class="" data-check="" title="" value="" />';
-
-// ### 类型检验：正则
-// $config['Input']['Type'] = array(
-// 		### 数字
-// 		'number' => '/^[1-9]\d*$/',
-// 		### 数值
-// 		'float'  => '/^[+-]?\d+(?:\.\d+)?$/',
-// 		### 英文字母
-// 		'letter' => '/^[a-zA-Z]+$/',
-// 		### 英文字母数字划线
-// 		'char'   => '/^[a-zA-Z0-9_-]+$/',
-// 		### 移动电话
-// 		'mp'     => '/^(?:\+86)?1[358][0-9]{9}$/',
-// 		### 固话传真
-// 		'fax'    => '/^0[0-9]{2,3}-[1-9][0-9]{6,7}$/',
-// 		### 网址
-// 		'url'    => '/^(?:https?:\/\/)?[a-zA-Z0-9-_.\/]+(?:\?.+)?$/',
-// 		### 邮箱
-// 		'email'  => '/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$/',
-// 		### 日期
-// 		'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/',
-// 		### 时间
-// 		'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/',
-
-// );
+$config['Record'] = array(
+	_DEFAULT => array(
+		'primary' => Lang::ZH,
+	),
+);

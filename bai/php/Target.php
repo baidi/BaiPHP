@@ -79,7 +79,7 @@ class Target extends Bai
 	 * @param mixed $value 项目值
 	 * @return void
 	 */
-	static public function session($item, $value)
+	public static function session($item, $value)
 	{
 		global $target;
 		$_SESSION[$item] = $value;

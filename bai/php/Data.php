@@ -30,16 +30,18 @@ class Data extends Work
 	protected $charset = 'utf8';
 	/** 是否保持 */
 	protected $lasting = false;
+	/** 重复前缀 */
+	protected $pre = '_w_';
 
 	/** 数据工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取数据工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Data 数据工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 	    if ($setting != null || ! self::$ACCESS instanceof Data)
 	    {
@@ -57,7 +59,7 @@ class Data extends Work
 	 * @param array $where 条件
 	 * @return int 数据件数
 	 */
-	static public function count($table = null, $where = null)
+	public static function count($table = null, $where = null)
 	{
 		### 数据连接
 		$data = Data::access();
@@ -108,7 +110,7 @@ class Data extends Work
 	 * @param integer $offset 起始位置
 	 * @return array 检索结果
 	 */
-	static public function read($table = null, $where = null, $order = null, $limit = 0, $offset = 0)
+	public static function read($table = null, $where = null, $order = null, $limit = 0, $offset = 0)
 	{
 		### 数据连接
 		$data = Data::access();
@@ -173,7 +175,7 @@ class Data extends Work
 	 * @param array $values 字段值
 	 * @return int 执行结果
 	 */
-	static public function create($table = null, $values = null)
+	public static function create($table = null, $values = null)
 	{
 		### 数据连接
 		$data = Data::access();
@@ -207,7 +209,7 @@ class Data extends Work
 		}
 		Log::logf(__FUNCTION__, $count, __CLASS__);
 		$data->pdo->commit();
-		return $count;
+		return $data->pdo->lastInsertId();
 	}
 
 	/**
@@ -221,7 +223,7 @@ class Data extends Work
 	 * @param array $where 条件
 	 * @return int 执行结果
 	 */
-	static public function update($table = null, $values = null, $where = null)
+	public static function update($table = null, $values = null, $where = null)
 	{
 		### 数据连接
 		$data = Data::access();
@@ -246,6 +248,15 @@ class Data extends Work
 		{
 			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
+		}
+		### 排除重复键
+		foreach ($where as $item => $value)
+		{
+			if (isset($values[$item]))
+			{
+				$where[$this->pre.$item] = $where[$item];
+				unset($where[$item]);
+			}
 		}
 
 		### 建立SQL语句
@@ -274,7 +285,7 @@ class Data extends Work
 	 * @param array 条件 $where
 	 * @return integer 执行结果
 	 */
-	static public function delete($table = null, $where = null)
+	public static function delete($table = null, $where = null)
 	{
 		### 数据连接
 		$data = Data::access();
@@ -312,6 +323,42 @@ class Data extends Work
 	}
 
 	/**
+	 * <h4>描述数据</h4>
+	 * <p>
+	 * 根据数据表名读取列定义。
+	 * </p>
+	 * @param string 表名 $table
+	 * @return array 数据列
+	 */
+	public static function show($table = null)
+	{
+		### 数据连接
+		$data = Data::access();
+		if ($data == null)
+		{
+			return false;
+		}
+		### 数据表
+		if ($table == null)
+		{
+			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			return false;
+		}
+
+		### 建立SQL语句
+		$sql = 'show full columns from '.$data->field($table);
+
+		### 执行SQL语句
+		$rows = $data->entrust($sql, $where);
+		if ($rows === false)
+		{
+			return $rows;
+		}
+		Log::logf(__FUNCTION__, count($rows), __CLASS__);
+		return $rows;
+	}
+
+	/**
 	 * <h4>执行SQL语句</h4>
 	 * <p>
 	 * SQL语句中以<:field>作为占位符，参数列表中以<field>作为键名。
@@ -328,7 +375,7 @@ class Data extends Work
 		}
 
 		### SQL语句
-		Log::logs($sql);
+		Log::logf('sql', $sql, __CLASS__);
 
 		### 执行SQL语句
 		$stm = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));

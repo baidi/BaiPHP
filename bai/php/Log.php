@@ -62,14 +62,14 @@ class Log extends Work
 	protected $ending = "\r\n";
 
 	/** 日志工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取日志工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Log 日志工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
@@ -85,7 +85,7 @@ class Log extends Work
 	 * @param integer $level 日志级别
 	 * @return string 日志信息
 	 */
-	static public function logs($item = null, $type = null, $level = Log::INFO)
+	public static function logs($item = null, $type = null, $level = Log::INFO)
 	{
 		$log = Log::access();
 		return $log->entrust($item, $type, null, $level);
@@ -99,7 +99,7 @@ class Log extends Work
 	 * @param integer $level 日志级别
 	 * @return string 日志信息
 	 */
-	static public function logf($item = null, $params = null, $type = null, $level = Log::INFO)
+	public static function logf($item = null, $params = null, $type = null, $level = Log::INFO)
 	{
 		$log = Log::access();
 		return $log->entrust($item, $type, $params, $level);

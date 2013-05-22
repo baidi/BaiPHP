@@ -28,14 +28,14 @@ class Style extends Work
 	protected $links = null;
 
 	/** 样式工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取样式工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Style 样式工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
@@ -51,7 +51,7 @@ class Style extends Work
 	 * </p>
 	 * @return string 样式内容
 	 */
-	static public function css($item = null, $inset = false)
+	public static function css($item = null, $inset = false)
 	{
 		$style = Style::access();
 		return $style->entrust($item, __FUNCTION__, $inset);
@@ -64,7 +64,7 @@ class Style extends Work
 	 * </p>
 	 * @return string 样式内容
 	 */
-	static public function js($item = null, $inset = false)
+	public static function js($item = null, $inset = false)
 	{
 		$style = Style::access();
 		return $style->entrust($item, __FUNCTION__, $inset);
@@ -77,7 +77,7 @@ class Style extends Work
 	 * </p>
 	 * @return string 样式内容
 	 */
-	static public function img($item = null)
+	public static function img($item = null)
 	{
 		$style = Style::access();
 		return $style->entrust($item, __FUNCTION__);
@@ -90,7 +90,7 @@ class Style extends Work
 	 * </p>
 	 * @return string 样式内容
 	 */
-	static public function file($item = null, $branch = null)
+	public static function file($item = null, $branch = null)
 	{
 		$style = Style::access();
 		return $style->entrust($item, $branch);

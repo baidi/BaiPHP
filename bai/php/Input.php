@@ -18,20 +18,28 @@
  * </p>
  * @author 白晓阳
  */
-class Input extends Work
+class Input extends Template
 {
 	/** 首选项 */
-	protected $primary = 'text';
+	protected $primary = 'input';
+	/** 检验匹配式 */
+	protected $check = null;
+	/** 输入类型 */
+	protected $types   = null;
+	/** 输入验证 */
+	protected $checks  = null;
+	/** 输入提示 */
+	protected $hints   = null;
 
 	/** 输入工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取输入工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Style 输入工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
@@ -45,121 +53,129 @@ class Input extends Work
 	 * <p>
 	 * 生成输入项。
 	 * </p>
-	 * @param array $item 输入项
+	 * @param string $item 生成项
+	 * @param array $setting 模板参数
 	 * @return string 输入项（HTML）
 	 */
-	public function entrust($item = null)
+	public function entrust($item = null, $setting = null)
 	{
-		if ($item == null || ! is_string($item))
+		### 生成项默认为input
+		if ($item == null)
 		{
-			return null;
+			$item = $this->primary;
 		}
+		### 字符串默认作为$value
+		if ($setting != null && is_string($setting))
+		{
+			$setting = array('value' => $setting);
+		}
+		if (! is_array($setting))
+		{
+			$setting = array();
+		}
+		### 匹配检验项
 		$event = $this->target[self::EVENT];
-		$this->runtime['event'] = $event;
-		$this->runtime['item']  = $item;
-		$this->runtime['type']  = $this->type();
-		$this->runtime['value'] = $this->value();
-		$this->runtime['check'] = $this->check();
-		$this->runtime['hint']  = $this->hint();
-		$this->result = $this->format();
+		$check = $this->config(self::CHECK, $event, $item);
+		if (preg_match_all($this->check, $check, $cases, PREG_SET_ORDER))
+		{
+			$cases[_DEFAULT] = $check;
+		}
+		$this->runtime['cases'] = $cases;
+		### 填充模板参数
+		$setting['event'] = $event;
+		$setting['item']  = $item;
+		$setting['value'] = $this->pick($item, $this->target[$event]);
+		if ($cases != null)
+		{
+			$setting['type']  = $this->type();
+			$setting['check'] = $this->check();
+			$setting['hint']  = $this->hint();
+		}
+		### 解析模板
+		$this->result = parent::entrust($item, $setting);
 		return $this->result;
 	}
 
+	/**
+	 * <h4>解析输入类型</h4>
+	 * <p>
+	 * 根据检验条件（type=***）解析输入类型。
+	 * </p>
+	 * @return string 输入类型
+	 */
 	protected function type()
 	{
-		$event = $this->pick('event', $this->runtime);
-		$item  = $this->pick('item',  $this->runtime);
-		$check = $this->config(self::CHECK, $event, $item);
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$mode = $this->pick(_DEFAULT, $preset);
-		if (preg_match($mode, $check, $type))
+		$cases = $this->pick('cases', $this->runtime);
+		### 获取输入类型
+		$result = null;
+		foreach ($cases as $case)
 		{
-			$type = $type[1];
-		}
-		if ($type == null)
-		{
-			$type = $this->primary;
-		}
-		$alt = $this->pick($type, $preset);
-		return ($alt == null) ? $type : $alt;
-	}
-
-	protected function value()
-	{
-		$event = $this->pick('event', $this->runtime);
-		$item  = $this->pick('item',  $this->runtime);
-		$value = $this->pick($item, $this->target[$event]);
-		if ($value == null)
-		{
-			return null;
-		}
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$type  = $this->pick('type',  $this->runtime);
-		foreach ($preset as $item => $mode)
-		{
-			$alt = preg_replace($item, $mode, $type);
-			if ($alt != $type)
+			$item  = $this->pick('item',  $case);
+			if ($item === __FUNCTION__)
 			{
+				$result = $this->pick('value', $case);
 				break;
 			}
 		}
-		return sprintf($alt, $value);
+		### 转换输入类型
+		$alt = $this->pick($result, $this->types);
+		return ($alt === null) ? $result : $alt;
 	}
 
+	/**
+	 * <h4>解析输入验证</h4>
+	 * <p>
+	 * 根据检验条件（required、max=***）解析输入验证。
+	 * required => required="required"
+	 * max=9 => maxlength="9"
+	 * 全部 => data-check="***"
+	 * </p>
+	 * @return string 输入验证
+	 */
 	protected function check()
 	{
-		$event = $this->pick('event', $this->runtime);
-		$item  = $this->pick('item',  $this->runtime);
-		$check = $this->config(self::CHECK, $event, $item);
-		$preset = $this->pick(__FUNCTION__, $this->preset);
+		$cases = $this->pick('cases', $this->runtime);
 		$result = array();
-		foreach ($preset as $item => $value)
+		foreach ($cases as $case)
 		{
-			$alt = preg_replace($item, $value, $check);
-			if ($alt !== $check)
+			$item  = $this->pick('item',  $case);
+			$params = $this->pick('params', $case);
+			$check = $this->pick($item, $this->checks);
+			if ($check != null)
 			{
-				$result[] = $alt;
+				$result[] = sprintf($check, $params);
 			}
 		}
 		return implode(' ', $result);
 	}
 
+	/**
+	 * <h4>解析输入提示</h4>
+	 * <p>
+	 * 根据检验条件解析输入提示。
+	 * </p>
+	 * @return string 输入提示
+	 */
 	protected function hint()
 	{
-		$event = $this->pick('event', $this->runtime);
-		$item  = $this->pick('item',  $this->runtime);
-		$check = $this->config(self::CHECK, $event, $item);
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$mode = $this->pick(_DEFAULT, $this->preset);
-		preg_match_all($mode, $check, $cases, PREG_SET_ORDER);
-		$hints = array();
+		$cases = $this->pick('cases', $this->runtime);
+		$result = array();
 		foreach ($cases as $case)
 		{
-			if (isset($preset[$case['item']]))
+			$item  = $this->pick('item',  $case);
+			$params = $this->pick('params', $case);
+			$hint = $this->pick($item, $this->hints);
+			if ($hint != null)
 			{
-				$hints[] = $preset[$case['item']];
+				$result[] = sprintf($hint, $params);
 				continue;
 			}
-			if (isset($preset[$case['value']]))
+			$hint = $this->pick($params, $this->hints);
+			if ($hint != null)
 			{
-				$hints[] = $preset[$case['value']];
+				$result[] = $case;
 			}
 		}
 		return implode(', ', $hints);
-	}
-
-	protected function format()
-	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		if ($preset == null || ! is_string($preset))
-		{
-			return null;
-		}
-		foreach ($this->runtime as $item => $value)
-		{
-			$preset = str_replace('{$'.$item.'}', $value, $preset);
-		}
-		$preset = preg_replace('/\{\$[^\}]+\}/', '', $preset);
-		return $preset;
 	}
 }

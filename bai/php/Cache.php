@@ -34,7 +34,7 @@ class Cache extends Work
 	protected $items   = null;
 
 	/** 缓存静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取缓存工场入口</h4>

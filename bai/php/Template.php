@@ -28,7 +28,7 @@
 class Template extends Work
 {
 	/** 参数表达式 */
-	protected $param = '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#';
+	protected $mode = '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#';
 	/** 参数处理式 */
 	protected $handler = array(
 		### 判断处理式
@@ -44,20 +44,26 @@ class Template extends Work
 	protected $templates = null;
 
 	/** 模板工场静态入口 */
-	static private $ACCESS = null;
+	private static $ACCESS = null;
 
 	/**
 	 * <h4>获取模板工场入口</h4>
 	 * @param array $setting 即时配置
 	 * @return Template 模板工场
 	 */
-	static public function access($setting = null)
+	public static function access($setting = null)
 	{
 		if ($setting != null || self::$ACCESS == null)
 		{
 			self::$ACCESS = new Template($setting);
 		}
 		return self::$ACCESS;
+	}
+
+	public static function fetch($item = null, $setting = null)
+	{
+		$template = Template::access();
+		return $template->entrust($item, $setting);
 	}
 
 	/**
@@ -82,10 +88,15 @@ class Template extends Work
 			return null;
 		}
 		### 参数匹配
-		if ($this->param == null || ! preg_match_all($this->param, $template, $params, PREG_SET_ORDER))
+		if ($this->mode == null || ! preg_match_all($this->mode, $template, $params, PREG_SET_ORDER))
 		{
 			$this->result = $template;
 			return $this->result;
+		}
+		### 字符串默认作为$value
+		if ($setting != null && is_string($setting))
+		{
+			$setting = array('value' => $setting);
 		}
 		if (is_array($setting))
 		{

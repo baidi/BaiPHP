@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <title>CSS</title>
-<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
 <style>
 body {
-	background-color: #dddddd;
 }
 .header-bar {
 	margin: 6px;
@@ -47,12 +46,61 @@ body {
 	border-radius: 6px;
 	box-shadow: 3px 0 6px 1px #f0fff0;
 }
+.header {
+	clear:both;
+	background: #f0f9f0;
+	border-bottom: 2px solid #99cc99;
+	border-top: 1px solid #cceccc;
+}
+.header span {
+	position: relative;
+	display: inline-block;
+	line-height: 36px;
+	min-width: 36px;
+	padding: 6px;
+	color: #008000;
+}
+.header span:hover, .header span.on {
+	background: #f0fff0;
+	border-bottom: 2px solid #f04000;
+	margin-bottom: -2px;
+}
+.colors span{
+	display: inline-block;
+	line-height: 32px;
+	min-width: 32px;
+}
 </style>
 <script type="text/javascript">
 </script>
 </head>
 <body>
-	<br>
+	<div class="colors">
+		<span style="background:#F0F9F0;">F0F9F0</span>
+		<span style="background:#E0F4E0;">E0F4E0</span>
+		<span style="background:#D6F0D6;">D6F0D6</span>
+		<span style="background:#CCECCC;">CCECCC</span>
+		<span style="background:#F0FfF0;">F0FFF0</span>
+		<span style="background:#ccffcc;">CCFFCC</span>
+		<span style="background:#99CC99;">99CC99</span>
+		<span style="background:#009933;">009933</span>
+		<span style="background:#009F3C;">009F3C</span>
+		<span style="background:#006600;">006600</span>
+		<span style="background:#FFF9F0;">FFF9F0</span>
+		<span style="background:#FCDFCC;">FCDFCC</span>
+		<span style="background:#FF6600;">FF6600</span>
+		<span style="background:#F06000;">F06000</span>
+		<span style="background:#F04000;">F04000</span>
+		<hr>
+		<input maxlength="6" onblur="$('#pick').text(this.value);$('#pick').css('background', '#'+this.value);" />
+		<span id="pick">T</span>
+	</div><br>
+	<div class="header">
+		<span>Item1</span>
+		<span class="on">Item1</span>
+		<span style="background:#fff9f0;">Item1</span>
+		<span>Item1</span>
+	</div>
 	<div class="header-bar">
 		<span class="header-menu">Menu1</span>
 		<span class="header-menu">Menu2</span>
