@@ -11,25 +11,26 @@
 	<?php echo Style::js($this->js, true); ?>
 </head>
 <body>
-	<div class="page">
-		<header><!-- 页眉 -->
-		    <?php echo $this->load('_header.php'); ?>
-		</header>
-		<div><!-- 页面 -->
-			<aside class="lside"><!-- 左边栏 -->
-			</aside>
-			<?php if ($this->rside) { ?>
-			<aside class="rside"><!-- 右边栏 -->
-				<?php echo $this->rside; ?>
-			</aside>
-			<?php } ?>
-			<div class="main"><!-- 主体 -->
-				<?php echo $this->load("$this->target"); ?>
-			</div>
+	<header class="header"><!-- 页眉 -->
+	    <?php echo $this->load('_header.php'); ?>
+	</header>
+	<div class="page"><!-- 页面 -->
+		<?php if ($this->lside) { ?>
+		<aside class="lside"><!-- 左边栏 -->
+			<?php echo $this->lside; ?>
+		</aside>
+		<?php } ?>
+		<?php if ($this->rside) { ?>
+		<aside class="rside"><!-- 右边栏 -->
+			<?php echo $this->rside; ?>
+		</aside>
+		<?php } ?>
+		<div class="main"><!-- 主体 -->
+			<?php echo $this->load("$this->target"); ?>
 		</div>
-		<footer><!-- 页脚 -->
-			<?php echo $this->load('_footer.php'); ?>
-		</footer>
 	</div>
+	<footer><!-- 页脚 -->
+		<?php echo $this->load('_footer.php'); ?>
+	</footer>
 </body>
 </html>

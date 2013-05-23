@@ -46,29 +46,38 @@ body {
 	border-radius: 6px;
 	box-shadow: 3px 0 6px 1px #f0fff0;
 }
+.colors span{
+	display: inline-block;
+	line-height: 32px;
+	min-width: 32px;
+}
 .header {
 	clear:both;
+	position: relative;
 	background: #f0f9f0;
-	border-bottom: 2px solid #99cc99;
 	border-top: 1px solid #cceccc;
+	text-align: right;
 }
-.header span {
+.header .edge {
+	margin-left: 100px;
+	border-bottom: 2px solid #99cc99;
+}
+.header .logo {
+	float: left;
+}
+.header a {
 	position: relative;
 	display: inline-block;
+	font-size: 20px;
 	line-height: 36px;
 	min-width: 36px;
 	padding: 6px;
 	color: #008000;
 }
-.header span:hover, .header span.on {
+.header a.on, .header a:hover {
 	background: #f0fff0;
 	border-bottom: 2px solid #f04000;
 	margin-bottom: -2px;
-}
-.colors span{
-	display: inline-block;
-	line-height: 32px;
-	min-width: 32px;
 }
 </style>
 <script type="text/javascript">
@@ -91,17 +100,18 @@ body {
 		<span style="background:#FF6600;">FF6600</span>
 		<span style="background:#F06000;">F06000</span>
 		<span style="background:#F04000;">F04000</span>
-		<hr>
 		<input maxlength="6" onblur="$('#pick').text(this.value);$('#pick').css('background', '#'+this.value);" />
 		<span id="pick">T</span>
 	</div><br>
 	<div class="header">
-		<span>Item1</span>
-		<span class="on">Item1</span>
-		<span style="background:#fff9f0;">Item1</span>
-		<span>Item1</span>
+		<img class="logo" src="img/logo.png"></img>
+		<a>菜单</a>
+		<a class="on">菜单</a>
+		<a>菜单</a>
+		<a>菜单</a>
+		<div class="edge"></div>
 	</div>
-	<div class="header-bar">
+	<!--div class="header-bar">
 		<span class="header-menu">Menu1</span>
 		<span class="header-menu">Menu2</span>
 		<span class="header-menu2">Menu3</span>
@@ -115,6 +125,6 @@ body {
 	<div class="header-bar2">
 		<br>&amp;
 		<br>
-	</div>
+	</div-->
 </body>
 </html>
