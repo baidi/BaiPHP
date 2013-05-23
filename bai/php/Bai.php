@@ -1,22 +1,32 @@
 <?php
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
- * @link      http://www.baiphp.com
- * @copyright Copyright (c) 2011 - 2012, 白晓阳
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
+ * @link      http://www.baiphp.net
+ * @copyright Copyright 2011 - 2013, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
- *            2.0.0 2012/07/01 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
- * <p>欢迎提供捐助。任何捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授权。</p>
+ *            2.0.0 2013/07/01 全面重构代码，弃用公共函数，独立启动引擎，优化配置文件结构，增加
+ *            原始虚类、目标工场、样式工场、模板工场、语言工场和记录工场，并优化代码结构。
+ * @license
+ * <p>化简PHP（BaiPHP）开发框架，是依据"面向目标"的设计思想、基于"服务-流程-工场"的设计模式、以简洁
+ * 灵活为方向、由白晓阳设计和开发的一套PHP应用框架。该框架的核心是基于配置并即时可控的流程走向和流程覆
+ * 盖，它采用了简洁优雅的实现方式，不但显著提升框架的易学性和易用性，而且最大限度地释放出应用的灵活性和扩
+ * 展性，从而尽可能地降低程序的开发和维护成本。</p>
+ * <p>化简PHP（BaiPHP）开发框架完全开放源代码，任何人都可以自由地复制、传播、修改和使用该代码，但未经
+ * 授权，不得用于商业目的。</p>
+ * <p>欢迎对该框架提供任何形式的捐助，捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授
+ * 权。</p>
+ * <p>化简PHP（BaiPHP）开发框架由白晓阳持有版权，并保留一切权利。</p>
  */
 
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>元始虚类</h3>
  * <p>
  * 定义公共基础标识、单一开放入口和内部共享行为。
- * 服务、流程、工场和其他框架内部类都应当继承该类。
+ * 服务、流程、工场及其他框架内部类都必须继承该类。
  * </p>
+ * @copyright Copyright 2011 - 2013, 白晓阳
  * @author 白晓阳
  */
 abstract class Bai implements ArrayAccess
@@ -44,14 +54,17 @@ abstract class Bai implements ArrayAccess
 	protected $target  = null;
 	/** 执行结果 */
 	protected $result  = null;
-	/** 错误信息 */
-	protected $error   = null;
+	/** 警示信息 */
+	protected $notice  = null;
+
+	/** 警示模板 */
+	protected $board   = '_error.php';
 
 	/**
 	 * <h4>委托目标</h4>
 	 * <p>
-	 * （外部）委托当前对象完成目标并交付结果。
-	 * 所有子对象必须以该行为作为非静态单一开放入口。
+	 * （外部）委托当前对象处理目标并交付结果。
+	 * 所有子对象应当以该行为作为非静态单一开放入口。
 	 * </p>
 	 * @param array $setting 即时配置
 	 * @return mixed 交付结果
@@ -64,8 +77,10 @@ abstract class Bai implements ArrayAccess
 	/**
 	 * <h4>执行目标</h4>
 	 * <p>
-	 * （流程或工场）根据预置流程执行目标以实现交付。
-	 * 预置流程由全局配置：$config[self::FLOW][__CLASS__]设定。
+	 * （流程或工场）根据预置流程依次处理目标并交付结果。
+	 * 预置流程由全局配置$config[self::FLOW][当前对象名]设定。
+	 * 如果当前对象未预置流程，则逐级回溯父对象的预置流程。最后将即时配置并入预置流程。
+	 * 如果仍无可用流程，则正常交付。
 	 * </p>
 	 * @param array $setting 即时配置
 	 * @return mixed 执行结果
@@ -73,44 +88,52 @@ abstract class Bai implements ArrayAccess
 	protected function run($setting = null)
 	{
 		### 读取预置流程
-		$class = get_class($this);
-		$preset = $this->config(self::FLOW, $class);
-		if ($preset == null || ! is_array($preset))
+		$parent = $class = get_class($this);
+		$flow = $this->config(self::FLOW, $class);
+		while ($flow == null || ! is_array($flow))
 		{
-			$preset = $this->config(self::FLOW, get_parent_class($this));
+			### 回溯父对象的预置流程
+			$parent = get_parent_class($parent);
+			if (! $parent)
+			{
+				break;
+			}
+			$flow = $this->config(self::FLOW, $parent);
 		}
-		$this->stuff($setting, $preset);
-		if ($preset == null || ! is_array($preset))
+		### 合并即时配置
+		$this->stuff($setting, $flow);
+		if ($flow == null || ! is_array($flow))
 		{
+			### 无可用流程，正常结束
 			return true;
 		}
 		### 执行预置流程
 		$jump = null;
-		foreach ($preset as $item => $mode)
+		foreach ($flow as $item => $mode)
 		{
-			### 跳转模式
 			if ($mode === self::NIL || ($jump != null && $jump !== $item))
 			{
+				### 跳转模式
 				continue;
 			}
 			if (method_exists($this, $item))
 			{
-				### 执行内部方法
+				### 执行自身方法
 				Log::logf(__FUNCTION__, $class.'->'.$item, __CLASS__);
 				$this->result = $this->$item();
 			}
 			else
 			{
-				### 委托外部对象
-				$flow = $this->build($item);
-				if ($flow != null)
+				### 委托其他对象
+				$step = $this->build($item);
+				if ($step != null)
 				{
-					Log::logf('entrust', "$flow", __CLASS__);
-					$this->result = $flow->entrust();
-					#$this->error = $flow->error;
+					Log::logf('entrust', "$step", __CLASS__);
+					$this->result = $step->entrust();
+					$this->notice = $step->notice;
 				}
 			}
-			if ($this->error == null)
+			if ($this->notice == null)
 			{
 				if ($mode === false)
 				{
@@ -119,7 +142,7 @@ abstract class Bai implements ArrayAccess
 				$jump = null;
 				continue;
 			}
-			$this->target->error = $this->error;
+			$this->target->notice = $this->notice;
 			$this->target->anchor = $this;
 			if (is_string($mode) && $mode)
 			{
@@ -134,18 +157,22 @@ abstract class Bai implements ArrayAccess
 	}
 
 	/**
-	 * <h4>输出错误页面</h4>
-	 * @return string 错误页面
+	 * <h4>输出警示</h4>
+	 * <p>
+	 * 根据警示信息和警示模板输出警示页面
+	 * </p>
+	 * @return string 警示页面
 	 */
 	protected function error()
 	{
-		return $this->load(_DEFAULT.__FUNCTION__, false, Flow::PAGE._DIR);
+		$this->notice = null;
+		return $this->load($this->board, false, Flow::PAGE);
 	}
 
 	/**
 	 * <h4>读取全局配置</h4>
 	 * <p>
-	 * 根据指定项目名，逐级读取全局配置。
+	 * 根据指定项目名，逐级读取全局配置内容。
 	 * 如果未指定项目名，则返回全局配置。
 	 * 如果未读取到指定项，则返回空（null）。
 	 * 全局配置由$config设定。
@@ -158,37 +185,37 @@ abstract class Bai implements ArrayAccess
 	{
 		### 项目名
 		$items = func_get_args();
-		$preset = $GLOBALS[__FUNCTION__];
+		$config = $GLOBALS[__FUNCTION__];
 		if ($items == null)
 		{
-			return $preset;
+			return $config;
 		}
 		### 根据项目名逐级读取全局配置
 		foreach ($items as $item)
 		{
-			if (! is_array($preset) || ! isset($preset["$item"]))
+			if (! is_array($config) || ! isset($config["$item"]))
 			{
 				return null;
 			}
-			$preset = $preset["$item"];
+			$config = $config["$item"];
 		}
-		return $preset;
+		return $config;
 	}
 
 	/**
 	 * <h4>检出项目值</h4>
 	 * <p>
-	 * 从列表中检出指定项目。
-	 * 优先检索自定义列表，默认检索当前目标及全局配置。
-	 * 如果未检索到指定项目，则返回空（null）。
+	 * 从自定列表或对象中检出指定项目的值。
+	 * 在扩展模式下，如果未检出该项目，会检索当前目标及全局配置。
+	 * 如果最终未检索到指定项目，则返回空（null）。
 	 * </p>
 	 * @param string $item 项目名
-	 * @param array $source 数据源
-	 * @param bool $limit 是否限定列表
+	 * @param array $list 自定列表或对象
+	 * @param bool $extra 扩展模式
 	 * @param bool $print 是否输出
 	 * @return mixed 项目值
 	 */
-	protected function pick($item = null, $source = null, $limit = true, $print = false)
+	protected function pick($item = null, $list = null, $extra = false, $print = false)
 	{
 		### 项目名
 		if ($item == null)
@@ -196,18 +223,18 @@ abstract class Bai implements ArrayAccess
 			return null;
 		}
 		$value = null;
-		### 从自定义列表中检值
-		if (is_array($source) && isset($source[$item]))
+		### 从自定列表中检值
+		if (is_array($list) && isset($list[$item]))
 		{
-			$value = $source[$item];
+			$value = $list[$item];
 		}
-		else if (is_object($source) && isset($source->$item))
+		else if (is_object($list) && isset($list->$item))
 		{
-			$value = $source->$item;
+			$value = $list->$item;
 		}
-		if (! $limit)
+		if ($extra)
 		{
-			### 从当前目标及全局配置中检值
+			### 扩展模式，从当前目标及全局配置中检值
 			if ($value === null)
 			{
 				$value = $this->target->$item;
@@ -227,53 +254,54 @@ abstract class Bai implements ArrayAccess
 	/**
 	 * <h4>输出项目值</h4>
 	 * <p>
-	 * 从列表中输出指定项目。
-	 * 优先检索自定义列表，默认检索当前目标及全局配置。
-	 * 如果未检索到指定项目，则输出空（null）。
+	 * 从自定列表或对象中检出指定项目的值并输出。
 	 * </p>
 	 * @param string $item 项目名
-	 * @param array $list 自定义列表
-	 * @param bool $limit 是否限定列表
+	 * @param array $list 自定列表或对象
+	 * @param bool $extra 扩展模式
 	 * @return mixed 项目值
 	 */
-	protected function drop($item = null, $list = null, $limit = true)
+	protected function drop($item = null, $list = null, $extra = false)
 	{
 		return $this->pick($item, $list, $limit, true);
 	}
 
 	/**
-	 * <h4>填充数据列表</h4>
+	 * <h4>填充项目</h4>
 	 * <p>
-	 * 填充数据列表到对象自身或目标列表。
+	 * 填充列表项目到对象属性或目标列表。
 	 * </p>
-	 * @param array $list 数据列表
-	 * @param array $master 目标列表
-	 * @param bool $force 是否更新空项
+	 * @param array $list 源列表
+	 * @param array $master 目标列表或对象
+	 * @param bool $all 是否更新空项
 	 * @return bool 填充结果
 	 */
-	protected function stuff($list = null, &$master = null, $force = true)
+	protected function stuff($list = null, &$master = null, $all = false)
 	{
+		### 源列表
 		if (! is_array($list))
 		{
 			return false;
 		}
-		### 填充到当前对象
 		if ($master === null)
 		{
+			### 默认填充到当前对象
 			$master = $this;
 		}
+		### 填充到目标对象属性
 		if (is_object($master))
 		{
 			foreach ($list as $item => $value)
 			{
-				if ($force || $value != null || ! isset($master->$item))
+				if ($all || $value != null || ! isset($master->$item))
 				{
 					$master->$item = $value;
 				}
 			}
 			return true;
 		}
-		if (! is_array($master) && ! ($master instanceof ArrayAccess))
+		### 目标无效，以填充列表替代
+		if (! is_array($master))
 		{
 			$master = $list;
 			return true;
@@ -286,7 +314,7 @@ abstract class Bai implements ArrayAccess
 				$this->stuff($value, $master[$item]);
 				continue;
 			}
-			if ($force || $value != null || ! isset($master[$item]))
+			if ($all || $value != null || ! isset($master[$item]))
 			{
 				$master[$item] = $value;
 			}
@@ -295,78 +323,14 @@ abstract class Bai implements ArrayAccess
 	}
 
 	/**
-	 * <h4>构建对象</h4>
-	 * <p>
-	 * 根据对象名检测并构建对象。
-	 * </p>
-	 * @param string $class 对象名
-	 * @param array $setting 即时配置
-	 * @return mixed 对象实例，对象未知则返回空（null）。
-	 */
-	protected function build($class = null, $setting = null)
-	{
-		if ($class == null || ! is_string($class))
-		{
-			return null;
-		}
-		$event = ucfirst("$this->target");
-		### 优先加载扩展对象
-		if (class_exists($event.$class))
-		{
-			$class = $event.$class;
-		}
-		else if (! class_exists($class))
-		{
-			### 对象未知
-			$error = Log::logf(__FUNCTION__, $class, __CLASS__, Log::EXCEPTION);
-			#trigger_error($error, E_USER_WARNING);
-			return null;
-		}
-		if (method_exists($class, 'access'))
-		{
-			### 静态构建
-			return $class::access($setting);
-		}
-		### 常态构建
-		return new $class($setting);
-	}
-
-	/**
-	 * <h4>构建网址</h4>
-	 * <p>
-	 * 根据事件名与服务名构建网址。
-	 * </p>
-	 * @param string $event 事件名
-	 * @param string $service 服务名
-	 * @param string $setting 即时配置
-	 * @return string 网址
-	 */
-	protected function url($event = null, $service = null, $setting = null)
-	{
-	    $result = array();
-	    if ($service != null)
-	    {
-	        $result[] = lcfirst(self::SERVICE).'='.$service;
-	    }
-	    if ($event != null)
-	    {
-	        $result[] = lcfirst(self::EVENT).'='.$event;
-	    }
-	    if ($result != null)
-	    {
-	        $result = '?'.implode('&', $result);
-	    }
-	    return $result == null ? _WEB : _WEB.$result;
-	}
-
-	/**
 	 * <h4>定位文件</h4>
 	 * <p>
 	 * 根据文件名确定文件基于根目录的相对路径。
 	 * </p>
 	 * @param string $item 文件名
-	 * @param string $branch 分支
-	 * @return array 文件路径
+	 * @param string $branch 扩展分支名
+	 * @return array 文件路径，最多包含两项内容：self::Bai指向框架核心文件路径，self::Service指
+	 * 向用户服务文件路径
 	 */
 	protected function locate($item = null, $branch = null)
 	{
@@ -384,15 +348,16 @@ abstract class Bai implements ArrayAccess
 		{
 			$branch .= _DIR;
 		}
+		### 文件路径
 		$bai     = $this->target[self::BAI].$branch.$item;
 		$service = $this->target[self::SERVICE].$branch.$item;
 		$result = array();
-		### 系统文件
+		### 框架核心文件
 		if (is_file(_LOCAL.$bai))
 		{
 			$result[self::BAI] = $bai;
 		}
-		### 服务文件
+		### 用户服务文件
 		if (is_file(_LOCAL.$service))
 		{
 			$result[self::SERVICE] = $service;
@@ -404,10 +369,10 @@ abstract class Bai implements ArrayAccess
 	 * <h4>加载文件</h4>
 	 * <p>
 	 * 根据目标事项或文件名加载页面文件。
-	 * 页面文件中可直接使用外部参数$_params。
 	 * </p>
-	 * @param string $item 文件名
+	 * @param string $item 目标事项或文件名（PHP）
 	 * @param bool $all 是否叠加
+	 * @param string $branch 扩展分支名
 	 * @return string 页面内容，页面无效则返回空。
 	 */
 	protected function load($item = null, $all = false, $branch = null)
@@ -417,15 +382,16 @@ abstract class Bai implements ArrayAccess
 		{
 			return null;
 		}
-		if (substr($item, - strlen(_EXT)) !== _EXT)
+		### 为目标事项添加后缀名
+		if (strcasecmp(substr($item, - strlen(_EXT)), _EXT) != 0)
 		{
 			$item .= _EXT;
 		}
-		### 路径
+		### 定位文件路径
 		$path    = $this->locate($item, $branch);
 		$bai     = $this->pick(self::BAI,     $path);
 		$service = $this->pick(self::SERVICE, $path);
-		### 加载文件
+		### 加载全部文件，框架核心文件优先
 		if ($all)
 		{
 			ob_start();
@@ -439,6 +405,7 @@ abstract class Bai implements ArrayAccess
 			}
 			return ob_get_clean();
 		}
+		### 加载单个文件，用户服务文件优先
 		if ($service != null)
 		{
 			ob_start();
@@ -451,6 +418,73 @@ abstract class Bai implements ArrayAccess
 			include _LOCAL.$bai;
 			return ob_get_clean();
 		}
+	}
+
+	/**
+	 * <h4>构建对象</h4>
+	 * <p>
+	 * 根据对象名检测并构建对象。
+	 * </p>
+	 * @param string $class 对象名
+	 * @param array $setting 即时配置
+	 * @return mixed 对象实例，对象未知时返回空（null）。
+	 */
+	protected function build($class = null, $setting = null)
+	{
+		### 对象名
+		if ($class == null || ! is_string($class))
+		{
+			return null;
+		}
+		$event = ucfirst("$this->target");
+		### 优先加载扩展对象
+		if (class_exists($event.$class))
+		{
+			$class = $event.$class;
+		}
+		else if (! class_exists($class))
+		{
+			### 对象未知
+			$this->notice = Log::logf(__FUNCTION__, $class, __CLASS__, Log::EXCEPTION);
+			#trigger_error($error, E_USER_ERROR);
+			return null;
+		}
+		if (method_exists($class, 'access'))
+		{
+			### 静态构建
+			return $class::access($setting);
+		}
+		### 常态构建
+		return new $class($setting);
+	}
+
+	/**
+	 * <h4>构建网址</h4>
+	 * <p>
+	 * 根据事件名与服务名构建相应网址。
+	 * </p>
+	 * @param string $event 事件名
+	 * @param string $service 服务名
+	 * @param string $setting 即时配置
+	 * @return string 网址
+	 */
+	protected function url($event = null, $service = null, $setting = null)
+	{
+		$url = array();
+		if ($service != null)
+		{
+			$url[] = lcfirst(self::SERVICE).'='.$service;
+		}
+		if ($event != null)
+		{
+			$url[] = lcfirst(self::EVENT).'='.$event;
+		}
+		$this->stuff($setting, $url);
+		if ($url != null)
+		{
+			$url = '?'.implode('&', $url);
+		}
+		return $url == null ? _WEB : _WEB.$url;
 	}
 
 	/**
@@ -503,7 +537,7 @@ abstract class Bai implements ArrayAccess
 	 */
 	public function __get($item)
 	{
-		Log::logf(__FUNCTION__, get_class($this).'->'.$item, __CLASS__, Log::NOTICE);
+		Log::logf(__FUNCTION__, get_class($this).'->'.$item, __CLASS__);
 		$this->$item = null;
 		return $this->$item;
 	}
@@ -526,17 +560,20 @@ abstract class Bai implements ArrayAccess
 	}
 
 	/**
-	 * <h4>构建对象</h4>
+	 * <h4>构建子对象</h4>
 	 * <p>
-	 * 设置当前目标和预置数据。
+	 * 设置当前目标并应用预置数据和即时配置。
 	 * </p>
 	 * @param array $setting 即时配置
+	 * @global Target 当前目标
 	 */
 	protected function __construct($setting = null)
 	{
+		### 设置当前目标
 		global $target;
-		$class = get_class($this);
 		$this->target = $target;
+		### 应用预置数据和即时配置
+		$class = get_class($this);
 		$this->stuff($this->config($class), $this->preset);
 		$this->stuff($setting, $this->preset);
 		$this->stuff($this->pick(_DEFAULT, $this->preset), $this, false);

@@ -1,10 +1,10 @@
 <?php
 global $config;
 $config[Lang::LANG][Lang::ZH] = array(
-	'title'       => 'BaiPHP-简单PHP',
+	'title'       => 'BaiPHP-化简PHP',
 	'author'      => 'baidi-白晓阳',
-	'keywords'    => 'BaiPHP-简单PHP',
-	'description' => 'BaiPHP-简单PHP',
+	'keywords'    => 'BaiPHP-化简PHP',
+	'description' => 'BaiPHP-化简PHP',
 	'logo' => 'BaiPHP - 化简PHP  化繁为简, 四两拨千',
 	'copyright'   => 'Copyright '.date('Y').', All Rights Reserved. 版权('.date('Y').')所有，保留一切权力。',
 	'nav' => array(

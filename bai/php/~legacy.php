@@ -1,22 +1,11 @@
 <?php
 /**
- * <b>BaiPHP（简单PHP）开发框架</b>
+ * <b>化简PHP（BaiPHP）开发框架</b>
  * @author		白晓阳
  * @copyright	Copyright (c) 2011 - 2012, 白晓阳
- * @link		http://dacbe.com
- * @version    V1.0.0 2012/03/31 首版
+ * @link		http://www.baiphp.net/
+ * @version     V1.0.0 2012/03/31 首版
  * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
- */
-
-/**
- * <b>BaiPHP（简单PHP）开发框架</b><br/>
- * <b>扩展工场</b>
- * <p>
- * ！！！建议所有扩展工场以Extend结尾！！！
- * ！！！建议所有扩展方法以e开头！！！
- * ！！！不要把扩展做得过于臃肿和庞大，这是一个清新简单的系统！！！
- * </p>
- * @author 白晓阳
  */
 
 /**
@@ -96,5 +85,47 @@ function eVCode($item, array $params = null)
 	if ($item && $params && strtoupper($item) == cRead($params[0]))
 		return false;
 	return Log::logs(__FUNCTION__, 'Event');
+}
+
+/**
+ * <b>生成安全暗号</b><br/>
+ * 由服务器端生成并发送到客户端，客户端原样提交，用于检验客户端的唯一性
+ *
+ * @param string $event 事件
+ * @param integer $seed 随机种子
+ *
+ * @return string 安全暗号
+ */
+function cCipher($event, $seed = 10000)
+{
+	if (! defined('_CIPHER') || ! _CIPHER || empty($_SESSION))
+	{
+		return null;
+	}
+	$cipher = md5($event.date('YmdHis').rand(0, $seed));
+	$_SESSION[_CIPHER] = $cipher;
+	return $cipher;
+}
+
+/**
+ * <b>还原加密数据</b><br/>
+ * 还原客户端发送的加密数据，仅在开启安全暗号时有效
+ *
+ * @param string $data 加密数据
+ *
+ * @return string 原始数据
+ */
+function cReset($data)
+{
+	if (! $data || ! defined('_CIPHER') || ! _CIPHER || empty($_SESSION))
+	{
+		return null;
+	}
+	for ($i = 0, $m = strlen($data); $i < $m; $i++)
+	{
+		$b = ord($data[$i]);
+		$data[$i] = chr(((($b & 0x0F) - ($b >> 4)) & 0x0F) + ($b & 0xF0));
+	}
+	return urldecode($data);
 }
 ?>

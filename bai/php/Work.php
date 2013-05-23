@@ -1,6 +1,6 @@
 <?php
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * @author		白晓阳
  * @copyright	Copyright (c) 2011 - 2012, 白晓阳
  * @link		http://dacbe.com
@@ -9,7 +9,7 @@
  */
 
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>工场</h3>
  * <p>工场具备下述特点：</p>
  * <ol>

@@ -1,7 +1,7 @@
 <?php
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
- * @link      http://www.baiphp.com
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
+ * @link      http://www.baiphp.net
  * @copyright Copyright (c) 2011 - 2012, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
@@ -11,7 +11,7 @@
  */
 
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>测试工场</h3>
  * <p>
  * 功能与代码覆盖率单元测试。

@@ -15,7 +15,7 @@
 </head>
 <body>
 	<header><!-- 页首 -->
-		<div class="box logo">BaiPHP - 简单PHP</div>
+		<div class="box logo">BaiPHP - 化简PHP</div>
 		<nav class="box">
 			<?php
 // 			foreach (c('menu') as $item => $title) {

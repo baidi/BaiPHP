@@ -1,7 +1,7 @@
 <?php
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
- * @link      http://www.baiphp.com
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
+ * @link      http://www.baiphp.net
  * @copyright Copyright (c) 2011 - 2012, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
@@ -11,7 +11,7 @@
  */
 
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>全局配置</h3>
  * <p>
  * 框架运行时的各项配置。
@@ -22,7 +22,7 @@ global $config;
 
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
-	Work::EVENT   => 'home',  ### 目标事项
+	Bai::EVENT   => 'home',  ### 目标事项
 	'Branches'    => array(   ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
 		# '/^[a-zA-Z0-9_\x7f-\xff]+Work$/' => Work::WORK._DIR,
@@ -30,6 +30,9 @@ $config[Bai::BAI] = array(
 );
 
 ### 全局配置：流程
+### 对象名 => (键名 => 键值, 键名 => 键值, ...)
+### 键名：当前对象的方法名（可以无参调用），或要委托的其他对象名。
+### 键值：true：继续执行；false：结束执行；Bai::NIL:跳过；字符串：出错时跳转到该项，否则正常执行。
 $config[Flow::FLOW] = array(
 	Flow::TARGET      => array(
 		Flow::CONTROL => false,

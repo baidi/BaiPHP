@@ -1,7 +1,7 @@
 
 	<div class="box">
 		<div class="t">服务-流程-工场模式</div>
-		<p>BaiPHP（简单PHP）开发框架依据服务-流程-工场模式进行设计，该模式将程序划分为服务（Service）、流程（Flow）和工场（Work）三个部分。</p>
+		<p>化简PHP（BaiPHP）开发框架依据服务-流程-工场模式进行设计，该模式将程序划分为服务（Service）、流程（Flow）和工场（Work）三个部分。</p>
 		<a class="row" href="/download/Flowork.zip">下载文档</a>
 	</div>
 	<div class="box">

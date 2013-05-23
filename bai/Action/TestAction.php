@@ -1,6 +1,6 @@
 <?php
 /**
- * <b>BaiPHP（简单PHP）开发框架</b>
+ * <b>化简PHP（BaiPHP）开发框架</b>
  * @author		白晓阳
  * @copyright	Copyright (c) 2011 - 2012, 白晓阳
  * @link		http://dacbe.com
@@ -9,7 +9,7 @@
  */
 
 /**
- * <b>BaiPHP（简单PHP）开发框架</b><br/>
+ * <b>化简PHP（BaiPHP）开发框架</b><br/>
  * <b>事件处理流程：</b>
  * <p>
  * 检验输入、更新缓存、访问数据库并分派至相应页面

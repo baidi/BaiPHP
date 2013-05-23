@@ -1,6 +1,6 @@
 <?php
 /**
- * <b>BaiPHP（简单PHP）开发框架</b>
+ * <b>化简PHP（BaiPHP）开发框架</b>
  * @author		白晓阳
  * @copyright	Copyright (c) 2011 - 2012, 白晓阳
  * @link		http://dacbe.com
@@ -9,7 +9,7 @@
  */
 
 /**
- * <b>BaiPHP（简单PHP）开发框架</b><br/>
+ * <b>化简PHP（BaiPHP）开发框架</b><br/>
  * <b>列表组件</b>
  * <p>
  * 组织形式：

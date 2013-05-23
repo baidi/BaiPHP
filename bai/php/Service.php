@@ -1,6 +1,6 @@
 <?php
 /**
- * <b>BaiPHP（简单PHP）开发框架</b>
+ * <b>化简PHP（BaiPHP）开发框架</b>
  * @author		白晓阳
  * @copyright	Copyright (c) 2011 - 2012, 白晓阳
  * @link		http://dacbe.com
@@ -10,7 +10,7 @@
  */
 
 /**
- * <h2>BaiPHP（简单PHP）开发框架</h2>
+ * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>服务</h3>
  * <p>服务具有下述特点：</p>
  * <ol>
