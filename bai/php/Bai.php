@@ -332,6 +332,34 @@ abstract class Bai implements ArrayAccess
 	}
 
 	/**
+	 * <h4>构建网址</h4>
+	 * <p>
+	 * 根据事件名与服务名构建网址。
+	 * </p>
+	 * @param string $event 事件名
+	 * @param string $service 服务名
+	 * @param string $setting 即时配置
+	 * @return string 网址
+	 */
+	protected function url($event = null, $service = null, $setting = null)
+	{
+	    $result = array();
+	    if ($service != null)
+	    {
+	        $result[] = lcfirst(self::SERVICE).'='.$service;
+	    }
+	    if ($event != null)
+	    {
+	        $result[] = lcfirst(self::EVENT).'='.$event;
+	    }
+	    if ($result != null)
+	    {
+	        $result = '?'.implode('&', $result);
+	    }
+	    return $result == null ? _WEB : _WEB.$result;
+	}
+
+	/**
 	 * <h4>定位文件</h4>
 	 * <p>
 	 * 根据文件名确定文件基于根目录的相对路径。
