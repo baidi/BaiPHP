@@ -111,9 +111,9 @@ class Target extends Bai
 		### 加载配置
 		if ($setting != null)
 		{
-			$bai     = _LOCAL.$this->config(_DEFAULT, self::BAI);
-			$service = _LOCAL.$this->config(_DEFAULT, self::SERVICE);
-			$root    = $this->config(_DEFAULT, 'Root');
+			$bai     = _LOCAL.$this->config(_DEF, self::BAI);
+			$service = _LOCAL.$this->config(_DEF, self::SERVICE);
+			$root    = $this->config(_DEF, 'Root');
 			foreach ((array)$setting as $item)
 			{
 				if ($item == null || ! is_string($item))
@@ -136,7 +136,7 @@ class Target extends Bai
 			$this->preset = $this->config(__CLASS__);
 		}
 		### 应用预置数据
-		$this->stuff($this->config(_DEFAULT));
+		$this->stuff($this->config(_DEF));
 		$this->stuff($this->config(self::BAI));
 		$this->stuff($this->config(self::TARGET));
 		### 应用全局数据

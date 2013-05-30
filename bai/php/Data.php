@@ -81,10 +81,10 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'select count(1) as count from '.$data->field($table);
+		$sql = 'SELECT COUNT(1) AS TOTAL FROM '.$data->field($table);
 		if ($where != null)
 		{
-			$sql .= ' where '.$data->join($where);
+			$sql .= ' WHERE '.$data->join($where);
 		}
 
 		### 执行SQL语句
@@ -93,7 +93,7 @@ class Data extends Work
 		{
 			return $rows;
 		}
-		$count = (int) $rows[0]['count'];
+		$count = (int) $rows[0]['TOTAL'];
 		Log::logf(__FUNCTION__, $count, __CLASS__);
 		return $count;
 	}
@@ -132,27 +132,27 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'select * from '.$data->field($table);
+		$sql = 'SELECT * FROM '.$data->field($table);
 		if ($where != null)
 		{
-			$sql .= ' where '.$data->join($where);
+			$sql .= ' WHERE '.$data->join($where);
 		}
 		if ($order != null)
 		{
 			if (is_array($order))
 			{
-				$sql .= ' order by '.$data->join($order, ',', false);
+				$sql .= ' ORDER BY '.$data->join($order, ',', false);
 			}
 			else if (is_string($order))
 			{
-				$sql .= ' order by '.$order;
+				$sql .= ' ORDER BY '.$order;
 			}
 		}
 		if ($limit > 0)
 		{
-			$sql .= ' limit '.$limit;
+			$sql .= ' LIMIT '.$limit;
 			if ($offset > 0) {
-				$sql .= ' offset '.$offset;
+				$sql .= ' OFFSET '.$offset;
 			}
 		}
 
@@ -197,7 +197,7 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'insert into '.$data->field($table).' set '.$data->join($values, ',');
+		$sql = 'INSERT INTO '.$data->field($table).' SET '.$data->join($values, ',');
 
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
@@ -260,8 +260,8 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'update '.$data->field($table).' set '.$data->join($values, ',');
-		$sql .= ' where '.$data->join($where);
+		$sql = 'UPDATE '.$data->field($table).' SET '.$data->join($values, ',');
+		$sql .= ' WHERE '.$data->join($where);
 
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
@@ -307,7 +307,7 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'delete from '.$data->field($table).' where '.$data->join($where);
+		$sql = 'DELETE FROM '.$data->field($table).' WHERE '.$data->join($where);
 
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
@@ -346,7 +346,7 @@ class Data extends Work
 		}
 
 		### 建立SQL语句
-		$sql = 'show full columns from '.$data->field($table);
+		$sql = 'SHOW FULL COLUMNS FROM '.$data->field($table);
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
@@ -390,7 +390,12 @@ class Data extends Work
 		$column = $stm->columnCount();
 		if ($column > 0)
 		{
-			return $stm->fetchAll(PDO::FETCH_ASSOC);
+		    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+		    ### 字段名转为大写
+		    foreach ($rows as &$row) {
+		        $row = array_change_key_case($row, CASE_UPPER);
+		    }
+			return $rows;
 		}
 		return $stm->rowCount();
 	}
@@ -436,7 +441,7 @@ class Data extends Work
 		{
 			return '``';
 		}
-		$field = '`'.str_replace('`', '``', $field).'`';
+		$field = '`'.str_replace('`', '', $field).'`';
 		$field = str_replace('.', '`.`', $field);
 		return $field;
 	}
@@ -489,7 +494,7 @@ class Data extends Work
 		### 连接数据库
 		$this->stuff(self::$ACCESS, $this->preset);
 		$this->stuff($setting, $this->preset);
-		$this->stuff($this->pick(_DEFAULT, $this->preset));
+		$this->stuff($this->pick(_DEF, $this->preset));
 		if (! $this->connect())
 		{
 			$this->target->error = $this->error;

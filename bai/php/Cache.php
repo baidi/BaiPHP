@@ -191,7 +191,7 @@ class Cache extends Work
 	 */
 	protected function rename($item)
 	{
-		$item = $this->target[self::SERVICE].$this->target[self::EVENT]._DEFAULT.$item;
+		$item = $this->target[self::SERVICE].$this->target[self::EVENT]._DEF.$item;
 		$item = urlencode($item);
 		return $item;
 	}

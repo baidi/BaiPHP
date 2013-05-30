@@ -216,7 +216,7 @@ class Log extends Work
 			$rank = $this->pick(self::UNKNOWN, $this->ranks);
 		}
 		$message = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
-		$filename = _LOCAL.$this->root.self::BAI._DEFAULT.date('Y-m-d').'.log';
+		$filename = _LOCAL.$this->root.self::BAI._DEF.date('Y-m-d').'.log';
 		error_log($message, 3, $filename);
 		return $this->result;
 	}

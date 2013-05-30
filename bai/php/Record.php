@@ -26,25 +26,25 @@ class Record extends Work
 	const DELETE = 'delete';
 
 	/** 数据表名 */
-	private $table = null;
+	protected $table = null;
 	/** 数据主键 */
-	private $pk = null;
+	protected $pk = null;
 	/** 数据键值 */
-	private $id = null;
+	protected $id = null;
 	/** 数据状态 */
-	private $status = null;
+	protected $status = null;
 	/** 数据字段 */
-	private $columns = null;
+	protected $columns = null;
 	/** 原始数据 */
-	private $origin = array();
+	protected $origin = array();
 	/** 更新数据 */
-	private $update = array();
+	protected $update = array();
 
 	/**
 	 * 数据的增删改查<br/>
 	 * @param string $action 数据操作
 	 *     create： 插入； update： 更新； delete： 删除； 其他： 扩展；
-	 */
+	*/
 	public function entrust($action = null)
 	{
 		try {
@@ -114,7 +114,7 @@ class Record extends Work
 	{
 		foreach ($this->update as $item => $value)
 		{
-			
+				
 		}
 	}
 
@@ -152,10 +152,40 @@ class Record extends Work
 		}
 		foreach ($columns as $column)
 		{
-			$this->columns[$column['field']] = $column;
-			if ($column['field'] == 'PRI')
+			$column['Check'] = $this->type($column);
+			$this->columns[$column['Field']] = $column;
+			if ($column['Key'] == 'PRI')
 			{
 				$this->pk = $column['field'];
+			}
+		}
+	}
+
+	protected function type($column = null)
+	{
+		if ($check == null || ! is_array($column))
+		{
+			return null;
+		}
+		$check = array();
+		if ($column['NULL'] == 'NO' && $column['DEFAULT'] === null && $column['EXTRA'] == null) {
+			$check[] = 'required';
+		}
+		$mode = '#^(?<type>[A-Za-z_]+)(?<options>\([^)]\+))?#';
+		$def = strtoupper($column['TYPE']);
+		if (preg_match($mode, $def, $matches))
+		{
+			$type = $this->pick('type', $matches);
+			if (strpos('UNSIGNED', $def) !== false) {
+				$type .= '+';
+			}
+			$options = $this->pick('options', $matches);
+			$check[] = 'type='.$this->pick($type, $this->types);
+			if ($type == 'ENUM' || $type == 'SET')
+			{
+				$check[] = 'options='.$options;
+			} else if ($options != null) {
+				$check[] = 'max='.$options;
 			}
 		}
 	}

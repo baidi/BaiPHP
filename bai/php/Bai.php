@@ -54,11 +54,11 @@ abstract class Bai implements ArrayAccess
 	protected $target  = null;
 	/** 执行结果 */
 	protected $result  = null;
-	/** 警示信息 */
+	/** 提示信息 */
 	protected $notice  = null;
 
-	/** 警示模板 */
-	protected $board   = '_error.php';
+	/** 提示页面 */
+	protected $board   = '_notice.php';
 
 	/**
 	 * <h4>委托目标</h4>
@@ -576,6 +576,6 @@ abstract class Bai implements ArrayAccess
 		$class = get_class($this);
 		$this->stuff($this->config($class), $this->preset);
 		$this->stuff($setting, $this->preset);
-		$this->stuff($this->pick(_DEFAULT, $this->preset), $this, false);
+		$this->stuff($this->pick(_DEF, $this->preset), $this, false);
 	}
 }

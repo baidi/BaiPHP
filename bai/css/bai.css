@@ -1,5 +1,6 @@
 /*--- HTML元素 ---*/
 body {
+	margin: 0;
 	font: $font$;
 	color: $color$;
 	background: $background$;
@@ -162,7 +163,8 @@ textarea {
 /*--- 页面布局 ---*/
 .page {
 	margin: 0 auto;
-	width: $width$; /* 全局宽度 */
+	min-width: 480px;
+	max-width: $width$; /* 全局宽度 */
 }
 
 header, footer {

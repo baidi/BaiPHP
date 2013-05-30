@@ -78,7 +78,7 @@ class Input extends Template
 		$check = $this->config(self::CHECK, $event, $item);
 		if (preg_match_all($this->check, $check, $cases, PREG_SET_ORDER))
 		{
-			$cases[_DEFAULT] = $check;
+			$cases[_DEF] = $check;
 		}
 		$this->runtime['cases'] = $cases;
 		### 填充模板参数

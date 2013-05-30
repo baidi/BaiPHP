@@ -186,14 +186,79 @@ class Check extends Work
 	 * @param int $length 长度
 	 * @return mixed false：检验通过；string：提示信息
 	 */
-	protected function max($length)
+	protected function max($length = null, $decimal = 0)
 	{
+	    if ($length === null || $length <= 0 || $decimal < 0) {
+	        return false;
+	    }
 		$value = $this->pick('value', $this->runtime);
+		if ($decimal > 0) {
+		    $len = mb_strlen($value, $this->charset);
+		    
+		}
 		if ($value == null || mb_strlen($value, $this->charset) <= $length)
 		{
 			return false;
 		}
 		return Log::logf(__FUNCTION__, $length, __CLASS__);
+	}
+
+	/**
+	 * <h4>数值范围检验</h4>
+	 * @param number $min 最小值
+	 * @param number $max 最大值
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function range($min = null, $max = null)
+	{
+	    if ($min === null || $max === null || ! is_numeric($min) || ! is_numeric($max)) {
+	        return false;
+	    }
+		$value = $this->pick('value', $this->runtime);
+		if ($value == null || $value >= $min && $value <= $max) {
+			return false;
+		}
+		return Log::logf(__FUNCTION__, array($min, $max), __CLASS__);
+	}
+
+	/**
+	 * <h4>单选项检验</h4>
+	 * @param string $options 可选项
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function enum($options = null)
+	{
+	    if ($options === null) {
+	        return false;
+	    }
+		$value = $this->pick('value', $this->runtime);
+		$options = explode($this->delimiter, $options);
+		if ($value == null || array_search("'$value'", $options) !== false) {
+			return false;
+		}
+		return Log::log(__FUNCTION__, __CLASS__);
+	}
+
+	/**
+	 * <h4>单选项检验</h4>
+	 * @param string $options 可选项
+	 * @return mixed false：检验通过；string：提示信息
+	 */
+	protected function set($options = null)
+	{
+	    if ($options === null) {
+	        return false;
+	    }
+		$values = $this->pick('value', $this->runtime);
+		$values = explode($this->delimiter, $values);
+		$options = explode($this->delimiter, $options);
+		foreach ($values as $value) {
+    		if ($value == null || array_search("'$value'", $options) !== false) {
+    			continue;
+    		}
+		    return Log::log(__FUNCTION__, __CLASS__);
+		}
+		return false;
 	}
 
 	/**

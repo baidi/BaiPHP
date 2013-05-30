@@ -22,6 +22,7 @@ global $config;
 
 ### 全局配置：系统，可覆盖默认配置
 $config[Bai::BAI] = array(
+	'Debug'      => true,
 	Bai::EVENT   => 'home',  ### 目标事项
 	'Branches'    => array(   ### 扩展路径
 		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => Flow::ACTION._DIR,
@@ -62,7 +63,7 @@ $config[Flow::FLOW] = array(
 
 ### 全局配置：目标
 $config[Work::TARGET] = array(
-	_DEFAULT => array(
+	_DEF => array(
 		'filters' => array(
 			'#<script.*>.*</script\s*>#i' => '',
 			'#javascript\s*:#i' => '',
@@ -85,7 +86,7 @@ $config[Flow::CONTROL] = array(
 
 ### 全局配置：页面流程
 $config[Flow::PAGE] = array(
-	_DEFAULT      => array(
+	_DEF      => array(
 		'layout'  => '_page.php',
 		'css'     => array(
 			'bai.css',
@@ -129,7 +130,7 @@ $config[Flow::PAGE] = array(
 
 ### 全局配置：数据工场
 $config[Work::DATA] = array(
-	_DEFAULT     => array(
+	_DEF     => array(
 		'dsn'      => 'mysql:host=localhost;dbname=baiphp',
 		'dbhost'   => 'localhost',
 		'dbtype'   => 'mysql',
@@ -149,7 +150,7 @@ $config[Work::DATA] = array(
 
 ### 全局配置：日志工场
 $config[Work::LOG] = array(
-	_DEFAULT          => array(
+	_DEF          => array(
 		### 日志级别
 		'level'       => Log::ALL | Log::DEBUG | Log::PERFORM,
 		### 日志目录
@@ -192,7 +193,10 @@ $config[Work::LOG] = array(
 		'required'    => '输入项不能为空……',
 		'min'         => '输入项不能小于〖%d〗位……',
 		'max'         => '输入项不能大于〖%d〗位……',
-		'type'        => '输入项属性不符……',
+		'range'       => '请输入%d到%d内的值……',
+		'enum'        => '请选择正确的选项……',
+		'set'         => '请选择正确的选项……',
+		'type'        => '请输入正确的内容……',
 		'__call'      => '输入项检验设置有误：%s',
 	),
 	Work::DATA        => array(
@@ -238,7 +242,7 @@ $config[Work::LOG] = array(
 
 ### 全局配置：检验工场
 $config[Work::CHECK] = array(
-	_DEFAULT      => array(
+	_DEF      => array(
 		### 字符编码
 		'charset'     => 'utf-8',
 		### 参数分割符
@@ -275,7 +279,7 @@ $config[Work::CHECK] = array(
 
 ### 全局配置：缓存工场
 $config[Work::CACHE] = array(
-	_DEFAULT => array(
+	_DEF => array(
 		### 是否开启
 		'valid'     => false,
 		### 缓存时间：秒
@@ -291,7 +295,7 @@ $config[Work::CACHE] = array(
 
 ### 全局配置：样式工场
 $config[Work::STYLE] = array(
-	_DEFAULT  => array(
+	_DEF  => array(
 		### 默认图片（原图无效时使用）
 		'img' => '_blank.png',
 		### 可内嵌类型
@@ -309,7 +313,7 @@ $config[Work::STYLE] = array(
 
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
-	_DEFAULT => array(
+	_DEF => array(
 		'success'   => '过',
 		'failure'   => '挂',
 		'skip'      => '略',
@@ -319,7 +323,7 @@ $config[Work::TEST] = array(
 
 ### 全局配置：测试工场
 $config[Work::TEMPLATE] = array(
-	_DEFAULT        => array(
+	_DEF        => array(
 		'mode'      => '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#',
 		'handler'   => array(
 			'?'     => 'choose',
@@ -334,9 +338,9 @@ $config[Work::TEMPLATE] = array(
 );
 
 $config[Work::INPUT] = array(
-	_DEFAULT => array(
+	_DEF => array(
 		'primary' => 'text',
-		'check'    => $config[Work::CHECK][_DEFAULT]['mode'],
+		'check'    => $config[Work::CHECK][_DEF]['mode'],
 		'templates' => array(
 			'text' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" {$type ? type="$type" | type="text"} {$value} {$class ? class="$class"} {$style ? style="$style"} {$check ? data-check="$check"} {$hint ? placeholder="$hint"} />',
 		),
@@ -346,7 +350,7 @@ $config[Work::INPUT] = array(
 		'checks' => array(
 			'required' => 'required="required"',
 			'max' => 'maxlength="%d"',
-			_DEFAULT => 'data-check="%s"',
+			_DEF => 'data-check="%s"',
 		),
 		'hints'  => array(
 			'required' => '非空',
@@ -367,13 +371,56 @@ $config[Work::INPUT] = array(
 );
 
 $config['Lang'] = array(
-	_DEFAULT => array(
+	_DEF => array(
 		'primary' => Lang::ZH,
 	),
 );
 
 $config['Record'] = array(
-	_DEFAULT => array(
-		'primary' => Lang::ZH,
+	_DEF => array(
+	    'types'   => array(
+	    	### 整数
+	        'TINYINT'    => 'type=number range=-128,127',
+	        'SMALLINT'   => 'type=number range=-32768,32767',
+	        'MEDIUMINT'  => 'type=number range=-8388608,8388607',
+	        'INT'        => 'type=number range=-2147483648,2147483647',
+	        'INTEGER'    => 'type=number range=-2147483648,2147483647',
+	        'BIGINT'     => 'type=number',
+	    	### 非负整数
+	        'TINYINT+'   => 'type=number range=0,255',
+	        'SMALLINT+'  => 'type=number range=0,65535',
+	        'MEDIUMINT+' => 'type=number range=0,16777215',
+	        'INT+'       => 'type=number range=0,4294967295',
+	        'INTEGER+'   => 'type=number range=0,4294967295',
+	        'BIGINT+'    => 'type=number range=0,',
+	    	### 小数
+	        'FLOAT'      => 'type=float',
+	        'REAL'       => 'type=float',
+	        'DOUBLE'     => 'type=float',
+	        'DECIMAL'    => 'type=float',
+	        'DEC'        => 'type=float',
+	        'NUMERIC'    => 'type=float',
+	        'FIXED'      => 'type=float',
+	    	### 非负小数
+	        'FLOAT+'     => 'type=float range=0,',
+	        'REAL+'      => 'type=float range=0,',
+	        'DOUBLE+'    => 'type=float range=0,',
+	        'DECIMAL+'   => 'type=float range=0,',
+	        'DEC+'       => 'type=float range=0,',
+	        'NUMERIC+'   => 'type=float range=0,',
+	        'FIXED+'     => 'type=float range=0,',
+	    	### 日期日期
+	        'DATE'       => 'type=date',
+	        'DATETIME'   => 'type=datetime',
+	        'TIMESTAMP'  => 'type=datetime',
+	        'TIME'       => 'type=time',
+	        'YEAR'       => 'type=number max=4 range=1901,2155',
+	    	### 真假
+	    	'BOOL'       => 'type=checkbox',
+	    	'BOOLEAN'    => 'type=checkbox',
+	    	### 文本
+	    	'ENUM'       => 'type=select',
+	    	'SET'        => 'type=list',
+	    ),
 	),
 );

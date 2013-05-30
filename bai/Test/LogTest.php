@@ -37,7 +37,7 @@ return array(
 	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => null,
-		Test::PARAMS   => array('logs', _DEFAULT.Test::TEST),
+		Test::PARAMS   => array('logs', _DEF.Test::TEST),
 	),
 	### Log测试：entrust(预置日志)
 	array(

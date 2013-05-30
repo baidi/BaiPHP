@@ -21,7 +21,7 @@ return array(
 	array(
 		Test::ITEM     => 'config',
 		Test::EXPECTED => null,
-		Test::PARAMS   => _DEFAULT.Page::FLOW,
+		Test::PARAMS   => _DEF.Page::FLOW,
 	),
 	### 测试情景：config（多级项目）
 	array(
@@ -85,7 +85,7 @@ return array(
 	array(
 		Test::ITEM     => 'build',
 		Test::EXPECTED => null,
-		Test::PARAMS   => _DEFAULT.Page::PAGE,
+		Test::PARAMS   => _DEF.Page::PAGE,
 	),
 	### 测试情景：build（分支对象）
 	array(
