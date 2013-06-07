@@ -39,8 +39,7 @@ class Check extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || ! self::$ACCESS instanceof Check)
-		{
+		if ($setting != null || ! self::$ACCESS instanceof Check) {
 			self::$ACCESS = new Check($setting);
 		}
 		return self::$ACCESS;
@@ -63,34 +62,29 @@ class Check extends Work
 	 */
 	public function entrust($setting = null)
 	{
-		if ($this->mode == null || ! is_string($this->mode))
-		{
+		if ($this->mode == null || ! is_string($this->mode)) {
 			return true;
 		}
 
 		### 读取检验设置
-		$event = $this->target[self::EVENT];
+		$event = "$this->target";
 		$preset = $this->pick($event, $this->preset);
 		$this->stuff($setting, $preset);
-		if ($preset == null || ! is_array($preset))
-		{
+		if ($preset == null || ! is_array($preset)) {
 			return true;
 		}
 
 		### 检验输入项目
-		foreach ($preset as $item => $mode)
-		{
-			if ($item == null || $mode == null || ! is_string($mode))
-			{
+		foreach ($preset as $item => $mode) {
+			if ($item == null || $mode == null || ! is_string($mode)) {
 				continue;
 			}
 			$this->runtime['item']  = $item;
 			$this->runtime['mode']  = $mode;
 			$this->runtime['value'] = $this->pick($item, $this->target[$event]);
-			$this->error = $this->item();
-			if ($this->error)
-			{
-				$this->target->error = $this->error;
+			$this->notice = $this->item();
+			if ($this->notice) {
+				$this->target->notice = $this->notice;
 				return false;
 			}
 		}
@@ -108,29 +102,22 @@ class Check extends Work
 		$mode = $this->runtime['mode'];
 		Log::logf(__FUNCTION__, array($item, $mode), __CLASS__);
 		### 解析检验模式
-		if (! preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER))
-		{
+		if (! preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER)) {
 			return false;
 		}
-		foreach ($cases as $case)
-		{
+		foreach ($cases as $case) {
 			$check  = $this->pick('item',  $case);
 			$params = $this->pick('params', $case);
-			if ($params != null)
-			{
+			if ($params != null) {
 				$params = explode($this->delimiter, $params);
 			}
 			### 执行检验场景
-			if ($params === null)
-			{
+			if ($params === null) {
 				$message = $this->$check();
-			}
-			else
-			{
+			} else {
 				$message = call_user_func_array(array($this, $check), $params);
 			}
-			if ($message)
-			{
+			if ($message) {
 				return $message;
 			}
 		}
@@ -145,8 +132,7 @@ class Check extends Work
 	{
 		$value = $this->pick('value', $this->runtime);
 		$mode  = $this->pick(__FUNCTION__, $this->types);
-		if ($value != null && preg_match($mode, $value))
-		{
+		if ($value != null && preg_match($mode, $value)) {
 			return Log::logs(__FUNCTION__, __CLASS__);
 		}
 		return false;
@@ -159,8 +145,7 @@ class Check extends Work
 	protected function required()
 	{
 		$value = $this->pick('value', $this->runtime);
-		if ($value == null)
-		{
+		if ($value == null) {
 			return Log::logs(__FUNCTION__, __CLASS__);
 		}
 		return false;
@@ -174,8 +159,7 @@ class Check extends Work
 	protected function min($length)
 	{
 		$value = $this->pick('value', $this->runtime);
-		if ($value == null || mb_strlen($value, $this->charset) >= $length)
-		{
+		if ($value == null || mb_strlen($value, $this->charset) >= $length) {
 			return false;
 		}
 		return Log::logf(__FUNCTION__, $length, __CLASS__);
@@ -188,16 +172,15 @@ class Check extends Work
 	 */
 	protected function max($length = null, $decimal = 0)
 	{
-	    if ($length === null || $length <= 0 || $decimal < 0) {
-	        return false;
-	    }
+		if ($length === null || $length <= 0 || $decimal < 0) {
+			return false;
+		}
 		$value = $this->pick('value', $this->runtime);
 		if ($decimal > 0) {
-		    $len = mb_strlen($value, $this->charset);
-		    
+			$len = mb_strlen($value, $this->charset);
+
 		}
-		if ($value == null || mb_strlen($value, $this->charset) <= $length)
-		{
+		if ($value == null || mb_strlen($value, $this->charset) <= $length) {
 			return false;
 		}
 		return Log::logf(__FUNCTION__, $length, __CLASS__);
@@ -211,9 +194,9 @@ class Check extends Work
 	 */
 	protected function range($min = null, $max = null)
 	{
-	    if ($min === null || $max === null || ! is_numeric($min) || ! is_numeric($max)) {
-	        return false;
-	    }
+		if ($min === null || $max === null || ! is_numeric($min) || ! is_numeric($max)) {
+			return false;
+		}
 		$value = $this->pick('value', $this->runtime);
 		if ($value == null || $value >= $min && $value <= $max) {
 			return false;
@@ -228,9 +211,9 @@ class Check extends Work
 	 */
 	protected function enum($options = null)
 	{
-	    if ($options === null) {
-	        return false;
-	    }
+		if ($options === null) {
+			return false;
+		}
 		$value = $this->pick('value', $this->runtime);
 		$options = explode($this->delimiter, $options);
 		if ($value == null || array_search("'$value'", $options) !== false) {
@@ -246,17 +229,17 @@ class Check extends Work
 	 */
 	protected function set($options = null)
 	{
-	    if ($options === null) {
-	        return false;
-	    }
+		if ($options === null) {
+			return false;
+		}
 		$values = $this->pick('value', $this->runtime);
 		$values = explode($this->delimiter, $values);
 		$options = explode($this->delimiter, $options);
 		foreach ($values as $value) {
-    		if ($value == null || array_search("'$value'", $options) !== false) {
-    			continue;
-    		}
-		    return Log::log(__FUNCTION__, __CLASS__);
+			if ($value == null || array_search("'$value'", $options) !== false) {
+				continue;
+			}
+			return Log::log(__FUNCTION__, __CLASS__);
 		}
 		return false;
 	}
@@ -273,8 +256,7 @@ class Check extends Work
 	{
 		$value = $this->pick('value', $this->runtime);
 		$mode  = $this->pick($type, $this->types);
-		if ($value == null || $mode == null || preg_match($mode, $value))
-		{
+		if ($value == null || $mode == null || preg_match($mode, $value)) {
 			return false;
 		}
 		return Log::logs(__FUNCTION__, __CLASS__);
@@ -288,8 +270,7 @@ class Check extends Work
 	public function __call($name, $params)
 	{
 		### 调用外部方法进行检验
-		if (is_callable($name))
-		{
+		if (is_callable($name)) {
 			return call_user_func_array($name, $params);
 		}
 		return Log::logs(__FUNCTION__, __CLASS__);

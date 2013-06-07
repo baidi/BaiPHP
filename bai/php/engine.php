@@ -36,7 +36,7 @@ ini_set('error_reporting', E_ALL | E_STRICT);
 ### 设置页面错误显示，默认：0（不显示）
 ini_set('display_errors', 1);
 ### 设置日志错误记录，默认：1（记录）
-ini_set('log_errors', 0);
+ini_set('log_errors', 1);
 
 
 /** 默认项 */
@@ -54,13 +54,11 @@ define('_LOCAL', dirname($_SERVER['SCRIPT_FILENAME'])._DIR);
 ### 解析网络路径
 $server = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
 $server .= $_SERVER['SERVER_NAME'];
-if ($_SERVER['SERVER_PORT'] != 80)
-{
+if ($_SERVER['SERVER_PORT'] != 80) {
 	$server .= ':'.$_SERVER['SERVER_PORT'];
 }
 $path = dirname($_SERVER['SCRIPT_NAME']);
-if (strlen($path) > 1)
-{
+if (strlen($path) > 1) {
 	$server .= $path;
 }
 /** 网络路径 */
@@ -76,64 +74,61 @@ $config[_DEF] = array(
 	### 系统路径，存放系统框架文件
 	'Bai'       => 'bai'._DIR,
 	### 服务路径，存放用户响应文件
-	'Service'   => (empty($_REQUEST['service']) ? 'service' : $_REQUEST['service'])._DIR,
+	'Service'   => 'service'._DIR,
+	### 运行路径，存放运行时产生的文件
+	'Runtime'   => '.runtime'._DIR,
 	### 基本路径，相对于系统路径和服务路径，存放核心文件
 	'Root'      => substr(_EXT, 1)._DIR,
-	### 分支路径，相对于系统路径和服务路径，存放扩展文件
-	'Branches'  => array(),
-	'Error'     => '<hr/><p>一个不注意，就会出问题。努力，努力，做出好程序。</p><p>:-)%s</p>',
-	'Notice'    => '<hr/><p>大体还可以，细节多留意。仔细，仔细，做出好程序。</p><p>:-)%s</p>',
-	'Exception' => '<hr/><p>不是没做好，就是没想好。推敲，推敲，不能留死角。</p><p>:-)%s</p>',
+	### 扩展路径，相对于系统路径和服务路径，存放扩展文件
+	'Extent'    => array(
+		'/^[a-zA-Z0-9_\x7f-\xff]+Action$/' => 'Action'._DIR,
+		'/^[a-zA-Z0-9_\x7f-\xff]+Work$/'   => 'Work'._DIR,
+	),
+	'Error'     => '一个不注意，就会出问题：[%s] %s',
+	'Exception' => '不是没做到，就是没想到：[%s] %s',
+	'Notice'    => '大体还可以，细节要留意：[%s] %s',
 );
+if (! empty($_REQUEST['service'])) {
+    $config[_DEF]['Service'] = preg_replace('#[\/]#', '', $_REQUEST['service'])._DIR;
+}
 
 
 ### 对象自动加载
 spl_autoload_register(function($class)
 {
-	global $config, $target;
-	if ($target == null)
-	{
-		$target = $config[_DEF];
-	}
+    $config = $GLOBALS['config'][_DEF];
 	### 加载路径
-	$bai     = _LOCAL.$target['Bai'];
-	$service = _LOCAL.$target['Service'];
-	$root    = $target['Root'];
+	$bai     = _LOCAL.$config['Bai'];
+	$service = _LOCAL.$config['Service'];
+	$root    = $config['Root'];
 	$branch  = null;
-	foreach ($target['Branches'] as $item => $mode)
-	{
-		if (preg_match($item, $class))
-		{
+	foreach ((array)$config['Extent'] as $item => $mode) {
+		if (preg_match($item, $class)) {
 			$branch = $mode;
 			break;
 		}
 	}
 	### 加载文件
 	$file = $class._EXT;
-	if ($branch != null)
-	{
+	if ($branch != null) {
 		### 加载用户扩展文件
-		if (is_file($service.$branch.$file))
-		{
+		if (is_file($service.$branch.$file)) {
 			require_once $service.$branch.$file;
 			return class_exists($class, false);
 		}
 		### 加载系统扩展文件
-		if (is_file($bai.$branch.$file))
-		{
+		if (is_file($bai.$branch.$file)) {
 			require_once $bai.$branch.$file;
 			return class_exists($class, false);
 		}
 	}
 	### 加载用户核心文件
-	if (is_file($service.$root.$file))
-	{
+	if (is_file($service.$root.$file)) {
 		require_once $service.$root.$file;
 		return class_exists($class, false);
 	}
 	### 加载系统核心文件
-	if (is_file($bai.$root.$file))
-	{
+	if (is_file($bai.$root.$file)) {
 		require_once $bai.$root.$file;
 		return class_exists($class, false);
 	}
@@ -142,17 +137,14 @@ spl_autoload_register(function($class)
 
 
 ### 异常自动捕获
-set_exception_handler(function($exception){
-	global $config, $target;
-	if ($target == null)
-	{
-		$target = $config[_DEF];
-	}
-	if (empty($target['Debug'])) {
+set_exception_handler(function($e)
+{
+    $config = $GLOBALS['config'][_DEF];
+	if (empty($config['Debug'])) {
 		ob_clean();
 	}
-	echo sprintf($target['Exception'], $exception->getMessage());
-	return $exception;
+	$file = basename($e->getFile()).':>'.$e->getLine().':>'.get_class($e);
+	echo sprintf($config['Exception'], $file, $e->getMessage());
 });
 
 
@@ -161,30 +153,25 @@ register_shutdown_function(function()
 {
 	### 错误信息
 	$error = error_get_last();
-	if ($error == null)
-	{
+	if ($error == null) {
 		return true;
 	}
-	global $config, $target;
-	if ($target == null)
-	{
-		$target = $config[_DEF];
-	}
+    $config = $GLOBALS['config'][_DEF];
 	$type = $error['type'];
+	$file = basename($error['file']).':>'.$error['line'];
 	### 程序被迫中止时
-	if ($type == E_ERROR || $type == E_USER_ERROR || $type == E_PARSE
-			|| $type == E_COMPILE_ERROR || $type == E_CORE_ERROR
-			|| $type == E_RECOVERABLE_ERROR)
-	{
-		if (empty($target['Debug'])) {
+	if ($type == E_ERROR || $type == E_USER_ERROR || $type == E_CORE_ERROR
+			|| $type == E_COMPILE_ERROR || $type == E_PARSE
+			|| $type == E_RECOVERABLE_ERROR) {
+		if (empty($config['Debug'])) {
 			ob_clean();
 		}
-		echo sprintf($target['Error'], $error['message']);
+		echo sprintf($config['Error'], $file, $error['message']);
 		return false;
 	}
 	### 程序受到影响时
-	if (! empty($target['Debug'])) {
-		echo sprintf($target['Notice'], $error['message']);
+	if (! empty($config['Debug'])) {
+		echo sprintf($config['Notice'], $file, $error['message']);
 		return false;
 	}
 });

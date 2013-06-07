@@ -1,11 +1,22 @@
 <?php
 /**
  * <h2>化简PHP（BaiPHP）开发框架</h2>
- * @author		白晓阳
- * @copyright	Copyright (c) 2011 - 2012, 白晓阳
- * @link		http://dacbe.com
- * @version     V1.0.0 2012/03/31 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ * @link      http://www.baiphp.net
+ * @copyright Copyright 2011 - 2013, 白晓阳
+ * @author    白晓阳
+ * @version   1.0.0 2012/03/31 首版
+ *            2.0.0 2013/07/01 全面重构代码，弃用公共函数，独立启动引擎，优化配置文件结构，增加
+ *            原始虚类、目标工场、样式工场、模板工场、语言工场和记录工场，并优化代码结构。
+ * @license
+ * <p>化简PHP（BaiPHP）开发框架，是依据"面向目标"的设计思想、基于"服务-流程-工场"的设计模式、以简洁
+ * 灵活为方向、由白晓阳设计和开发的一套PHP应用框架。该框架的核心是基于配置并即时可控的流程走向和流程覆
+ * 盖，它采用了简洁优雅的实现方式，不但显著提升框架的易学性和易用性，而且最大限度地释放出应用的灵活性和扩
+ * 展性，从而尽可能地降低程序的开发和维护成本。</p>
+ * <p>化简PHP（BaiPHP）开发框架完全开放源代码，任何人都可以自由地复制、传播、修改和使用该代码，但未经
+ * 授权，不得用于商业目的。</p>
+ * <p>欢迎对该框架提供任何形式的捐助，捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授
+ * 权。</p>
+ * <p>化简PHP（BaiPHP）开发框架由白晓阳持有版权，并保留一切权利。</p>
  */
 
 /**
@@ -23,21 +34,23 @@
 abstract class Work extends Bai
 {
 	/** 标识：日志工场 */
-	const LOG = 'Log';
+	const LOG      = 'Log';
 	/** 标识：检验工场 */
-	const CHECK = 'Check';
+	const CHECK    = 'Check';
 	/** 标识：数据工场 */
-	const DATA = 'Data';
+	const DATA     = 'Data';
+	/** 标识：记录工场 */
+	const RECORD   = 'Record';
 	/** 标识：缓存工场 */
-	const CACHE = 'Cache';
+	const CACHE    = 'Cache';
 	/** 标识：样式工场 */
-	const STYLE = 'Style';
+	const STYLE    = 'Style';
 	/** 标识：输入工场 */
-	const INPUT = 'Input';
+	const INPUT    = 'Input';
 	/** 标识：测试工场 */
-	const TEST = 'Test';
+	const TEST     = 'Test';
 	/** 标识：语言工场 */
-	const LANG = 'Lang';
+	const LANG     = 'Lang';
 	/** 标识：模板工场 */
 	const TEMPLATE = 'Template';
 }

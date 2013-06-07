@@ -43,8 +43,7 @@ class Cache extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if (self::$ACCESS == null)
-		{
+		if (self::$ACCESS == null) {
 			self::$ACCESS = new Cache($setting);
 		}
 		return self::$ACCESS;
@@ -63,8 +62,7 @@ class Cache extends Work
 	 */
 	public function entrust($item = null, $data = null, $hard = false)
 	{
-		if (! $this->valid || $item == null || ! $this->pick($item, $this->items))
-		{
+		if (! $this->valid || $item == null || ! $this->pick($item, $this->items)) {
 			return false;
 		}
 
@@ -74,14 +72,12 @@ class Cache extends Work
 		$this->runtime['hard'] = $hard;
 
 		### 清空缓存
-		if ($item === self::CLEAR)
-		{
+		if ($item === self::CLEAR) {
 			$this->result = $this->clear();
 			return $this->result;
 		}
 		### 提取缓存
-		if ($data === null)
-		{
+		if ($data === null) {
 			$this->result = $this->fetch();
 			return $this->result;
 		}
@@ -102,20 +98,17 @@ class Cache extends Work
 
 		### 提取缓存
 		$data = apc_fetch($item, $result);
-		if ($result === false)
-		{
+		if ($result === false) {
 			return $result;
 		}
 
-		if (! is_string($data) || substr($data, - strlen(__CLASS__)) !== __CLASS__)
-		{
+		if (! is_string($data) || substr($data, - strlen(__CLASS__)) !== __CLASS__) {
 			### 内存缓存
 			return $data;
 		}
-		
+
 		### 文件缓存
-		if (! is_file($data))
-		{
+		if (! is_file($data)) {
 			return false;
 		}
 		### 读取缓存文件
@@ -137,16 +130,14 @@ class Cache extends Work
 		Log::logf(__FUNCTION__, $item, __CLASS__);
 
 		### 写入内存
-		if (! $hard)
-		{
+		if (! $hard) {
 			return apc_store($item, $data, $this->timeout);
 		}
 
 		### 写入文件
 		$filename = _LOCAL.$this->root.$item.'.'.__CLASS__;
 		$file = fopen($filename, 'w');
-		if (! $file)
-		{
+		if (! $file) {
 			Log::logf('file', $filename, __CLASS__);
 			return false;
 		}
@@ -169,15 +160,12 @@ class Cache extends Work
 		### 缓存文件
 		$root = _LOCAL.$this->root;
 		$files = scandir($root);
-		if ($files == null)
-		{
+		if ($files == null) {
 			return self::CLEAR;
 		}
 		### 清空缓存文件
-		foreach ($files as $file)
-		{
-			if (substr($file, - strlen(__CLASS__)) === __CLASS__ && ! unlink($path.$file))
-			{
+		foreach ($files as $file) {
+			if (substr($file, - strlen(__CLASS__)) === __CLASS__ && ! unlink($path.$file)) {
 				return false;
 			}
 		}
@@ -191,7 +179,7 @@ class Cache extends Work
 	 */
 	protected function rename($item)
 	{
-		$item = $this->target[self::SERVICE].$this->target[self::EVENT]._DEF.$item;
+		$item = $this->target->service.$this->target->event._DEF.$item;
 		$item = urlencode($item);
 		return $item;
 	}
@@ -205,10 +193,8 @@ class Cache extends Work
 		parent::__construct($setting);
 		### 构建缓存目录
 		$root = _LOCAL;
-		foreach (explode(_DIR, $this->root) as $dir)
-		{
-			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
-			{
+		foreach (explode(_DIR, $this->root) as $dir) {
+			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR)) {
 				break;
 			}
 			$root .= $dir._DIR;

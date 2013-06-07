@@ -43,11 +43,10 @@ class Data extends Work
 	 */
 	public static function access($setting = null)
 	{
-	    if ($setting != null || ! self::$ACCESS instanceof Data)
-	    {
-	    	return new Data($setting);
-	    }
-	    return self::$ACCESS;
+		if ($setting != null || ! self::$ACCESS instanceof Data) {
+			return new Data($setting);
+		}
+		return self::$ACCESS;
 	}
 
 	/**
@@ -63,34 +62,29 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
-		if ($where != null && ! is_array($where))
-		{
+		if ($where != null && ! is_array($where)) {
 			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
 		### 建立SQL语句
 		$sql = 'SELECT COUNT(1) AS TOTAL FROM '.$data->field($table);
-		if ($where != null)
-		{
+		if ($where != null) {
 			$sql .= ' WHERE '.$data->join($where);
 		}
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
-		if ($rows === false)
-		{
+		if ($rows === false) {
 			return $rows;
 		}
 		$count = (int) $rows[0]['TOTAL'];
@@ -114,42 +108,33 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
-		if ($where != null && ! is_array($where))
-		{
+		if ($where != null && ! is_array($where)) {
 			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
 		### 建立SQL语句
 		$sql = 'SELECT * FROM '.$data->field($table);
-		if ($where != null)
-		{
+		if ($where != null) {
 			$sql .= ' WHERE '.$data->join($where);
 		}
-		if ($order != null)
-		{
-			if (is_array($order))
-			{
+		if ($order != null) {
+			if (is_array($order)) {
 				$sql .= ' ORDER BY '.$data->join($order, ',', false);
-			}
-			else if (is_string($order))
-			{
+			} else if (is_string($order)) {
 				$sql .= ' ORDER BY '.$order;
 			}
 		}
-		if ($limit > 0)
-		{
+		if ($limit > 0) {
 			$sql .= ' LIMIT '.$limit;
 			if ($offset > 0) {
 				$sql .= ' OFFSET '.$offset;
@@ -158,8 +143,7 @@ class Data extends Work
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
-		if ($rows === false)
-		{
+		if ($rows === false) {
 			return $rows;
 		}
 		Log::logf(__FUNCTION__, count($rows), __CLASS__);
@@ -179,19 +163,16 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 字段值
-		if ($values == null || ! is_array($values))
-		{
+		if ($values == null || ! is_array($values)) {
 			$data->error = Log::logs('values', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
@@ -202,8 +183,7 @@ class Data extends Work
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
 		$count = $data->entrust($sql, $values);
-		if ($count === false)
-		{
+		if ($count === false) {
 			$data->pdo->rollback();
 			return $count;
 		}
@@ -227,33 +207,27 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 字段值
-		if ($values == null || ! is_array($values))
-		{
+		if ($values == null || ! is_array($values)) {
 			$data->error = Log::logs('values', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
-		if ($where == null || ! is_array($where))
-		{
+		if ($where == null || ! is_array($where)) {
 			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 排除重复键
-		foreach ($where as $item => $value)
-		{
-			if (isset($values[$item]))
-			{
+		foreach ($where as $item => $value) {
+			if (isset($values[$item])) {
 				$where[$this->pre.$item] = $where[$item];
 				unset($where[$item]);
 			}
@@ -266,8 +240,7 @@ class Data extends Work
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
 		$count = $data->entrust($sql, $values + $where);
-		if ($count === false)
-		{
+		if ($count === false) {
 			$data->pdo->rollback();
 			return $count;
 		}
@@ -289,19 +262,16 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
-		if ($where == null || ! is_array($where))
-		{
+		if ($where == null || ! is_array($where)) {
 			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
@@ -312,8 +282,7 @@ class Data extends Work
 		### 执行SQL语句
 		$data->pdo->beginTransaction();
 		$count = $data->entrust($sql, $where);
-		if ($count === false)
-		{
+		if ($count === false) {
 			$data->pdo->rollback();
 			return $count;
 		}
@@ -334,13 +303,11 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null)
-		{
+		if ($data == null) {
 			return false;
 		}
 		### 数据表
-		if ($table == null)
-		{
+		if ($table == null) {
 			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
@@ -350,8 +317,7 @@ class Data extends Work
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
-		if ($rows === false)
-		{
+		if ($rows === false) {
 			return $rows;
 		}
 		Log::logf(__FUNCTION__, count($rows), __CLASS__);
@@ -369,8 +335,7 @@ class Data extends Work
 	 */
 	public function entrust($sql = null, $params = null)
 	{
-		if ($sql == null || $this->pdo == null)
-		{
+		if ($sql == null || $this->pdo == null) {
 			return false;
 		}
 
@@ -379,22 +344,20 @@ class Data extends Work
 
 		### 执行SQL语句
 		$stm = $this->pdo->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		if (! $stm || ! $stm->execute($params))
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+		if (! $stm || ! $stm->execute($params)) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			Log::logs($this->pick(2, $stm->errorInfo()), null, Log::EXCEPTION);
 			return false;
 		}
 
 		### 执行结果
 		$column = $stm->columnCount();
-		if ($column > 0)
-		{
-		    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
-		    ### 字段名转为大写
-		    foreach ($rows as &$row) {
-		        $row = array_change_key_case($row, CASE_UPPER);
-		    }
+		if ($column > 0) {
+			$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+			### 字段名转为大写
+			foreach ($rows as &$row) {
+				$row = array_change_key_case($row, CASE_UPPER);
+			}
 			return $rows;
 		}
 		return $stm->rowCount();
@@ -410,20 +373,17 @@ class Data extends Work
 	protected function join($params = null, $gap = 'and', $holder = true)
 	{
 		$sql = '';
-		if ($params == null || ! is_array($params))
-		{
+		if ($params == null || ! is_array($params)) {
 			return $sql;
 		}
 		if ($holder) {
-			foreach ($params as $item => $value)
-			{
+			foreach ($params as $item => $value) {
 				$field = $this->field($item);
 				$sql .= "$gap $field=:$item ";
 			}
 			return substr($sql, strlen($gap));
 		}
-		foreach ($params as $item)
-		{
+		foreach ($params as $item) {
 			$field = $this->field($item);
 			$sql .= "$gap $field ";
 		}
@@ -437,8 +397,7 @@ class Data extends Work
 	 */
 	protected function field($field = null)
 	{
-		if ($field == null || ! is_string($field))
-		{
+		if ($field == null || ! is_string($field)) {
 			return '``';
 		}
 		$field = '`'.str_replace('`', '', $field).'`';
@@ -453,31 +412,23 @@ class Data extends Work
 	protected function connect()
 	{
 		### 连接信息
-		if ($this->dsn == null || $this->user == null)
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+		if ($this->dsn == null || $this->user == null) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 连接数据库
-		try
-		{
+		try {
 			$this->pdo = new PDO($this->dsn, $this->user, $this->password);
-			if ($this->charset != null)
-			{
+			if ($this->charset != null) {
 				$this->pdo->query('set character set '.$this->field($this->charset));
 			}
-			if ($this->lasting)
-			{
+			if ($this->lasting) {
 				self::$ACCESS = $this;
-			}
-			else
-			{
+			} else {
 				self::$ACCESS = $this->preset;
 			}
-		}
-		catch (PDOException $e)
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+		} catch (PDOException $e) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			Log::logs($e->getMessage(), null, Log::EXCEPTION);
 			return false;
 		}
@@ -495,10 +446,9 @@ class Data extends Work
 		$this->stuff(self::$ACCESS, $this->preset);
 		$this->stuff($setting, $this->preset);
 		$this->stuff($this->pick(_DEF, $this->preset));
-		if (! $this->connect())
-		{
-			$this->target->error = $this->error;
-			trigger_error($this->error, E_USER_ERROR);
+		if (! $this->connect()) {
+			$this->target->notice = $this->notice;
+			trigger_error($this->notice, E_USER_ERROR);
 		}
 	}
 }

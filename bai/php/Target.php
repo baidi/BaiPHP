@@ -2,12 +2,21 @@
 /**
  * <h2>化简PHP（BaiPHP）开发框架</h2>
  * @link      http://www.baiphp.net
- * @copyright Copyright (c) 2011 - 2012, 白晓阳
+ * @copyright Copyright 2011 - 2013, 白晓阳
  * @author    白晓阳
  * @version   1.0.0 2012/03/31 首版
- *            2.0.0 2012/07/01 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
- * <p>欢迎提供捐助。任何捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授权。</p>
+ *            2.0.0 2013/07/01 全面重构代码，弃用公共函数，独立启动引擎，优化配置文件结构，增加
+ *            原始虚类、目标工场、样式工场、模板工场、语言工场和记录工场，并优化代码结构。
+ * @license
+ * <p>化简PHP（BaiPHP）开发框架，是依据"面向目标"的设计思想、基于"服务-流程-工场"的设计模式、以简洁
+ * 灵活为方向、由白晓阳设计和开发的一套PHP应用框架。该框架的核心是基于配置并即时可控的流程走向和流程覆
+ * 盖，它采用了简洁优雅的实现方式，不但显著提升框架的易学性和易用性，而且最大限度地释放出应用的灵活性和扩
+ * 展性，从而尽可能地降低程序的开发和维护成本。</p>
+ * <p>化简PHP（BaiPHP）开发框架完全开放源代码，任何人都可以自由地复制、传播、修改和使用该代码，但未经
+ * 授权，不得用于商业目的。</p>
+ * <p>欢迎对该框架提供任何形式的捐助，捐助者自动获得仅限于捐助者自身的商业使用（不包括再发行和再授权）授
+ * 权。</p>
+ * <p>化简PHP（BaiPHP）开发框架由白晓阳持有版权，并保留一切权利。</p>
  */
 
 /**
@@ -20,8 +29,12 @@
  */
 class Target extends Bai
 {
+	/** 当前服务 */
+	protected $service = null;
+	/** 当前事项 */
+	protected $event   = null;
 	/** 抛锚点 */
-	protected $anchor = null;
+	protected $anchor  = null;
 	/** 内容过滤 */
 	protected $filters = null;
 
@@ -32,11 +45,11 @@ class Target extends Bai
 	 */
 	public function entrust($setting = null)
 	{
-		$event = $this[self::SERVICE].$this[self::EVENT];
+		$event = $this->service.$this->event;
 		Log::logf(__FUNCTION__, $event, __CLASS__);
-		Log::logf('start', date('Y-m-d H:m:s', _START), __CLASS__, Log::PERFORM);
+		Log::logf('start', date('Y-m-d H:m:s.B', _START), __CLASS__);
 		$this->result = $this->run($setting);
-		Log::logf('close', microtime(true) - _START, __CLASS__, Log::PERFORM);
+		Log::logf('close', microtime(true) - _START, __CLASS__);
 		Log::logf('deliver', $event, __CLASS__);
 		return $this->result;
 	}
@@ -48,43 +61,30 @@ class Target extends Bai
 	 */
 	protected function filter($inputs = null)
 	{
-		if ($inputs == null)
-		{
+		if ($inputs == null || $this->filters == null
+				|| ! is_array($this->filters)) {
 			return $inputs;
 		}
-		if ($this->filters == null || ! is_array($this->filters))
-		{
-			return $inputs;
-		}
-		### 过滤文字
-		if (! is_array($inputs))
-		{
-			foreach ($this->filters as $item => $mode)
-			{
-				$inputs = preg_replace($item, $mode, $inputs);
-			}
-			return $inputs;
-		}
-		### 过滤数组
-		foreach ($inputs as $item => &$value)
-		{
-			$value = $this->filter($value);
+		foreach ($this->filters as $item => $mode) {
+			$inputs = preg_replace($item, $mode, $inputs);
 		}
 		return $inputs;
 	}
 
 	/**
-	 * <h3>设定项目值</h3>
+	 * <h3>读取项目</h3>
 	 * @param string $item 项目名
-	 * @param mixed $value 项目值
-	 * @return void
+	 * @return mixed 项目值
 	 */
-	public static function session($item, $value)
+	public function offsetGet($item)
 	{
-		global $target;
-		$_SESSION[$item] = $value;
-		$target->$item = $value;
-		return $value;
+		if (! $this->offsetExists($item)) {
+			$this->runtime[$item] = null;
+			if (isset($this->$item)) {
+				$this->runtime[$item] = $this->$item;
+			}
+		}
+		return $this->runtime[$item];
 	}
 
 	/**
@@ -92,14 +92,14 @@ class Target extends Bai
 	 */
 	public function __toString()
 	{
-		return $this[self::EVENT];
+		return $this->event;
 	}
 
 	/**
 	 * <h4>构建目标</h4>
 	 * <p>
 	 * 根据$_SESSION、$_GET、$_POST、预置数据、自定义数据构建当前目标。
-	 * 优先级依次提升，但预置数据中的当前事项和服务路径会被提交的数据覆盖。
+	 * 数据优先级依次提升，但预置数据中的当前事项和服务路径会被提交的数据覆盖。
 	 * </p>
 	 * @param array $setting 即时配置
 	 */
@@ -109,50 +109,31 @@ class Target extends Bai
 		#session_id(md5($_SERVER['REMOTE_HOST'].$_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']));
 		session_start();
 		### 加载配置
-		if ($setting != null)
-		{
-			$bai     = _LOCAL.$this->config(_DEF, self::BAI);
-			$service = _LOCAL.$this->config(_DEF, self::SERVICE);
-			$root    = $this->config(_DEF, 'Root');
-			foreach ((array)$setting as $item)
-			{
-				if ($item == null || ! is_string($item))
-				{
-					continue;
-				}
-				if (substr($item, - strlen(_EXT)) !== _EXT)
-				{
-					$item .= _EXT;
-				}
-				if (is_file($bai.$root.$item))
-				{
-					include $bai.$root.$item;
-				}
-				if (is_file($service.$root.$item))
-				{
-					include $service.$root.$item;
-				}
-			}
-			$this->preset = $this->config(__CLASS__);
+		foreach ((array)$setting as $item) {
+			$this->load($item, true, $this->config(_DEF, 'Root'));
 		}
 		### 应用预置数据
-		$this->stuff($this->config(_DEF));
-		$this->stuff($this->config(self::BAI));
-		$this->stuff($this->config(self::TARGET));
+		$this->stuff($this->config(__CLASS__));
 		### 应用全局数据
-		$this->stuff($_SESSION);
-		$this->stuff($this->filter($_COOKIE));
-		$this->stuff($this->filter($_GET));
-		$this->stuff($this->filter($_POST));
+		$this->stuff($_SESSION, $this->runtime);
+		$this->stuff($this->filter($_COOKIE), $this->runtime);
+		$this->stuff($this->filter($_GET), $this->runtime);
+		$this->stuff($this->filter($_POST), $this->runtime);
 		### 应用目标事项
-		if ($this[lcfirst(self::EVENT)] != null)
-		{
-			$this[self::EVENT] = $this[lcfirst(self::EVENT)];
+		$event = $this['event'];
+		if ($event == null) {
+			$event = $this->config(_DEF, self::EVENT);
 		}
-		### 应用目标入口
-		if ($this[lcfirst(self::SERVICE)] != null)
-		{
-			$this[self::SERVICE] = $this[lcfirst(self::SERVICE)];
+		if ($event != null) {
+			$this->event = $event;
+		}
+		### 应用服务入口
+		$service = $this['service'];
+		if ($service == null) {
+			$service = $this->config(_DEF, self::SERVICE);
+		}
+		if ($service != null) {
+			$this->service = $service;
 		}
 		$this->target = $this;
 	}

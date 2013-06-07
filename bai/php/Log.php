@@ -14,7 +14,7 @@
  * <h2>化简PHP（BaiPHP）开发框架</h2>
  * <h3>日志工场</h3>
  * <p>
- * 生成日志信息并输出日志。
+ * 根据预置内容生成日志信息并输出。
  * </p>
  * @author 白晓阳
  */
@@ -41,25 +41,14 @@ class Log extends Work
 	/** 日志级别: 全部 */
 	const ALL       = 127;
 
-	/** 日志级别名 */
-	protected $ranks = array
-	(
-		self::FATAL     => ' [致命] ',
-		self::ERROR     => ' [错误] ',
-		self::EXCEPTION => ' [异常] ',
-		self::WARING    => ' [警告] ',
-		self::NOTICE    => ' [提示] ',
-		self::INFO      => ' [信息] ',
-		self::UNKNOWN   => ' [未知] ',
-		self::DEBUG     => ' [调试] ',
-		self::PERFORM   => ' [性能] ',
-	);
 	/** 日志级别 */
-	protected $level = self::ALL;
+	protected $level  = self::ALL;
 	/** 日志目录 */
-	protected $root = 'Log/';
+	protected $root   = null;
 	/** 日志结束符 */
-	protected $ending = "\r\n";
+	protected $ending = "\n";
+	/** 日志级别名 */
+	protected $ranks  = null;
 
 	/** 日志工场静态入口 */
 	private static $ACCESS = null;
@@ -71,8 +60,7 @@ class Log extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || self::$ACCESS == null)
-		{
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Log($setting);
 		}
 		return self::$ACCESS;
@@ -85,7 +73,7 @@ class Log extends Work
 	 * @param integer $level 日志级别
 	 * @return string 日志信息
 	 */
-	public static function logs($item = null, $type = null, $level = Log::INFO)
+	public static function logs($item = null, $type = null, $level = self::INFO)
 	{
 		$log = Log::access();
 		return $log->entrust($item, $type, null, $level);
@@ -99,7 +87,7 @@ class Log extends Work
 	 * @param integer $level 日志级别
 	 * @return string 日志信息
 	 */
-	public static function logf($item = null, $params = null, $type = null, $level = Log::INFO)
+	public static function logf($item = null, $params = null, $type = null, $level = self::INFO)
 	{
 		$log = Log::access();
 		return $log->entrust($item, $type, $params, $level);
@@ -119,19 +107,17 @@ class Log extends Work
 	 */
 	public function entrust($item = null, $type = null, $params = null, $level = self::INFO)
 	{
-		if ($item == null)
-		{
+		if ($item == null) {
 			return null;
 		}
 		### 执行数据
-		$this->runtime['item']   = "$item";
-		$this->runtime['type']   = "$type";
-		$this->runtime['params'] = $params;
-		$this->runtime['level']  = $level;
+		$this['item']   = "$item";
+		$this['type']   = "$type";
+		$this['params'] = $params;
+		$this['level']  = $level;
 		### 处理日志
 		$this->result = $this->fetch();
-		if ($this->result != null)
-		{
+		if ($this->result != null) {
 			$this->result = $this->format();
 			$this->result = $this->record();
 		}
@@ -148,11 +134,10 @@ class Log extends Work
 	protected function fetch()
 	{
 		### 执行数据
-		$item = $this->pick('item', $this->runtime);
-		$type = $this->pick('type', $this->runtime);
+		$item = $this['item'];
+		$type = $this['type'];
 		### 即时日志
-		if ($type == null)
-		{
+		if ($type == null) {
 			return $item;
 		}
 		### 读取预置日志
@@ -170,19 +155,13 @@ class Log extends Work
 	 */
 	protected function format()
 	{
-		#if ($this->result == null)
-		#{
-		#	return $this->result;
-		#}
 		### 执行数据
-		$params = $this->pick('params', $this->runtime);
-		if ($params == null)
-		{
+		$params = $this['params'];
+		if ($params == null) {
 			return $this->result;
 		}
 		### 单一参数
-		if (! is_array($params))
-		{
+		if (! is_array($params)) {
 			return sprintf($this->result, $params);
 		}
 		### 数组参数
@@ -199,20 +178,14 @@ class Log extends Work
 	 */
 	protected function record()
 	{
-		#if ($this->result == null)
-		#{
-		#	return $this->result;
-		#}
 		### 执行数据
-		$level = $this->pick('level', $this->runtime);
-		if (($level & $this->level) == 0)
-		{
+		$level = $this['level'];
+		if (($level & $this->level) == 0) {
 			return $this->result;
 		}
 		### 记录日志
 		$rank = $this->pick($level, $this->ranks);
-		if ($rank == null)
-		{
+		if ($rank == null) {
 			$rank = $this->pick(self::UNKNOWN, $this->ranks);
 		}
 		$message = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
@@ -233,10 +206,8 @@ class Log extends Work
 		parent::__construct($setting);
 		### 构建日志目录
 		$root = _LOCAL;
-		foreach (explode(_DIR, $this->root) as $dir)
-		{
-			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR))
-			{
+		foreach (explode(_DIR, $this->root) as $dir) {
+			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR)) {
 				break;
 			}
 			$root .= $dir._DIR;

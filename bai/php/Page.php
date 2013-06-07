@@ -30,7 +30,7 @@ class Page extends Flow
 	protected $js      = null;
 	/** 页面版式 */
 	protected $formats = null;
-	/** 页面整理 */
+	/** 页面修整 */
 	protected $trims   = null;
 
 	/**
@@ -39,48 +39,49 @@ class Page extends Flow
 	 */
 	protected function html()
 	{
-		$this->lside = null;
-		$this->rside = null;
+		$this['js']    = $this->js;
+		$this['css']   = $this->css;
+		$this['lside'] = null;
+		$this['rside'] = null;
 		return $this->load($this->layout);
 	}
 
 	/**
-	 * <h4>页面内容处理与缓存</h4>
+	 * <h4>页面内容处理</h4>
+	 * <p>
+	 * 应用页面版式，页面修整，并缓存页面
+	 * </p>
 	 * @param string $event 事件
 	 * @param string $page 页面内容
 	 */
 	protected function format()
 	{
 		$page = $this->result;
-
 		### 应用页面版式
-		if ($this->formats && is_array($this->formats))
-		{
-			$items = array_keys($this->formats);
-			$values = array_values($this->formats);
-			$page = str_replace($items, $values, $page);
+		if ($this->formats && is_array($this->formats)) {
+			$page = str_replace(array_keys($this->formats), array_values($this->formats), $page);
 		}
-
-		### 页面整理
-		if ($this->trims && is_array($this->trims))
-		{
-			$items = array_keys($this->trims);
-			$values = array_values($this->trims);
-			$page = preg_replace($items, $values, $page);
+		### 应用页面修整
+		if ($this->trims && is_array($this->trims)) {
+			$page = preg_replace(array_keys($this->trims), array_values($this->trims), $page);
 		}
-
-		### 页面缓存
-		// $cache = Cache::access();
-		// $cache->entrust($event, $page);
+		### 应用页面缓存
+		#$cache = Cache::access();
+		#$cache->entrust($event, $page);
 		return $page;
 	}
 
 	/**
-	 * 属性未知时，返回对应语言项或预置内容。
+	 * <h3>读取项目</h3>
+	 * @param string $item 项目名
+	 * @return mixed 项目值
 	 */
-	public function __get($item)
+	public function offsetGet($item)
 	{
-		$this->$item = Lang::fetch($item, false);
-		return $this->$item;
+		if (! isset($this->runtime[$item])) {
+			### 从语言工场取值
+			$this->runtime[$item] = Lang::fetch($item, false);
+		}
+		return $this->runtime[$item];
 	}
 }

@@ -68,19 +68,16 @@ class Test extends Work
 	 */
 	public function entrust($testee = null, $tester = null)
 	{
-		if ($testee == null || ! class_exists($testee, true))
-		{
+		if ($testee == null || ! class_exists($testee, true)) {
 			### 测试对象无效
 			Log::logf('testee', $testee, __CLASS__);
 			return $this->result;
 		}
-		if ($tester == null)
-		{
+		if ($tester == null) {
 			$tester = $testee;
 		}
 		$cases = $this->load($tester);
-		if ($cases == null || ! is_array($cases))
-		{
+		if ($cases == null || ! is_array($cases)) {
 			### 测试文件无效
 			Log::logf('tester', $tester, __CLASS__);
 			return $this->result;
@@ -92,11 +89,9 @@ class Test extends Work
 		### 执行测试
 		$this->result = array();
 		$this->runtime['testee'] = $testee;
-		foreach ($cases as $case)
-		{
+		foreach ($cases as $case) {
 			$item = $this->pick(self::ITEM, $case);
-			if ($case == null || ! is_array($case) || $item == null)
-			{
+			if ($case == null || ! is_array($case) || $item == null) {
 				$this->result[self::CASES][] = $this->skip;
 				Log::logf('testResult', $this->skip, __CLASS__);
 				continue;
@@ -111,10 +106,8 @@ class Test extends Work
 		xdebug_stop_code_coverage();
 
 		### 测试结果
-		foreach ($codes as $file => $code)
-		{
-			if (basename($file) === $testee._EXT)
-			{
+		foreach ($codes as $file => $code) {
+			if (basename($file) === $testee._EXT) {
 				$this->result[self::FILE] = $file;
 				$this->result[self::CODES] = $code;
 				break;
@@ -137,21 +130,17 @@ class Test extends Work
 		$case   = $this->pick('case',   $this->runtime);
 		$item   = $this->pick(self::ITEM, $case);
 		$mode   = $this->pick(self::MODE, $case);
-		if ($mode == null)
-		{
+		if ($mode == null) {
 			$mode = self::MODE_METHOD;
 		}
-		try
-		{
+		try {
 			### 执行测试场景
 			Log::logf(__FUNCTION__, $item, __CLASS__);
 			return $this->$mode();
-		}
-		catch (Exception $e)
-		{
+		} catch (Exception $e) {
 			Log::logf('error', $item, __CLASS__);
 			Log::logs($e->getMessage(), null, Log::EXCEPTION);
-			return $this->error;
+			return $this->notice;
 		}
 	}
 
@@ -175,12 +164,10 @@ class Test extends Work
 		// $params   = $this->testHolder($params);
 		### 构建对象
 		$testee = $this->build($item, $params);
-		if ($testee == null)
-		{
+		if ($testee == null) {
 			return $this->failure;
 		}
-		if ($expected == null)
-		{
+		if ($expected == null) {
 			$expected = $item;
 		}
 		$this->$expected = $testee;
@@ -207,20 +194,14 @@ class Test extends Work
 		$expected = $this->pick(self::EXPECTED, $case);
 		// 		$params   = $this->testHolder($params);
 		### 执行测试
-		if ($this->$testee == null || ! method_exists($this->$testee, $item))
-		{
+		if ($this->$testee == null || ! method_exists($this->$testee, $item)) {
 			return $this->skip;
 		}
-		if ($params === null)
-		{
+		if ($params === null) {
 			$actual = $this->$testee->$item();
-		}
-		else if (! is_array($params))
-		{
+		} else if (! is_array($params)) {
 			$actual = $this->$testee->$item($params);
-		}
-		else
-		{
+		} else {
 			$actual = call_user_func_array(array($this->$testee, $item), $params);
 		}
 		return $this->testResult($actual, $expected);
@@ -232,33 +213,33 @@ class Test extends Work
 	 * 将引用参数置换成实际参数。
 	 * </p>
 	 * @param mixed $params 引用参数
-	 */
-// 	protected function testHolder($params = null)
-// 	{
-// 		if ($params == null)
-// 		{
-// 			return $params;
-// 		}
-// 		if (! is_array($params))
-// 		{
-// 			if (is_string($params) && strpos($params, self::MODE_HOLDER) === 0)
-// 			{
-// 				$params = substr($params, strlen(self::MODE_HOLDER));
-// 				return $this->$params;
-// 			}
-// 			return $params;
-// 		}
-// 		foreach ($params as &$param)
-// 		{
-// 			if (is_string($param) && strpos($param, self::MODE_HOLDER) === 0)
-// 			{
-// 				$param = substr($param, strlen(self::MODE_HOLDER));
-// 				$param = $this->$param;
-// 				$param = &$param;
-// 			}
-// 		}
-// 		return $params;
-// 	}
+	 *//*
+	protected function testHolder($params = null)
+	{
+		if ($params == null)
+		{
+			return $params;
+		}
+		if (! is_array($params))
+		{
+			if (is_string($params) && strpos($params, self::MODE_HOLDER) === 0)
+			{
+				$params = substr($params, strlen(self::MODE_HOLDER));
+				return $this->$params;
+			}
+			return $params;
+		}
+		foreach ($params as &$param)
+		{
+			if (is_string($param) && strpos($param, self::MODE_HOLDER) === 0)
+			{
+				$param = substr($param, strlen(self::MODE_HOLDER));
+				$param = $this->$param;
+				$param = &$param;
+			}
+		}
+		return $params;
+	}*/
 
 	/**
 	 * <h4>比较场景</h4>
@@ -270,14 +251,11 @@ class Test extends Work
 	 */
 	protected function testResult($actual, $expected)
 	{
-		if (is_object($actual))
-		{
+		if (is_object($actual)) {
 			$result = ($actual instanceof $expected);
-		}
-		else
-		{
+		} else {
 			$result = ($actual === $expected) ||
-			(is_array($actual) && is_array($expected) && $actual == $expected);
+					(is_array($actual) && is_array($expected) && $actual == $expected);
 		}
 		return $result ? $this->success : $this->failure;
 	}
@@ -295,8 +273,7 @@ class Test extends Work
 
 	public function __toString()
 	{
-		if (! $this->name)
-		{
+		if (! $this->name) {
 			$this->name = __CLASS__;
 		}
 		return $this->name;

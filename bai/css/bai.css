@@ -4,10 +4,9 @@ body {
 	font: $font$;
 	color: $color$;
 	background: $background$;
-	background-color: $bgcolor$;
 }
 a {
-	color: $acolor$;
+	color: $lightanchor$;
 	cursor: pointer;
 	text-decoration: none;
 }
@@ -23,7 +22,7 @@ h1,h2,h3,h4,h5 {
 
 hr {
 	border: none;
-	border-bottom: 1px solid $linecolor$;
+	border-bottom: 1px solid $darkline$;
 }
 
 img {
@@ -58,8 +57,8 @@ p {
 pre {
 	margin: 0.5em;
 	padding: 0.5em;
-	background-color: $areacolor$;
-	border: 1px dashed $linecolor$;
+	background-color: $darkarea$;
+	border: 1px dashed $darkline$;
 }
 
 progress {
@@ -70,11 +69,14 @@ span {
 	word-break: break-all;
 }
 
-table, table td, table th {
-	border: 1px solid $linecolor$;
+table td, table th {
+	border: 1px solid $darkline$;
 }
 table tr:nth-child(even) {
-	background-color: $areacolor$;
+	background-color: $darkarea$;
+}
+table tr:hover {
+	background-color: $lightarea$;
 }
 
 textarea {
@@ -131,8 +133,8 @@ textarea {
 }
 
 .q {
-	background-color: $areacolor$;
-	border: 1px dashed $linecolor$;
+	background-color: $darkarea$;
+	border: 1px dashed $darkline$;
 }
 
 .r {
@@ -143,7 +145,7 @@ textarea {
 	font-size: 1.25em;
 	font-weight: bold;
 	margin-top: 0.5em;
-	border-bottom: 1px solid $linecolor$;
+	border-bottom: 1px solid $darkline$;
 }
 
 .tc {
@@ -163,8 +165,8 @@ textarea {
 /*--- 页面布局 ---*/
 .page {
 	margin: 0 auto;
-	min-width: 480px;
-	max-width: $width$; /* 全局宽度 */
+	min-width: $min$;
+	max-width: $max$; /* 全局宽度 */
 }
 
 header, footer {
@@ -185,22 +187,12 @@ header, footer {
 	display: inline-block;
 }
 
-header nav a { /* 页首导航 */
-	width: 6em;
-	font: 16px/24px normal;
-	border: 1px solid #ffffff;
-	background: $areacolor$;
-	border-top-right-radius: 8px;
-	border-top-left-radius: 8px;
-}
-
 .box { /* 布局块 */
 	position: relative;
 	margin: 0.5em;
 	margin-bottom: 1em;
 	padding: 0.5em;
-	border: 1px solid $linecolor$;
-	border-radius: 6px;
+	border: 1px solid $darkline$;
 }
 
 .gap { /* 布局框 */
@@ -208,18 +200,12 @@ header nav a { /* 页首导航 */
 	margin: 4px 8px 8px 4px;
 	padding: 4px;
 }
-
-footer nav a { /* 页脚链接 */
-	width: 6em;
-	border: 1px solid #ffffff;
-	background: $areacolor$;
-}
 /*--- 页面布局 ---*/
 
 
 /*--- 信息提示 --*/
 .error {
-	color: #ff0000;
+	color: $errorcolor$;
 }
 
 .notice {
@@ -320,10 +306,10 @@ footer nav a { /* 页脚链接 */
 .header {
 	clear:both;
 	position: relative;
-	background: #f0f9f0;
-	border-top: 1px solid #cceccc;
+	background: $darkarea$;
+	border-top: 1px solid $lightline$;
 	text-align: right;
-	border-bottom: 2px solid #99cc99;
+	border-bottom: 2px solid $darkline$;
 }
 .header .logo {
 	float: left;
@@ -336,10 +322,10 @@ footer nav a { /* 页脚链接 */
 	height: 36px;
 	min-width: 36px;
 	padding: 6px;
-	color: #008000;
+	color: $darkanchor$;
 }
 .header a.on, .header a:hover {
-	background: #f0fff0;
+	background: $lightarea$;
 	border-bottom: 2px solid #f04000;
 	margin-bottom: -2px;
 }

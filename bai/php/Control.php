@@ -20,6 +20,15 @@
  */
 class Control extends Flow
 {
+	/** 访问地址过滤 */
+	protected $filters    = null;
+	/** 每秒最大访问频度 */
+	protected $visitLimit = 10;
+	/** 访问次数键值（用于$_SESSION） */
+	protected $visitCount = '_visit_count';
+	/** 访问时间键值（用于$_SESSION） */
+	protected $visitTime  = '_visit_time';
+
 	/**
 	 * <h4>访问登记</h4>
 	 * <p>
@@ -42,9 +51,9 @@ class Control extends Flow
 			### 客户环境
 			$_SERVER['HTTP_USER_AGENT'],
 		);
-		$this->target->client = Log::logf('client', $client, __CLASS__);
-		### 访问目标
-		$server = array(
+		Log::logf('client', $client, __CLASS__);
+			### 访问目标
+			$server = array(
 			### 服务器主机名
 			$_SERVER['SERVER_NAME'],
 			### 服务器IP地址
@@ -58,7 +67,7 @@ class Control extends Flow
 			### 服务器环境
 			$_SERVER['SERVER_SOFTWARE'],
 		);
-		$this->target->server = Log::logf('server', $server, __CLASS__);
+		Log::logf('server', $server, __CLASS__);
 		### 响应文件
 		$script = array(
 			### 响应文件
@@ -66,7 +75,7 @@ class Control extends Flow
 			### 访问参数
 			$_SERVER['QUERY_STRING'],
 		);
-		$this->target->script = Log::logf('script', $script, __CLASS__);
+		Log::logf('script', $script, __CLASS__);
 		return true;
 	}
 
@@ -76,52 +85,48 @@ class Control extends Flow
 	 */
 	protected function filter()
 	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		if ($preset == null || ! is_array($preset))
-		{
+		if ($this->filters == null || ! is_array($this->filters)) {
 			return true;
 		}
 		### 访问地址过滤
 		$result = true;
-		foreach ($preset as $item => $mode)
-		{
-			if (preg_match($item, $_SERVER['REMOTE_ADDR']))
-			{
+		foreach ($this->filters as $item => $mode) {
+			if (preg_match($item, $_SERVER['REMOTE_ADDR'])) {
 				$result = $mode;
 			}
 		}
-		if (! $result)
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
+		if (! $result) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
 		}
 		return $result;
 	}
 
 	/**
 	 * <h4>访问频度限制</h4>
-	 * <p>利用会话实现访问频度限制。</p>
+	 * <p>利用会话实现简单的访问频度限制。</p>
 	 * @return boolean
 	 */
 	protected function limit()
 	{
-		$preset = $this->pick(__FUNCTION__, $this->preset);
-		$limit  = (int) $this->pick(__FUNCTION__, $preset);
-		$keyCount = $this->pick('count', $preset);
-		$keyTime  = $this->pick('time',  $preset);
-		$count = (int) $this->pick($keyCount, $_SESSION);
-		if ($limit > 0 && $count >= $limit)
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
-			return false;
-		}
-		$time  = $this->pick($keyTime,  $_SESSION);
-		if ($time != $_SERVER['REQUEST_TIME'])
-		{
-			$_SESSION[$keyTime]  = $_SERVER['REQUEST_TIME'];
-			$_SESSION[$keyCount] = 1;
+		if ($this->visitLimit <= 0) {
 			return true;
 		}
-		$_SESSION[$keyCount] = $count + 1;
+		### 当前访问次数
+		$count = (int)$this->pick($this->visitCount, $_SESSION);
+		if ($count >= $this->visitLimit) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::ERROR);
+			return false;
+		}
+		### 访问时间
+		$time  = $this->pick($this->visitTime,  $_SESSION);
+		if ($time != $_SERVER['REQUEST_TIME']) {
+			### 重新统计
+			$_SESSION[$this->visitTime]  = $_SERVER['REQUEST_TIME'];
+			$_SESSION[$this->visitCount] = 1;
+			return true;
+		}
+		### 更新访问次数
+		$_SESSION[$this->visitCount] = $count + 1;
 		return true;
 	}
 }

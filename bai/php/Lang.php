@@ -38,8 +38,7 @@ class Lang extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || self::$ACCESS == null)
-		{
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Lang($setting);
 		}
 		return self::$ACCESS;
@@ -58,8 +57,7 @@ class Lang extends Work
 	{
 		$lang = Lang::access();
 		$result = $lang->entrust($item);
-		if ($print)
-		{
+		if ($print) {
 			echo $result;
 		}
 		return $result;
@@ -75,16 +73,14 @@ class Lang extends Work
 	 */
 	public function entrust($item = null)
 	{
-		if ($item == null || ! is_string($item))
-		{
+		if ($item == null || ! is_string($item)) {
 			return null;
 		}
 		$preset = $this->pick($this->primary, $this->preset);
 		### 事件语言配置
-		$event = $this->pick($this->target[self::EVENT], $preset);
+		$event = $this->pick("$this->target", $preset);
 		$this->result = $this->pick($item, $event);
-		if ($this->result === null)
-		{
+		if ($this->result === null) {
 			### 全局语言配置
 			$this->result = $this->pick($item, $preset);
 		}
@@ -107,11 +103,6 @@ class Lang extends Work
 	protected function __construct($setting = null)
 	{
 		parent::__construct($setting);
-		$primary = $this->target[self::LANG];
-		if ($primary != null)
-		{
-			$this->primary = $primary;
-		}
 		$this->load($this->primary, true);
 		$this->stuff($this->config(__CLASS__), $this->preset);
 		$this->stuff($setting, $this->preset);

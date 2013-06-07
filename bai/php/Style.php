@@ -37,8 +37,7 @@ class Style extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || self::$ACCESS == null)
-		{
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Style($setting);
 		}
 		return self::$ACCESS;
@@ -108,25 +107,20 @@ class Style extends Work
 	 */
 	public function entrust($items = null, $branch = null, $inset = false)
 	{
-		if ($items == null)
-		{
+		if ($items == null) {
 			return null;
 		}
-		if ($branch == null)
-		{
+		if ($branch == null) {
 			$branch == get_class($this);
 		}
 		$this->result = '';
-		foreach ((array)$items as $item)
-		{
-			if ($item == null || ! is_string($item))
-			{
+		foreach ((array)$items as $item) {
+			if ($item == null || ! is_string($item)) {
 				continue;
 			}
 			$this->runtime['item']   = $item;
 			$this->runtime['branch'] = $branch;
-			if (! $inset)
-			{
+			if (! $inset) {
 				$this->result = $this->link();
 				break;
 			}
@@ -145,8 +139,7 @@ class Style extends Work
 		$item     = $this->pick('item',   $this->runtime);
 		$branch   = $this->pick('branch', $this->runtime);
 		$template = $this->pick($branch,  $this->insets);
-		if (! $template)
-		{
+		if (! $template) {
 			return null;
 		}
 		### 路径
@@ -155,13 +148,11 @@ class Style extends Work
 		$service = $this->pick(self::SERVICE, $path);
 		### 加载文件
 		$content = '';
-		if ($bai != null)
-		{
+		if ($bai != null) {
 			Log::logf(__FUNCTION__, $bai, __CLASS__);
 			$content .= file_get_contents(_LOCAL.$bai);
 		}
-		if ($service != null)
-		{
+		if ($service != null) {
 			Log::logf(__FUNCTION__, $service, __CLASS__);
 			$content .= file_get_contents(_LOCAL.$service);
 		}
@@ -184,29 +175,24 @@ class Style extends Work
 		$bai     = $this->pick(self::BAI,     $path);
 		$service = $this->pick(self::SERVICE, $path);
 		### 外链文件
-		if ($template != null)
-		{
+		if ($template != null) {
 			$content = '';
-			if ($service != null)
-			{
+			if ($service != null) {
 				Log::logf(__FUNCTION__, $service, __CLASS__);
 				$content .= sprintf($template, _WEB.$service);
 			}
-			if ($bai != null)
-			{
+			if ($bai != null) {
 				Log::logf(__FUNCTION__, $bai, __CLASS__);
 				$content .= sprintf($template, _WEB.$bai);
 			}
 			return $content;
 		}
 		### 外链文件名
-		if ($service != null)
-		{
+		if ($service != null) {
 			Log::logf(__FUNCTION__, $service, __CLASS__);
 			return _WEB.$service;
 		}
-		if ($bai != null)
-		{
+		if ($bai != null) {
 			Log::logf(__FUNCTION__, $bai, __CLASS__);
 			return _WEB.$bai;
 		}

@@ -28,7 +28,7 @@
 class Template extends Work
 {
 	/** 参数表达式 */
-	protected $mode = '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#';
+	protected $mode = null;
 	/** 参数处理式 */
 	protected $handler = array(
 		### 判断处理式
@@ -53,8 +53,7 @@ class Template extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || self::$ACCESS == null)
-		{
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Template($setting);
 		}
 		return self::$ACCESS;
@@ -77,29 +76,24 @@ class Template extends Work
 	 */
 	public function entrust($item = null, $setting = null)
 	{
-		if ($item == null)
-		{
+		if ($item == null) {
 			return null;
 		}
 		### 读取模板
 		$template = $this->pick("$item", $this->templates);
-		if ($template == null || ! is_string($template))
-		{
+		if ($template == null || ! is_string($template)) {
 			return null;
 		}
 		### 参数匹配
-		if ($this->mode == null || ! preg_match_all($this->mode, $template, $params, PREG_SET_ORDER))
-		{
+		if ($this->mode == null || ! preg_match_all($this->mode, $template, $params, PREG_SET_ORDER)) {
 			$this->result = $template;
 			return $this->result;
 		}
 		### 字符串默认作为$value
-		if ($setting != null && is_string($setting))
-		{
+		if ($setting != null && is_string($setting)) {
 			$setting = array('value' => $setting);
 		}
-		if (is_array($setting))
-		{
+		if (is_array($setting)) {
 			krsort($setting);
 		}
 		### 执行数据
@@ -124,15 +118,13 @@ class Template extends Work
 		$template = $this->pick('template', $this->runtime);
 		$setting  = $this->pick('setting',  $this->runtime);
 		$params   = $this->pick('params',   $this->runtime);
-		foreach ($params as $param)
-		{
+		foreach ($params as $param) {
 			### 解析参数
 			$name    = $this->pick('name',   $param);
 			$value   = $this->pick($name,    $setting);
 			$handle  = $this->pick('handle', $param);
 			$handler = $this->pick($handle,  $this->handler);
-			if ($handler == null)
-			{
+			if ($handler == null) {
 				### 参数直接置换
 				$template = str_replace($param[0], $this->pick($name, $setting), $template);
 				continue;
@@ -158,12 +150,10 @@ class Template extends Work
 		$value   = $this->pick('value', $this->runtime);
 		### 获取表达式
 		$content = $this->pick('first', $this->runtime);
-		if (! $value)
-		{
+		if (! $value) {
 			$content = $this->pick('last', $this->runtime);
 		}
-		if ($content == null)
-		{
+		if ($content == null) {
 			return null;
 		}
 		return str_replace($this->peg.$name, $value, $content);
@@ -180,23 +170,19 @@ class Template extends Work
 		$value   = $this->pick('value', $this->runtime);
 		$content = $this->pick('first', $this->runtime);
 		### 参数非数组
-		if (! is_array($value))
-		{
-			if ($content == null)
-			{
+		if (! is_array($value)) {
+			if ($content == null) {
 				return $value;
 			}
 			return str_replace($this->peg.$name, $value, $content);
 		}
 		### 表达式为空
-		if ($content == null)
-		{
+		if ($content == null) {
 			return implode('', $value);
 		}
 		### 循环解析
 		$result = '';
-		foreach ($value as $key => $val)
-		{
+		foreach ($value as $key => $val) {
 			$result .= str_replace($this->looper, array($val, $key), $content);
 		}
 		return $result;

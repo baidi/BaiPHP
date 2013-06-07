@@ -41,8 +41,7 @@ class Input extends Template
 	 */
 	public static function access($setting = null)
 	{
-		if ($setting != null || self::$ACCESS == null)
-		{
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Input($setting);
 		}
 		return self::$ACCESS;
@@ -60,33 +59,28 @@ class Input extends Template
 	public function entrust($item = null, $setting = null)
 	{
 		### 生成项默认为input
-		if ($item == null)
-		{
+		if ($item == null) {
 			$item = $this->primary;
 		}
 		### 字符串默认作为$value
-		if ($setting != null && is_string($setting))
-		{
+		if ($setting != null && is_string($setting)) {
 			$setting = array('value' => $setting);
 		}
-		if (! is_array($setting))
-		{
+		if (! is_array($setting)) {
 			$setting = array();
 		}
 		### 匹配检验项
-		$event = $this->target[self::EVENT];
+		$event = $this->target->event;
 		$check = $this->config(self::CHECK, $event, $item);
-		if (preg_match_all($this->check, $check, $cases, PREG_SET_ORDER))
-		{
+		if (preg_match_all($this->check, $check, $cases, PREG_SET_ORDER)) {
 			$cases[_DEF] = $check;
 		}
 		$this->runtime['cases'] = $cases;
 		### 填充模板参数
 		$setting['event'] = $event;
 		$setting['item']  = $item;
-		$setting['value'] = $this->pick($item, $this->target[$event]);
-		if ($cases != null)
-		{
+		$setting['value'] = $this->pick($item, $this->target->event);
+		if ($cases != null) {
 			$setting['type']  = $this->type();
 			$setting['check'] = $this->check();
 			$setting['hint']  = $this->hint();
@@ -108,11 +102,9 @@ class Input extends Template
 		$cases = $this->pick('cases', $this->runtime);
 		### 获取输入类型
 		$result = null;
-		foreach ($cases as $case)
-		{
+		foreach ($cases as $case) {
 			$item  = $this->pick('item',  $case);
-			if ($item === __FUNCTION__)
-			{
+			if ($item === __FUNCTION__) {
 				$result = $this->pick('value', $case);
 				break;
 			}
@@ -136,13 +128,11 @@ class Input extends Template
 	{
 		$cases = $this->pick('cases', $this->runtime);
 		$result = array();
-		foreach ($cases as $case)
-		{
+		foreach ($cases as $case) {
 			$item  = $this->pick('item',  $case);
 			$params = $this->pick('params', $case);
 			$check = $this->pick($item, $this->checks);
-			if ($check != null)
-			{
+			if ($check != null) {
 				$result[] = sprintf($check, $params);
 			}
 		}
@@ -160,19 +150,16 @@ class Input extends Template
 	{
 		$cases = $this->pick('cases', $this->runtime);
 		$result = array();
-		foreach ($cases as $case)
-		{
+		foreach ($cases as $case) {
 			$item  = $this->pick('item',  $case);
 			$params = $this->pick('params', $case);
 			$hint = $this->pick($item, $this->hints);
-			if ($hint != null)
-			{
+			if ($hint != null) {
 				$result[] = sprintf($hint, $params);
 				continue;
 			}
 			$hint = $this->pick($params, $this->hints);
-			if ($hint != null)
-			{
+			if ($hint != null) {
 				$result[] = $case;
 			}
 		}

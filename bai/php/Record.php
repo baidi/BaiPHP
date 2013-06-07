@@ -66,8 +66,7 @@ class Record extends Work
 	 */
 	protected function refresh()
 	{
-		if ($this->id != null)
-		{
+		if ($this->id != null) {
 			$data = Data::read($this->table, array($this->pk => $this->id));
 			$this->origin = $data[0];
 			$this->status = self::REFRESH;
@@ -85,23 +84,19 @@ class Record extends Work
 	 */
 	protected function save()
 	{
-		if ($this->origin == null)
-		{
+		if ($this->origin == null) {
 			$id = Data::create($this->table, $this->update);
 			$this->origin = $this->update;
 			$this->origin[$this->pk] = $id;
 			return true;
 		}
 		$values = array();
-		foreach ($this->origin as $item => $value)
-		{
-			if (isset($this->update[$item]) && $this->update[$item] !== $value)
-			{
+		foreach ($this->origin as $item => $value) {
+			if (isset($this->update[$item]) && $this->update[$item] !== $value) {
 				$update[$item] = $this->update[$item];
 			}
 		}
-		if ($values == null)
-		{
+		if ($values == null) {
 			return true;
 		}
 		$where = array($this->pk => $this->id);
@@ -112,9 +107,8 @@ class Record extends Work
 
 	protected function check()
 	{
-		foreach ($this->update as $item => $value)
-		{
-				
+		foreach ($this->update as $item => $value) {
+
 		}
 	}
 
@@ -140,22 +134,18 @@ class Record extends Work
 	 */
 	protected function show()
 	{
-		if ($this->table == null)
-		{
-			$this->error = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+		if ($this->table == null) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		$columns = Data::show($this->table);
-		if (! $columns)
-		{
+		if (! $columns) {
 			return false;
 		}
-		foreach ($columns as $column)
-		{
+		foreach ($columns as $column) {
 			$column['Check'] = $this->type($column);
 			$this->columns[$column['Field']] = $column;
-			if ($column['Key'] == 'PRI')
-			{
+			if ($column['Key'] == 'PRI') {
 				$this->pk = $column['field'];
 			}
 		}
@@ -163,8 +153,7 @@ class Record extends Work
 
 	protected function type($column = null)
 	{
-		if ($check == null || ! is_array($column))
-		{
+		if ($check == null || ! is_array($column)) {
 			return null;
 		}
 		$check = array();
@@ -173,16 +162,14 @@ class Record extends Work
 		}
 		$mode = '#^(?<type>[A-Za-z_]+)(?<options>\([^)]\+))?#';
 		$def = strtoupper($column['TYPE']);
-		if (preg_match($mode, $def, $matches))
-		{
+		if (preg_match($mode, $def, $matches)) {
 			$type = $this->pick('type', $matches);
 			if (strpos('UNSIGNED', $def) !== false) {
 				$type .= '+';
 			}
 			$options = $this->pick('options', $matches);
 			$check[] = 'type='.$this->pick($type, $this->types);
-			if ($type == 'ENUM' || $type == 'SET')
-			{
+			if ($type == 'ENUM' || $type == 'SET') {
 				$check[] = 'options='.$options;
 			} else if ($options != null) {
 				$check[] = 'max='.$options;
@@ -197,12 +184,10 @@ class Record extends Work
 	 */
 	public function offsetGet($item)
 	{
-		if (isset($this->update[$item]))
-		{
+		if (isset($this->update[$item])) {
 			return $this->update[$item];
 		}
-		if (isset($this->origin[$item]))
-		{
+		if (isset($this->origin[$item])) {
 			return $this->origin[$item];
 		}
 		return null;
@@ -217,8 +202,7 @@ class Record extends Work
 	public function offsetSet($item, $value)
 	{
 		$column = $this->pick($item, $this->columns);
-		if ($column != null)
-		{
+		if ($column != null) {
 			$this->update[$item] = $value;
 		}
 	}
@@ -249,10 +233,9 @@ class Record extends Work
 	public function __construct($setting = null)
 	{
 		parent::__construct($setting);
-		if (! $this->show())
-		{
-			$this->target->error = $this->error;
-			trigger_error($this->error, E_USER_ERROR);
+		if (! $this->show()) {
+			$this->target->notice = $this->notice;
+			trigger_error($this->notice, E_USER_ERROR);
 		}
 		$this->refresh();
 	}
