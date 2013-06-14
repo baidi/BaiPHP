@@ -49,6 +49,10 @@ class Log extends Work
 	protected $ending = "\n";
 	/** 日志级别名 */
 	protected $ranks  = null;
+	/** 日志缓存 */
+	protected $buffer = array();
+	/** 缓存大小（行） */
+	protected $size   = 512;
 
 	/** 日志工场静态入口 */
 	private static $ACCESS = null;
@@ -170,9 +174,9 @@ class Log extends Work
 	}
 
 	/**
-	 * <h4>记录日志并处理日志文件</h4>
+	 * <h4>记录日志到缓存</h4>
 	 * <p>
-	 * 将日志信息写入日志文件。
+	 * 将日志信息记入日志缓存。
 	 * </p>
 	 * @return string 日志信息
 	 */
@@ -188,10 +192,25 @@ class Log extends Work
 		if ($rank == null) {
 			$rank = $this->pick(self::UNKNOWN, $this->ranks);
 		}
-		$message = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
-		$filename = _LOCAL.$this->root.self::BAI._DEF.date('Y-m-d').'.log';
-		error_log($message, 3, $filename);
+		$this->buffer[] = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
+		if (count($this->buffer) > $this->size) {
+			$this->flush();
+		}
 		return $this->result;
+	}
+
+	/**
+	 * <h4>输出日志到文件</h4>
+	 * <p>
+	 * 将日志信息写入日志文件。
+	 * </p>
+	 * @return string 日志信息
+	 */
+	protected function flush()
+	{
+		$filename = _LOCAL.$this->root._APP._DEF.date('Y-m-d').'.log';
+		file_put_contents($filename, $this->buffer, FILE_APPEND);
+		$this->buffer = array();
 	}
 
 	/**
@@ -213,6 +232,17 @@ class Log extends Work
 			$root .= $dir._DIR;
 		}
 		$this->root = substr($root, strlen(_LOCAL));
+	}
+
+	/**
+	 * <h4>撤销日志工场</h4>
+	 * <p>
+	 * 输出缓存的日志
+	 * </p>
+	 */
+	public function __destruct()
+	{
+		$this->flush();
 	}
 }
 ?>
