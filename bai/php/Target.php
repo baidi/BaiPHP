@@ -106,8 +106,10 @@ class Target extends Bai
 	public function __construct($setting = null)
 	{
 		### 启动会话
-		#session_id(md5($_SERVER['REMOTE_HOST'].$_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']));
-		session_start();
+		if (session_id() == null) {
+		    #session_id(md5($_SERVER['REMOTE_HOST'].$_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']));
+	        session_start();
+		}
 		### 加载配置
 		foreach ((array)$setting as $item) {
 			$this->load($item, true, $this->config(_DEF, 'Root'));

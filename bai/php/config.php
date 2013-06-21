@@ -54,7 +54,7 @@ $config[Flow::FLOW] = array(
 ### 全局配置：目标
 $config[Bai::TARGET] = array(
 	### 当前服务
-	'service' => 'service',
+	'service' => 'service'._DIR,
 	### 当前事项
 	'event'   => 'home',
 	### 数据过滤

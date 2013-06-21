@@ -13,7 +13,7 @@ $config[Lang::LANG][Lang::ZH] = array(
 		'example' => '案例',
 	),
     _DEF.'test' => array(
-        'code'  => '源代码',
+        'codes'  => '测试代码',
         'covered' => '已测试',
         'uncovered' => '未测试',
         'normal' => '其他',

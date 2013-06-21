@@ -27,9 +27,11 @@ $lineCount   = $this->pick(Test::TLINES, $counts);
     </div>
     <div class="text"><?php echo implode('', $results); ?></div>
     <div class="t">
-        <?php echo $this['code']; ?>
+        <?php echo $this['codes']; ?>
         <span class="fg">|</span>
         <?php echo $lineCount, '/', count($lines); ?>
+        <span class="fg">|</span>
+        <?php echo number_format($lineCount * 100 / count($lines), 1), '%'; ?>
         <pre class="fr"><?php echo $this['normal']; ?></pre>
         <pre class="uncovered fr"><?php echo $this['uncovered']; ?></pre>
         <pre class="covered fr"><?php echo $this['covered']; ?></pre>
