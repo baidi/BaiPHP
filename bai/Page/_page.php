@@ -11,7 +11,7 @@
 <?php echo Style::js($this['js'], true); ?>
 </head>
 <body>
-	<header class="header">
+	<header>
 		<!-- 页眉 -->
 		<?php echo $this->load('_header.php'); ?>
 	</header>

@@ -41,14 +41,19 @@ class Log extends Work
 	/** 日志级别: 全部 */
 	const ALL       = 127;
 
+	/** 日志标识： 清空缓冲区 */
+	const FLUSH     = '_FLUSH';
+
+	/** 日志目录 */
+	protected $dir    = null;
 	/** 日志级别 */
 	protected $level  = self::ALL;
-	/** 日志目录 */
-	protected $root   = null;
+	/** 日志仓库 */
+	protected $store  = null;
+	/** 日志级别名 */
+	protected $names  = null;
 	/** 日志结束符 */
 	protected $ending = "\n";
-	/** 日志级别名 */
-	protected $ranks  = null;
 	/** 日志缓存 */
 	protected $buffer = array();
 	/** 缓存大小（行） */
@@ -111,12 +116,19 @@ class Log extends Work
 	 */
 	public function entrust($item = null, $type = null, $params = null, $level = self::INFO)
 	{
+	    $this->result = null;
+	    ### 日志项目为空
 		if ($item == null) {
-			return null;
+			return $this->result;
+		}
+		### 清空缓冲区
+		if ($item === self::FLUSH) {
+		    $this->flush();
+		    return $this->result;
 		}
 		### 执行数据
 		$this['item']   = "$item";
-		$this['type']   = "$type";
+		$this['type']   = $type;
 		$this['params'] = $params;
 		$this['level']  = $level;
 		### 处理日志
@@ -145,7 +157,7 @@ class Log extends Work
 			return $item;
 		}
 		### 读取预置日志
-		$message = $this->pick($type, $this->preset);
+		$message = $this->pick($type, $this->store);
 		$message = $this->pick($item, $message);
 		return $message;
 	}
@@ -188,9 +200,9 @@ class Log extends Work
 			return $this->result;
 		}
 		### 记录日志
-		$rank = $this->pick($level, $this->ranks);
+		$rank = $this->pick($level, $this->names);
 		if ($rank == null) {
-			$rank = $this->pick(self::UNKNOWN, $this->ranks);
+			$rank = $this->pick(self::UNKNOWN, $this->names);
 		}
 		$this->buffer[] = date('[Y-m-d H:i:s]').$rank.$this->result.$this->ending;
 		if (count($this->buffer) > $this->size) {
@@ -208,7 +220,7 @@ class Log extends Work
 	 */
 	protected function flush()
 	{
-		$filename = _LOCAL.$this->root._APP._DEF.date('Y-m-d').'.log';
+		$filename = _LOCAL.$this->dir._APP._DEF.date('Y-m-d').'.log';
 		file_put_contents($filename, $this->buffer, FILE_APPEND);
 		$this->buffer = array();
 	}
@@ -224,14 +236,14 @@ class Log extends Work
 	{
 		parent::__construct($setting);
 		### 构建日志目录
-		$root = _LOCAL;
-		foreach (explode(_DIR, $this->root) as $dir) {
-			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR)) {
+		$path = _LOCAL;
+		foreach (explode(_DIR, $this->dir) as $dir) {
+			if ($dir == null || ! is_dir($path.$dir._DIR) && ! mkdir($path.$dir._DIR)) {
 				break;
 			}
-			$root .= $dir._DIR;
+			$path .= $dir._DIR;
 		}
-		$this->root = substr($root, strlen(_LOCAL));
+		$this->dir = substr($path, strlen(_LOCAL));
 	}
 
 	/**

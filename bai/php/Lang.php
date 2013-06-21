@@ -78,7 +78,7 @@ class Lang extends Work
 		}
 		$preset = $this->pick($this->primary, $this->preset);
 		### 事件语言配置
-		$event = $this->pick("$this->target", $preset);
+		$event = $this->pick(_DEF."$this->target", $preset);
 		$this->result = $this->pick($item, $event);
 		if ($this->result === null) {
 			### 全局语言配置

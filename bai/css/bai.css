@@ -57,7 +57,7 @@ p {
 pre {
 	margin: 0.5em;
 	padding: 0.5em;
-	background-color: $darkarea$;
+	background-color: #fcfffc;
 	border: 1px dashed $darkline$;
 }
 
@@ -108,6 +108,10 @@ textarea {
 	float: right;
 }
 
+.fg {
+	color: #f04000;
+}
+
 .h {
 	display: none;
 }
@@ -145,6 +149,7 @@ textarea {
 	font-size: 1.25em;
 	font-weight: bold;
 	margin-top: 0.5em;
+	padding-bottom: 0.2em;
 	border-bottom: 1px solid $darkline$;
 }
 
@@ -184,7 +189,6 @@ header, footer {
 }
 
 .main {
-	display: inline-block;
 }
 
 .box { /* 布局块 */
@@ -193,12 +197,6 @@ header, footer {
 	margin-bottom: 1em;
 	padding: 0.5em;
 	border: 1px solid $darkline$;
-}
-
-.gap { /* 布局框 */
-	position: relative;
-	margin: 4px 8px 8px 4px;
-	padding: 4px;
 }
 /*--- 页面布局 ---*/
 
@@ -305,7 +303,8 @@ header, footer {
 
 .header {
 	clear:both;
-	position: relative;
+	width: 100%;
+	z-index: 2;
 	background: $darkarea$;
 	border-top: 1px solid $lightline$;
 	text-align: right;
@@ -328,4 +327,8 @@ header, footer {
 	background: $lightarea$;
 	border-bottom: 2px solid #f04000;
 	margin-bottom: -2px;
+}
+.footer {
+	border-top: 1px solid $lightline$;
+	background: $darkarea$;
 }

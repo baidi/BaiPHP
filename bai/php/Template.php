@@ -82,7 +82,7 @@ class Template extends Work
 		### 读取模板
 		$template = $this->pick("$item", $this->templates);
 		if ($template == null || ! is_string($template)) {
-			return null;
+			$template = $item;
 		}
 		### 参数匹配
 		if ($this->mode == null || ! preg_match_all($this->mode, $template, $params, PREG_SET_ORDER)) {

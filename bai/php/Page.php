@@ -63,7 +63,7 @@ class Page extends Flow
 		}
 		### 应用页面修整
 		if ($this->trims && is_array($this->trims)) {
-			$page = preg_replace(array_keys($this->trims), array_values($this->trims), $page);
+			#$page = preg_replace(array_keys($this->trims), array_values($this->trims), $page);
 		}
 		### 应用页面缓存
 		#$cache = Cache::access();

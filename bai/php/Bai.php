@@ -50,6 +50,8 @@ abstract class Bai implements ArrayAccess
 	/** 标识：运行路径 */
 	const RUNTIME  = 'Runtime';
 
+	/** 依赖扩展 */
+	protected $extensions = array();
 	/** 预置数据 */
 	protected $preset  = array();
 	/** 执行数据 */
@@ -330,7 +332,7 @@ abstract class Bai implements ArrayAccess
 	/**
 	 * <h4>加载文件</h4>
 	 * <p>
-	 * 根据目标事项或文件名加载页面文件。
+	 * 根据目标事项或文件名加载PHP文件。
 	 * </p>
 	 * @param string $item 目标事项或文件名（PHP）
 	 * @param bool $all 是否叠加
@@ -522,7 +524,15 @@ abstract class Bai implements ArrayAccess
 		$this->target = $target;
 		### 应用预置数据和即时配置
 		$class = get_class($this);
-		$this->stuff($this->config($class));
-		$this->stuff($setting);
+		$this->stuff($this->config($class), $this->preset);
+		$this->stuff($setting, $this->preset);
+		$this->stuff($this->preset);
+		### 检查依赖扩展
+		foreach ((array)$this->extensions as $item) {
+		    if ($item != null && ! extension_loaded($item) && ! dl($item)) {
+		        $this->notice = Log::logf(__FUNCTION__, $item, __CLASS__, Log::ERROR);
+		        trigger_error($this->notice, E_USER_ERROR);
+		    }
+		}
 	}
 }

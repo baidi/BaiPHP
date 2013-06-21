@@ -95,14 +95,10 @@ $config[Work::DATA] = array(
 
 ### 全局配置：日志工场
 $config[LOG::LOG] = array(
-	### 日志级别
+	'dir'         => $config[_DEF][LOG::RUNTIME].LOG::LOG._DIR,
 	'level'       => Log::ALL | Log::DEBUG | Log::PERFORM,
-	### 日志目录
-	'root'        => $config[_DEF][LOG::RUNTIME].LOG::LOG._DIR,
-	### 日志结束符
 	'ending'      => "\n",
-	### 日志级别名
-	'ranks'       => array(
+	'names'       => array(
 		LOG::FATAL     => ' [致命] ',
 		LOG::ERROR     => ' [错误] ',
 		LOG::EXCEPTION => ' [异常] ',
@@ -113,14 +109,14 @@ $config[LOG::LOG] = array(
 		LOG::DEBUG     => ' [调试] ',
 		LOG::PERFORM   => ' [性能] ',
 	),
-	### 日志信息
-	'preset' => array(
+	'store' => array(
 		Work::BAI         => array(
 			'run'         => '->执行方法：%s',
 			'entrust'     => '+>委托目标：%s',
 			'build'       => '对象未知：%s',
 			'__get'       => '属性未知：%s',
 			'__call'      => '方法未知：%s',
+			'__construct' => '%s扩展尚未安装或无法启动',
 		),
 		Work::TARGET      => array(
 			'entrust'     => '>>目标启动：%s<<',
@@ -188,12 +184,11 @@ $config[LOG::LOG] = array(
 		Work::TEST        => array(
 			Work::TEST    => '--测试工场--',
 			'testee'      => '测试对象无效：%s',
-			'tester'      => '测试文件无效：%s',
-			'buildCase'   => '构建对象无效：%s',
-			'||'          => '跳过测试：%s',
-			'testCase'    => '执行测试场景：%s',
-			'testResult'  => '测试场景：%s',
-			'error'       => '执行测试出错：',
+			'source'      => '测试文件无效：%s',
+			'case'        => '测试场景无效：%s',
+			'test'        => '执行测试：%s',
+			'result'      => '测试结果：%s',
+			'error'       => '执行测试出错：%s',
 		),
 	),
 );
@@ -257,12 +252,12 @@ $config[Flow::PAGE] = array(
 		'$lightline$'   => '#cceccc',
 		'$darkline$'    => '#99cc99',
 		'$lightarea$'   => '#f0fff0',
-		'$darkarea$'    => '#f0f9f0',
+		'$darkarea$'    => '#f6fcf6',
 		'$shadowcolor$' => '#d0f9d0',
 		'$errorcolor$'  => '#ff0000',
 		'$noticecolor$' => '#99cc99',
 		'$lockedcolor$' => '#cccccc',
-		'$message$'     => json_encode($config[Work::LOG]['preset']),
+		'$message$'     => json_encode($config[Work::LOG]['store']),
 		'$type$'        => json_encode($config[Work::CHECK]['types']),
 	),
 	### 页面修整
@@ -314,10 +309,13 @@ $config[Work::STYLE] = array(
 
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
-	'success'   => '过',
-	'failure'   => '挂',
-	'skip'      => '略',
-	'error'     => '错',
+	'success'    => '过',
+	'failure'    => '挂',
+	'skip'       => '略',
+	'error'      => '错',
+	'extensions' => array(
+		'xdebug',
+    ),
 );
 
 ### 全局配置：测试工场
@@ -330,7 +328,8 @@ $config[Work::TEMPLATE] = array(
 	'peg'       => '$',
 	'looper'    => array('$value', '$key'),
 	'templates' => array(
-	'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
+	    'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
+	    'p'     => '<p {$class ? class="$class"}>{$value}</p>',
 	),
 );
 

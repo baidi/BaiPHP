@@ -21,33 +21,35 @@
  */
 class Test extends Work
 {
-	/** 测试标识：测试文件 */
-	const FILE  = 'FILE';
-	/** 测试标识：测试场景 */
-	const CASES = 'CASES';
-	/** 测试标识：测试代码 */
-	const CODES = 'CODES';
+	/** 测试结果标识：源文件 */
+	const TSOURCE = 'SOURCE';
+	/** 测试结果标识：测试对象 */
+	const TTESTEE = 'TESTEE';
+	/** 测试结果标识：测试结果 */
+	const TRESULT = 'RESULT';
+	/** 测试结果标识：代码覆盖 */
+	const TLINES  = 'LINES';
+	/** 测试结果标识：项目统计 */
+	const TCOUNT  = 'COUNT';
 
-	/** 测试项标识：测试项目 */
-	const ITEM = 'ITEM';
-	/** 测试项标识：测试参数 */
-	const PARAMS = 'PARAMS';
-	/** 测试项标识：预期结果 */
-	const EXPECTED = 'EXPECTED';
-	/** 测试项标识：测试方式 */
-	const MODE = 'MODE';
+	/** 测试项目标识：测试项目 */
+	const TITEM     = 'ITEM';
+	/** 测试项目标识：测试参数 */
+	const TPARAM    = 'PARAM';
+	/** 测试项目标识：预期结果 */
+	const TEXPECTED = 'EXPECTED';
+	/** 测试项目标识：测试方式 */
+	const TMODE     = 'MODE';
+
 	/** 测试方式：构建 */
-	const MODE_BUILD    = 'testBuild';
-	/** 测试方式：行为 */
-	const MODE_METHOD   = 'testMethod';
-	/** 测试项方式：属性 */
-	const MODE_PROPERTY = 'testProperty';
+	const TMODE_BUILD  = 'testBuild';
+	/** 测试方式：方法 */
+	const TMODE_METHOD = 'testMethod';
 	/** 测试方式：模拟 */
-	const MODE_MOCK     = 'testMock';
+	const TMODE_MOCK   = 'testMock';
 	/** 测试方式：引用 */
-	const MODE_HOLDER   = '&&';
+	const TMODE_REFER  = '$&&';
 
-	protected $name = null;
 	/** 测试结果：通过 */
 	protected $success = '-';
 	/** 测试结果：失败 */
@@ -63,56 +65,33 @@ class Test extends Work
 	 * 根据测试对象名和测试文件，执行相应的测试。
 	 * </p>
 	 * @param string $testee 测试对象名
-	 * @param string $tester 测试文件
+	 * @param string $source 测试文件名
 	 * @return array 测试结果
 	 */
-	public function entrust($testee = null, $tester = null)
+	public function entrust($testee = null, $source = null)
 	{
-		if ($testee == null || ! class_exists($testee, true)) {
-			### 测试对象无效
-			Log::logf('testee', $testee, __CLASS__);
+	    $this->result = null;
+		if ($testee == null || ! class_exists($testee)) {
+		    ### 测试对象无效
+			$this->notice = Log::logf('testee', $testee, __CLASS__);
 			return $this->result;
 		}
-		if ($tester == null) {
-			$tester = $testee;
+		if ($source == null) {
+		    ### 默认测试文件与测试对象同名
+			$source = $testee;
 		}
-		$cases = $this->load($tester);
+		$this->load($source);
+		$cases = $this->config(__CLASS__, $testee);
 		if ($cases == null || ! is_array($cases)) {
 			### 测试文件无效
-			Log::logf('tester', $tester, __CLASS__);
+			$this->notice = Log::logf('source', $source, __CLASS__);
 			return $this->result;
 		}
 
-		### 启动代码统计
-		ini_set('xdebug.coverage_enable', 1);
-		xdebug_start_code_coverage(XDEBUG_CC_UNUSED + XDEBUG_CC_DEAD_CODE);
 		### 执行测试
-		$this->result = array();
-		$this->runtime['testee'] = $testee;
-		foreach ($cases as $case) {
-			$item = $this->pick(self::ITEM, $case);
-			if ($case == null || ! is_array($case) || $item == null) {
-				$this->result[self::CASES][] = $this->skip;
-				Log::logf('testResult', $this->skip, __CLASS__);
-				continue;
-			}
-			$this->runtime['case'] = $case;
-			$result = $this->testCase();
-			$this->result[self::CASES][] = $result;
-			Log::logf('testResult', $result, __CLASS__);
-		}
-		### 关闭代码统计
-		$codes = xdebug_get_code_coverage();
-		xdebug_stop_code_coverage();
-
-		### 测试结果
-		foreach ($codes as $file => $code) {
-			if (basename($file) === $testee._EXT) {
-				$this->result[self::FILE] = $file;
-				$this->result[self::CODES] = $code;
-				break;
-			}
-		}
+		$this['testee'] = $testee;
+		$this['cases']  = $cases;
+		$this->result = $this->tests();
 		return $this->result;
 	}
 
@@ -122,26 +101,67 @@ class Test extends Work
 	 * 根据测试文件中的测试场景执行测试。
 	 * </p>
 	 * @return mixed 测试结果
+	 * Test::TSOURCE： 源文件（路径）
+	 * Test::TTESTEE： 测试对象（类名）
+	 * Test::TRESULT： 测试结果
+	 * Test::TLINES： 代码统计
+	 * Test::TCOUNT： 项目统计
+	 * Test::TCOUNT[Test::TRESULT]：完成的测试
+	 * Test::TCOUNT[Test::TLINES]：覆盖的代码
 	 */
-	protected function testCase()
+	protected function tests()
 	{
-		### 执行数据
-		$testee = $this->pick('testee', $this->runtime);
-		$case   = $this->pick('case',   $this->runtime);
-		$item   = $this->pick(self::ITEM, $case);
-		$mode   = $this->pick(self::MODE, $case);
-		if ($mode == null) {
-			$mode = self::MODE_METHOD;
+		### 启用代码统计
+		ini_set('xdebug.coverage_enable', 1);
+		xdebug_start_code_coverage(XDEBUG_CC_UNUSED + XDEBUG_CC_DEAD_CODE);
+
+		$testee = $this['testee'];
+		$cases  = $this['cases'];
+		### 执行测试
+		$results = array(self::TTESTEE => $testee);
+		foreach ($cases as $case) {
+		    ### 测试场景
+		    $item = $this->pick(self::TITEM, $case);
+		    if ($case == null || ! is_array($case) || $item == null) {
+		        ### 测试场景无效
+		        $results[self::TRESULT][] = $this->skip;
+		        Log::logf('case', $item, __CLASS__);
+		        continue;
+		    }
+		    ### 测试方式，默认为方法
+    		$mode   = $this->pick(self::TMODE, $case);
+    		if ($mode == null) {
+    			$mode = self::TMODE_METHOD;
+    		}
+		    $this['case'] = $case;
+		    ### 执行测试场景
+		    Log::logf('test', $item, __CLASS__);
+		    $result = $this->$mode();
+		    $results[self::TRESULT][] = $result;
+		    Log::logf('result', $result, __CLASS__);
 		}
-		try {
-			### 执行测试场景
-			Log::logf(__FUNCTION__, $item, __CLASS__);
-			return $this->$mode();
-		} catch (Exception $e) {
-			Log::logf('error', $item, __CLASS__);
-			Log::logs($e->getMessage(), null, Log::EXCEPTION);
-			return $this->notice;
+
+		### 关闭代码统计
+		$lines = xdebug_get_code_coverage();
+		xdebug_stop_code_coverage();
+
+		### 代码覆盖
+		foreach ($lines as $file => $line) {
+			if (strcasecmp(basename($file), $testee._EXT) == 0) {
+				$results[self::TSOURCE] = $file;
+				$results[self::TLINES] = array_diff($line, array(-2));
+				break;
+			}
 		}
+
+		### 项目统计
+		### 完成的测试
+		$count = count(array_intersect($results[self::TRESULT], array($this->success)));
+		$results[self::TCOUNT][self::TRESULT] = $count;
+		### 覆盖的代码
+		$count = count(array_intersect($results[self::TLINES], array(1)));
+		$results[self::TCOUNT][self::TLINES] = $count;
+		return $results;
 	}
 
 	/**
@@ -149,26 +169,25 @@ class Test extends Work
 	 * <p>
 	 * 为后续测试构建测试对象。
 	 * 场景内容：
-	 * Test::ITEM： 构建对象
-	 * Test::PARAMS： 构建参数
-	 * Test::EXPECTED： 构建目标，如果省略则使用构建对象
+	 * Test::TITEM： 构建对象
+	 * Test::TPARAM： 构建参数
+	 * Test::TEXPECTED： 构建目标，如果省略则使用构建对象
 	 * </p>
 	 */
 	protected function testBuild()
 	{
 		### 执行数据
-		$case     = $this->pick('case', $this->runtime);
-		$item     = $this->pick(self::ITEM,     $case);
-		$params   = $this->pick(self::PARAMS,   $case);
-		$expected = $this->pick(self::EXPECTED, $case);
-		// $params   = $this->testHolder($params);
-		### 构建对象
-		$testee = $this->build($item, $params);
-		if ($testee == null) {
-			return $this->failure;
-		}
+		$case     = $this['case'];
+		$item     = $this->pick(self::TITEM, $case);
+		$param    = $this->pick(self::TPARAM, $case);
+		$expected = $this->pick(self::TEXPECTED, $case);
 		if ($expected == null) {
 			$expected = $item;
+		}
+		### 构建对象
+		$testee = $this->build($item, $param);
+		if ($testee == null) {
+			return $this->failure;
 		}
 		$this->$expected = $testee;
 		return $this->testResult($testee, $expected);
@@ -179,63 +198,58 @@ class Test extends Work
 	 * <p>
 	 * 执行测试对象的方法测试。
 	 * 场景内容：
-	 * Test::ITEM： 测试方法
-	 * Test::PARAMS： 测试参数
-	 * Test::EXPECTED： 预期结果
+	 * Test::TITEM： 测试方法
+	 * Test::TPARAMS： 测试参数
+	 * Test::TEXPECTED： 预期结果
 	 * </p>
 	 */
 	protected function testMethod()
 	{
 		### 执行数据
-		$testee   = $this->pick('testee', $this->runtime);
-		$case     = $this->pick('case',   $this->runtime);
-		$item     = $this->pick(self::ITEM,     $case);
-		$params   = $this->pick(self::PARAMS,   $case);
-		$expected = $this->pick(self::EXPECTED, $case);
-		// 		$params   = $this->testHolder($params);
-		### 执行测试
+		$testee   = $this['testee'];
+		$case     = $this['case'];
+		$item     = $this->pick(self::TITEM, $case);
+		$param    = $this->pick(self::TPARAM, $case);
+		$expected = $this->pick(self::TEXPECTED, $case);
+		### 检查测试对象
 		if ($this->$testee == null || ! method_exists($this->$testee, $item)) {
+		    Log::logf('testee', $item, __CLASS__);
 			return $this->skip;
 		}
-		if ($params === null) {
+		### 执行测试
+		if ($param === null) {
 			$actual = $this->$testee->$item();
-		} else if (! is_array($params)) {
-			$actual = $this->$testee->$item($params);
+		} else if (! is_array($param)) {
+			$actual = $this->$testee->$item($param);
 		} else {
-			$actual = call_user_func_array(array($this->$testee, $item), $params);
+			$actual = call_user_func_array(array($this->$testee, $item), $param);
 		}
 		return $this->testResult($actual, $expected);
 	}
 
 	/**
-	 * <h4>置换场景</h4>
+	 * <h4>引用场景</h4>
 	 * <p>
 	 * 将引用参数置换成实际参数。
 	 * </p>
 	 * @param mixed $params 引用参数
 	 *//*
-	protected function testHolder($params = null)
+	protected function testRefer($params = null)
 	{
-		if ($params == null)
-		{
+		if ($params == null) {
 			return $params;
 		}
-		if (! is_array($params))
-		{
-			if (is_string($params) && strpos($params, self::MODE_HOLDER) === 0)
-			{
-				$params = substr($params, strlen(self::MODE_HOLDER));
+		if (! is_array($params)) {
+			if (is_string($params) && strpos($params, self::TMODE_REFER) === 0) {
+				$params = substr($params, strlen(self::TMODE_REFER));
 				return $this->$params;
 			}
 			return $params;
 		}
-		foreach ($params as &$param)
-		{
-			if (is_string($param) && strpos($param, self::MODE_HOLDER) === 0)
-			{
-				$param = substr($param, strlen(self::MODE_HOLDER));
+		foreach ($params as &$param) {
+			if (is_string($param) && strpos($param, self::TMODE_REFER) === 0) {
+				$param = substr($param, strlen(self::TMODE_REFER));
 				$param = $this->$param;
-				$param = &$param;
 			}
 		}
 		return $params;
@@ -244,7 +258,7 @@ class Test extends Work
 	/**
 	 * <h4>比较场景</h4>
 	 * <p>
-	 * 比较实际结果与预期结果是否相同。
+	 * 比较实际结果与预期结果是否相符。
 	 * </p>
 	 * @param mixed $actual 实际结果
 	 * @param mixed $expected 预期结果
@@ -252,31 +266,24 @@ class Test extends Work
 	protected function testResult($actual, $expected)
 	{
 		if (is_object($actual)) {
-			$result = ($actual instanceof $expected);
-		} else {
-			$result = ($actual === $expected) ||
-					(is_array($actual) && is_array($expected) && $actual == $expected);
+			return ($actual instanceof $expected) ? $this->success : $this->failure;
 		}
-		return $result ? $this->success : $this->failure;
+		if ($actual === $expected || (is_array($actual)
+		        && is_array($expected) && $actual == $expected)) {
+		    return $this->success;
+		}
+		return $this->failure;
 	}
 
 	/**
 	 * <h4>模拟对象方法</h4>
+	 * <p>
 	 * 模拟执行对象方法，并返回预置的模拟结果
-	 *
-	 * @see Bai::__call()
+	 * </p>
 	 */
 	public function __call($item, $params)
 	{
 		return $this->pick($item, $this->preset);
-	}
-
-	public function __toString()
-	{
-		if (! $this->name) {
-			$this->name = __CLASS__;
-		}
-		return $this->name;
 	}
 }
 ?>
