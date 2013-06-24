@@ -92,14 +92,14 @@ $config[_DEF] = array(
 	'Notice'    => '大体还可以，细节要留意：[%s] %s',
 );
 if (! empty($_REQUEST['service'])) {
-    $config[_DEF]['Service'] = preg_replace('#[\/]#', '', $_REQUEST['service'])._DIR;
+	$config[_DEF]['Service'] = preg_replace('#[\/]#', '', $_REQUEST['service'])._DIR;
 }
 
 
 ### 对象自动加载
 spl_autoload_register(function($class)
 {
-    $config = $GLOBALS['config'][_DEF];
+	$config = $GLOBALS['config'][_DEF];
 	### 加载路径
 	$bai     = _LOCAL.$config['Bai'];
 	$service = _LOCAL.$config['Service'];
@@ -142,7 +142,7 @@ spl_autoload_register(function($class)
 ### 异常自动捕获
 set_exception_handler(function($e)
 {
-    $config = $GLOBALS['config'][_DEF];
+	$config = $GLOBALS['config'][_DEF];
 	if (empty($config['Debug'])) {
 		ob_clean();
 	}
@@ -159,7 +159,7 @@ register_shutdown_function(function()
 	if ($error == null) {
 		return true;
 	}
-    $config = $GLOBALS['config'][_DEF];
+	$config = $GLOBALS['config'][_DEF];
 	$type = $error['type'];
 	$file = basename($error['file']).':>'.$error['line'];
 	### 程序被迫中止时

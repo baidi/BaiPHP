@@ -3,12 +3,12 @@
  * 目标测试场景
  */
 global $config;
-$config[Test::TEST][Flow::TARGET] = array(
+$config[Work::TEST][Work::TARGET] = array(
 	### 构建
 	array(
-		Test::TITEM    => Target::TARGET,
-		Test::TMODE    => Test::TMODE_BUILD,
-		Test::TPARAM   => 'config',
+		Test::ITEM    => Target::TARGET,
+		Test::MODE    => Test::MODE_BUILD,
+		Test::PARAM   => 'config',
 	),
 );
 ?>

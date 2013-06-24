@@ -39,6 +39,9 @@ class Page extends Flow
 	 */
 	protected function html()
 	{
+		if ($this->target->notice) {
+			 return $this->load($this->board);
+		 }
 		$this['js']    = $this->js;
 		$this['css']   = $this->css;
 		$this['lside'] = null;

@@ -107,8 +107,8 @@ class Target extends Bai
 	{
 		### 启动会话
 		if (session_id() == null) {
-		    #session_id(md5($_SERVER['REMOTE_HOST'].$_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']));
-	        session_start();
+			session_id($_SERVER['SERVER_NAME']);
+			session_start();
 		}
 		### 加载配置
 		foreach ((array)$setting as $item) {

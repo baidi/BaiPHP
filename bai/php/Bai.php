@@ -255,13 +255,13 @@ abstract class Bai implements ArrayAccess
 	 * @param bool $all 是否更新空项
 	 * @return bool 填充结果
 	 */
-	protected function stuff($list = null, &$master = null, $all = false)
+	protected function stuff($list = null, &$master = self::NIL, $all = false)
 	{
 		### 源列表
 		if (! is_array($list)) {
 			return false;
 		}
-		if ($master === null) {
+		if ($master === self::NIL) {
 			### 默认填充到当前对象
 			$master = $this;
 		}
@@ -529,10 +529,10 @@ abstract class Bai implements ArrayAccess
 		$this->stuff($this->preset);
 		### 检查依赖扩展
 		foreach ((array)$this->extensions as $item) {
-		    if ($item != null && ! extension_loaded($item) && ! dl($item)) {
-		        $this->notice = Log::logf(__FUNCTION__, $item, __CLASS__, Log::ERROR);
-		        trigger_error($this->notice, E_USER_ERROR);
-		    }
+			if ($item != null && ! extension_loaded($item) && ! dl($item)) {
+				$this->notice = Log::logf(__FUNCTION__, $item, __CLASS__, Log::ERROR);
+				trigger_error($this->notice, E_USER_ERROR);
+			}
 		}
 	}
 }

@@ -3,120 +3,120 @@
  * 日志工场测试场景
  */
 global $config;
-$config[Test::TEST][Test::LOG] = array(
+$config[Work::TEST][Work::LOG] = array(
 	### 构建
 	array(
-		Test::TITEM   => Test::LOG,
-		Test::TMODE   => Test::TMODE_BUILD,
-		Test::TPARAM  => array(
+		Test::ITEM   => Work::LOG,
+		Test::MODE   => Test::MODE_BUILD,
+		Test::PARAM  => array(
 			'level'   => Log::ALL,
-		    'size'    => 10,
+			'size'    => 10,
 			'store'   => array(
-			    Test::TEST => array(
-    				'logs'  => '日志工场测试：无参数日志',
-    				'logf'  => '日志工场测试：单参数日志【%s】',
-    				'logf2' => '日志工场测试：多参数日志【%s、%s】',
-			    ),
+				Work::TEST => array(
+					'logs'  => '日志工场测试：无参数日志',
+					'logf'  => '日志工场测试：单参数日志【%s】',
+					'logf2' => '日志工场测试：多参数日志【%s、%s】',
+				),
 			),
 		),
 	),
 	### entrust（无项目）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => null,
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => null,
 	),
 	### entrust（即时日志）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：即时日志',
-		Test::TPARAM    => '日志工场测试：即时日志',
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：即时日志',
+		Test::PARAM    => '日志工场测试：即时日志',
 	),
 	### entrust（未定义项目）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => null,
-		Test::TPARAM    => array('_logs', Test::TEST),
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => null,
+		Test::PARAM    => array('_logs', Work::TEST),
 	),
 	### entrust（未定义类别）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => null,
-		Test::TPARAM    => array('logs', _DEF.Test::TEST),
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => null,
+		Test::PARAM    => array('logs', _DEF.Work::TEST),
 	),
 	### entrust(无参数日志)
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：无参数日志',
-		Test::TPARAM    => array('logs', Test::TEST),
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：无参数日志',
+		Test::PARAM    => array('logs', Work::TEST),
 	),
 	### entrust（单参数日志）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：单参数日志【参数1】',
-		Test::TPARAM    => array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：单参数日志【参数1】',
+		Test::PARAM    => array(
 			'logf',
-			Test::TEST,
+			Work::TEST,
 			'参数1',
 		),
 	),
 	### entrust(多参数日志)
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：多参数日志【参数1、参数2】',
-		Test::TPARAM    => array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：多参数日志【参数1、参数2】',
+		Test::PARAM    => array(
 			'logf2',
-			Test::TEST,
+			Work::TEST,
 			array('参数1', '参数2'),
 		),
 	),
 	### entrust（级别过滤）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：无参数日志',
-		Test::TPARAM    => array(
-		    'logs',
-		    Test::TEST,
-		    null,
-		    Log::DEBUG,
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：无参数日志',
+		Test::PARAM    => array(
+			'logs',
+			Work::TEST,
+			null,
+			Log::DEBUG,
 		),
 	),
 	### entrust（未知级别）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => '日志工场测试：无参数日志',
-		Test::TPARAM    => array(
-		    'logs',
-		    Test::TEST,
-		    null,
-		    5,
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '日志工场测试：无参数日志',
+		Test::PARAM    => array(
+			'logs',
+			Work::TEST,
+			null,
+			5,
 		),
 	),
 	### entrust（清空缓冲区）
 	array(
-		Test::TITEM     => 'entrust',
-		Test::TEXPECTED => null,
-		Test::TPARAM    => array(Log::FLUSH),
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => null,
+		Test::PARAM    => array(Log::FLUSH),
 	),
 	### logs
 	array(
-		Test::TITEM     => 'logs',
-		Test::TEXPECTED => '日志工场测试：无参数日志',
-		Test::TPARAM    => array(
-		    'logs',
-		    Test::TEST,
+		Test::ITEM     => 'logs',
+		Test::EXPECTED => '日志工场测试：无参数日志',
+		Test::PARAM    => array(
+			'logs',
+			Work::TEST,
 		),
 	),
 	### logf
 	array(
-		Test::TITEM     => 'logf',
-		Test::TEXPECTED => '日志工场测试：单参数日志【参数1】',
-		Test::TPARAM    => array('logf', '参数1', Test::TEST),
+		Test::ITEM     => 'logf',
+		Test::EXPECTED => '日志工场测试：单参数日志【参数1】',
+		Test::PARAM    => array('logf', '参数1', Work::TEST),
 	),
 	### logf(多参数日志)
 	array(
-		Test::TITEM     => 'logf',
-		Test::TEXPECTED => '日志工场测试：多参数日志【参数1、参数2】',
-		Test::TPARAM    => array(
+		Test::ITEM     => 'logf',
+		Test::EXPECTED => '日志工场测试：多参数日志【参数1、参数2】',
+		Test::PARAM    => array(
 			'日志工场测试：多参数日志【%s、%s】',
 			array('参数1', '参数2'),
 		),

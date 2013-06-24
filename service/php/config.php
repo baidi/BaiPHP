@@ -26,7 +26,4 @@ global $config;
 $config[_DEF][Target::DEBUG] = true;
 
 ### 全局配置：检验工场
-$config[Work::CHECK]['sample'] = array(
-	'sampleInt' => 'required min=3 max=5 type=number',
-	'sampleLetter' => 'required min=3 max=10 type=letter',
-);
+

@@ -139,14 +139,15 @@ $config[LOG::LOG] = array(
 			Flow::PAGE    => '--页面流程--',
 		),
 		Work::CHECK       => array(
-			Work::CHECK   => '--检验工场--',
-			'item'        => '输入项目检验：%s[%s]',
+			Work::CHECK   => '--检验工场（Check）--',
+			'config'      => '检验工场（Check）设置有误……',
+			'checks'      => '检验输入项目：%s[%s]',
 			'cipher'      => '安全暗号不符或已过期，请刷新页面后重试……',
-			'risk'        => '输入项不能包含&lt; &gt; &amp; \' " ; % \ 等非法字符……',
+			'risk'        => '输入项不能包含&lt; &gt; &amp; \' " ; % \\ 等非法字符……',
 			'required'    => '输入项不能为空……',
 			'min'         => '输入项不能小于〖%d〗位……',
 			'max'         => '输入项不能大于〖%d〗位……',
-			'range'       => '请输入%d到%d内的值……',
+			'range'       => '请输入%d到%d间的数值……',
 			'enum'        => '请选择正确的选项……',
 			'set'         => '请选择正确的选项……',
 			'type'        => '请输入正确的内容……',
@@ -189,6 +190,7 @@ $config[LOG::LOG] = array(
 			'test'        => '执行测试：%s',
 			'result'      => '测试结果：%s',
 			'error'       => '执行测试出错：%s',
+			'testResult'  => '实际：%s <预期：%s>',
 		),
 	),
 );
@@ -198,13 +200,13 @@ $config[Work::CHECK] = array(
 	### 字符编码
 	'charset'     => 'utf-8',
 	### 参数分割符
-	'delimiter'   => ',',
+	'gap'   => ',',
 	### 检验模式
-	'mode'        => '/(?<check>[^\s=]+)(?:=(?<params>[^\s]+))?/',
+	'mode'        => '/(?<'.Check::ITEM.'>[^\s=]+)(?:=(?<'.Check::PARAM.'>[^\s]+))?/',
 	### 类型模式
 	'types'       => array(
 		### 风险字符
-		'risk'    => '/[<>&%\'\\\]+/',
+		'risk'    => '/[<>&%\'\\\\]+/',
 		### 整数
 		'integer' => '/^[1-9]\d*$/',
 		### 小数
@@ -225,6 +227,9 @@ $config[Work::CHECK] = array(
 		'date'   => '/^[0-9]{4}[-.\/]?(?:0?[1-9]|1[0-2])[-.\/]?(?:0?[1-9]|[12][0-9]|3[01])$/',
 		### 时间
 		'time'   => '/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$/',
+	),
+	'extensions' => array(
+		'mbstring',
 	),
 );
 
@@ -315,7 +320,7 @@ $config[Work::TEST] = array(
 	'error'      => '错',
 	'extensions' => array(
 		'xdebug',
-    ),
+	),
 );
 
 ### 全局配置：测试工场
@@ -328,8 +333,8 @@ $config[Work::TEMPLATE] = array(
 	'peg'       => '$',
 	'looper'    => array('$value', '$key'),
 	'templates' => array(
-	    'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
-	    'p'     => '<p {$class ? class="$class"}>{$value}</p>',
+		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
+		'p'     => '<p {$class ? class="$class"}>{$value}</p>',
 	),
 );
 

@@ -20,14 +20,21 @@
  */
 class Check extends Work
 {
+	/** 检验工场标识：检验项目 */
+	const ITEM  = 'ITEM';
+	/** 检验工场标识：检验参数 */
+	const PARAM = 'PARAM';
+
 	/** 字符编码 */
-	protected $charset   = 'utf-8';
+	protected $charset = 'utf-8';
 	/** 参数分割符 */
-	protected $delimiter = ',';
+	protected $gap     = ',';
 	/** 检验模式 */
-	protected $mode  = '/(?<item>[^\s=]+)(?:=(?<params>[^\s]+))?/';
+	protected $mode    = null;
 	/** 类型模式 */
-	protected $types = null;
+	protected $types   = null;
+	/** 检验内容 */
+	protected $events  = null;
 
 	/** 检验工场静态入口 */
 	private static $ACCESS = null;
@@ -63,28 +70,27 @@ class Check extends Work
 	public function entrust($setting = null)
 	{
 		if ($this->mode == null || ! is_string($this->mode)) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
 			return true;
 		}
 
 		### 读取检验设置
-		$event = "$this->target";
-		$preset = $this->pick($event, $this->preset);
-		$this->stuff($setting, $preset);
-		if ($preset == null || ! is_array($preset)) {
+		$event = $this->pick("$this->target", $this->events);
+		$this->stuff($setting, $event);
+		if ($event == null || ! is_array($event)) {
 			return true;
 		}
 
 		### 检验输入项目
-		foreach ($preset as $item => $mode) {
-			if ($item == null || $mode == null || ! is_string($mode)) {
+		foreach ($event as $item => $mode) {
+			if ($item == null || ! is_string($item) || $mode == null || ! is_string($mode)) {
 				continue;
 			}
-			$this->runtime['item']  = $item;
-			$this->runtime['mode']  = $mode;
-			$this->runtime['value'] = $this->pick($item, $this->target[$event]);
-			$this->notice = $this->item();
+			$this['item']  = $item;
+			$this['mode']  = $mode;
+			$this['value'] = $this->target[$item];
+			$this->notice = $this->checks();
 			if ($this->notice) {
-				$this->target->notice = $this->notice;
 				return false;
 			}
 		}
@@ -95,27 +101,31 @@ class Check extends Work
 	 * <h4>检验输入项目</h4>
 	 * @return mixed false：检验通过；string：提示信息
 	 */
-	protected function item()
+	protected function checks()
 	{
 		### 执行数据
-		$item = $this->runtime['item'];
-		$mode = $this->runtime['mode'];
+		$item = $this['item'];
+		$mode = $this['mode'];
+		$value = $this['value'];
 		Log::logf(__FUNCTION__, array($item, $mode), __CLASS__);
 		### 解析检验模式
 		if (! preg_match_all($this->mode, $mode, $cases, PREG_SET_ORDER)) {
 			return false;
 		}
 		foreach ($cases as $case) {
-			$check  = $this->pick('item',  $case);
-			$params = $this->pick('params', $case);
-			if ($params != null) {
-				$params = explode($this->delimiter, $params);
+			$check = $this->pick(self::ITEM,  $case);
+			if ($check !== 'required' && $value == null) {
+				continue;
+			}
+			$param = $this->pick(self::PARAM, $case);
+			if ($param != null) {
+				$param = explode($this->gap, $param);
 			}
 			### 执行检验场景
-			if ($params === null) {
+			if ($param === null) {
 				$message = $this->$check();
 			} else {
-				$message = call_user_func_array(array($this, $check), $params);
+				$message = call_user_func_array(array($this, $check), $param);
 			}
 			if ($message) {
 				return $message;
@@ -130,7 +140,7 @@ class Check extends Work
 	 */
 	protected function risk()
 	{
-		$value = $this->pick('value', $this->runtime);
+		$value = $this['value'];
 		$mode  = $this->pick(__FUNCTION__, $this->types);
 		if ($value != null && preg_match($mode, $value)) {
 			return Log::logs(__FUNCTION__, __CLASS__);
@@ -144,7 +154,7 @@ class Check extends Work
 	 */
 	protected function required()
 	{
-		$value = $this->pick('value', $this->runtime);
+		$value = $this['value'];
 		if ($value == null) {
 			return Log::logs(__FUNCTION__, __CLASS__);
 		}
@@ -158,8 +168,12 @@ class Check extends Work
 	 */
 	protected function min($length)
 	{
-		$value = $this->pick('value', $this->runtime);
-		if ($value == null || mb_strlen($value, $this->charset) >= $length) {
+		if ($length === null || ! is_numeric($length) || $length < 0) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
+			return false;
+		}
+		$value = $this['value'];
+		if (mb_strlen($value, $this->charset) >= $length) {
 			return false;
 		}
 		return Log::logf(__FUNCTION__, $length, __CLASS__);
@@ -168,19 +182,32 @@ class Check extends Work
 	/**
 	 * <h4>最大长度检验</h4>
 	 * @param int $length 长度
+	 * @param int $decimal 小数长度
 	 * @return mixed false：检验通过；string：提示信息
 	 */
 	protected function max($length = null, $decimal = 0)
 	{
-		if ($length === null || $length <= 0 || $decimal < 0) {
+		if ($length === null || ! is_numeric($length) || $length <= 0) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
 			return false;
 		}
-		$value = $this->pick('value', $this->runtime);
-		if ($decimal > 0) {
-			$len = mb_strlen($value, $this->charset);
-
+		$value = $this['value'];
+		if (is_numeric($decimal) && $decimal > 0) {
+			### 检验数字
+			$numbers = explode('.', $value);
+			$size = count($numbers);
+			### 整数部分长度
+			if ($size == 1 && mb_strlen($numbers[0], $this->charset) <= $length - $decimal) {
+				return false;
+			}
+			### 整数部分及小数部分
+			if ($size == 2 && mb_strlen($numbers[0], $this->charset) <= $length - $decimal
+					&& mb_strlen($numbers[1], $this->charset) <= $decimal) {
+				return false;
+			}
+			return Log::logf(__FUNCTION__, $length, __CLASS__);
 		}
-		if ($value == null || mb_strlen($value, $this->charset) <= $length) {
+		if (mb_strlen($value, $this->charset) <= $length) {
 			return false;
 		}
 		return Log::logf(__FUNCTION__, $length, __CLASS__);
@@ -195,10 +222,11 @@ class Check extends Work
 	protected function range($min = null, $max = null)
 	{
 		if ($min === null || $max === null || ! is_numeric($min) || ! is_numeric($max)) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
 			return false;
 		}
-		$value = $this->pick('value', $this->runtime);
-		if ($value == null || $value >= $min && $value <= $max) {
+		$value = $this['value'];
+		if ($value >= $min && $value <= $max) {
 			return false;
 		}
 		return Log::logf(__FUNCTION__, array($min, $max), __CLASS__);
@@ -206,40 +234,42 @@ class Check extends Work
 
 	/**
 	 * <h4>单选项检验</h4>
-	 * @param string $options 可选项
 	 * @return mixed false：检验通过；string：提示信息
 	 */
-	protected function enum($options = null)
+	protected function enum()
 	{
-		if ($options === null) {
+		$options = func_get_args();
+		if ($options == null) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
 			return false;
 		}
-		$value = $this->pick('value', $this->runtime);
-		$options = explode($this->delimiter, $options);
-		if ($value == null || array_search("'$value'", $options) !== false) {
+		$value = $this['value'];
+		if (array_search($value, $options) !== false
+				|| array_search("'$value'", $options) !== false) {
 			return false;
 		}
-		return Log::log(__FUNCTION__, __CLASS__);
+		return Log::logs(__FUNCTION__, __CLASS__);
 	}
 
 	/**
 	 * <h4>单选项检验</h4>
-	 * @param string $options 可选项
 	 * @return mixed false：检验通过；string：提示信息
 	 */
-	protected function set($options = null)
+	protected function set()
 	{
-		if ($options === null) {
+		$options = func_get_args();
+		if ($options == null) {
+			Log::logs('config', __CLASS__, Log::NOTICE);
 			return false;
 		}
-		$values = $this->pick('value', $this->runtime);
-		$values = explode($this->delimiter, $values);
-		$options = explode($this->delimiter, $options);
+		$values = $this['value'];
+		$values = explode($this->gap, $values);
 		foreach ($values as $value) {
-			if ($value == null || array_search("'$value'", $options) !== false) {
+			if ($value == null || array_search($value, $options) !== false
+					|| array_search("'$value'", $options) !== false) {
 				continue;
 			}
-			return Log::log(__FUNCTION__, __CLASS__);
+			return Log::logs(__FUNCTION__, __CLASS__);
 		}
 		return false;
 	}
@@ -254,9 +284,9 @@ class Check extends Work
 	 */
 	protected function type($type)
 	{
-		$value = $this->pick('value', $this->runtime);
+		$value = $this['value'];
 		$mode  = $this->pick($type, $this->types);
-		if ($value == null || $mode == null || preg_match($mode, $value)) {
+		if ($mode == null || preg_match($mode, $value)) {
 			return false;
 		}
 		return Log::logs(__FUNCTION__, __CLASS__);

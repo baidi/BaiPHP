@@ -116,15 +116,15 @@ class Log extends Work
 	 */
 	public function entrust($item = null, $type = null, $params = null, $level = self::INFO)
 	{
-	    $this->result = null;
-	    ### 日志项目为空
+		$this->result = null;
+		### 日志项目为空
 		if ($item == null) {
 			return $this->result;
 		}
 		### 清空缓冲区
 		if ($item === self::FLUSH) {
-		    $this->flush();
-		    return $this->result;
+			$this->flush();
+			return $this->result;
 		}
 		### 执行数据
 		$this['item']   = "$item";

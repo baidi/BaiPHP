@@ -12,10 +12,10 @@ $config[Lang::LANG][Lang::ZH] = array(
 		'design' => '设计',
 		'example' => '案例',
 	),
-    _DEF.'test' => array(
-        'codes'  => '测试代码',
-        'covered' => '已测试',
-        'uncovered' => '未测试',
-        'normal' => '其他',
-    ),
+	_DEF.'test' => array(
+		'codes'  => '测试代码',
+		'covered' => '已测试',
+		'uncovered' => '未测试',
+		'normal' => '其他',
+	),
 );
