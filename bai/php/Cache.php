@@ -29,9 +29,9 @@ class Cache extends Work
 	/** 缓存时间：秒 */
 	protected $timeout = 600;
 	/** 缓存目录 */
-	protected $root    = 'Cache/';
-	/** 缓存项目 */
-	protected $items   = null;
+	protected $dir     = null;
+	/** 缓存排除项 */
+	protected $exclude = null;
 
 	/** 缓存静态入口 */
 	private static $ACCESS = null;
@@ -43,7 +43,7 @@ class Cache extends Work
 	 */
 	public static function access($setting = null)
 	{
-		if (self::$ACCESS == null) {
+		if ($setting != null || self::$ACCESS == null) {
 			self::$ACCESS = new Cache($setting);
 		}
 		return self::$ACCESS;
@@ -60,24 +60,23 @@ class Cache extends Work
 	 * @param bool $hard 缓存方式： false：内存；true：文件
 	 * @return mixed 缓存数据或缓存结果
 	 */
-	public function entrust($item = null, $data = null, $hard = false)
+	public function entrust($item = null, $data = self::NIL, $hard = false)
 	{
-		if (! $this->valid || $item == null || ! $this->pick($item, $this->items)) {
+		if (! $this->valid || $item == null || $this->pick($item, $this->exclude)) {
 			return false;
 		}
 
 		### 执行数据
-		$this->runtime['item'] = $this->rename($item);
-		$this->runtime['data'] = $data;
-		$this->runtime['hard'] = $hard;
-
+		$this['item'] = $this->rename($item);
+		$this['data'] = $data;
+		$this['hard'] = $hard;
 		### 清空缓存
 		if ($item === self::CLEAR) {
 			$this->result = $this->clear();
 			return $this->result;
 		}
 		### 提取缓存
-		if ($data === null) {
+		if ($data === self::NIL) {
 			$this->result = $this->fetch();
 			return $this->result;
 		}
@@ -93,7 +92,7 @@ class Cache extends Work
 	protected function fetch()
 	{
 		### 执行数据
-		$item = $this->pick('item', $this->runtime);
+		$item = $this['item'];
 		Log::logf(__FUNCTION__, $item, __CLASS__);
 
 		### 提取缓存
@@ -102,8 +101,8 @@ class Cache extends Work
 			return $result;
 		}
 
+		### 内存缓存
 		if (! is_string($data) || substr($data, - strlen(__CLASS__)) !== __CLASS__) {
-			### 内存缓存
 			return $data;
 		}
 
@@ -111,10 +110,7 @@ class Cache extends Work
 		if (! is_file($data)) {
 			return false;
 		}
-		### 读取缓存文件
-		ob_start();
-		include $data;
-		return ob_get_clean();
+		return file_get_contents($data);
 	}
 
 	/**
@@ -124,9 +120,9 @@ class Cache extends Work
 	protected function push()
 	{
 		### 执行数据
-		$item = $this->pick('item', $this->runtime);
-		$data = $this->pick('data', $this->runtime);
-		$hard = $this->pick('hard', $this->runtime);
+		$item = $this['item'];
+		$data = $this['data'];
+		$hard = $this['hard'];
 		Log::logf(__FUNCTION__, $item, __CLASS__);
 
 		### 写入内存
@@ -135,19 +131,13 @@ class Cache extends Work
 		}
 
 		### 写入文件
-		$filename = _LOCAL.$this->root.$item.'.'.__CLASS__;
-		$file = fopen($filename, 'w');
-		if (! $file) {
+		$filename = _LOCAL.$this->dir.$item.'.'.__CLASS__;
+		if (file_put_contents($filename, $data) === false) {
 			Log::logf('file', $filename, __CLASS__);
 			return false;
 		}
-		flock($file, LOCK_EX);
-		fwrite($file, $data);
-		fflush($file);
-		flock($file, LOCK_UN);
-		fclose($file);
 		### 缓存文件名
-		return apc_store($item, $filename);
+		return apc_store($item, $filename, $this->timeout);
 	}
 
 	/**
@@ -158,14 +148,14 @@ class Cache extends Work
 		### 清空缓存
 		apc_clear_cache();
 		### 缓存文件
-		$root = _LOCAL.$this->root;
-		$files = scandir($root);
+		$dir = _LOCAL.$this->dir;
+		$files = scandir($dir);
 		if ($files == null) {
 			return self::CLEAR;
 		}
 		### 清空缓存文件
 		foreach ($files as $file) {
-			if (substr($file, - strlen(__CLASS__)) === __CLASS__ && ! unlink($path.$file)) {
+			if (substr($file, - strlen(__CLASS__)) === __CLASS__ && ! unlink($dir.$file)) {
 				return false;
 			}
 		}
@@ -179,7 +169,7 @@ class Cache extends Work
 	 */
 	protected function rename($item)
 	{
-		$item = $this->target->service.$this->target->event._DEF.$item;
+		$item = $this->target['service'].$this->target['event']._DEF.$item;
 		$item = urlencode($item);
 		return $item;
 	}
@@ -192,14 +182,14 @@ class Cache extends Work
 	{
 		parent::__construct($setting);
 		### 构建缓存目录
-		$root = _LOCAL;
-		foreach (explode(_DIR, $this->root) as $dir) {
-			if ($dir == null || ! is_dir($root.$dir._DIR) && ! mkdir($root.$dir._DIR)) {
+		$path = _LOCAL;
+		foreach (explode(_DIR, $this->dir) as $dir) {
+			if ($dir == null || ! is_dir($path.$dir._DIR) && ! mkdir($path.$dir._DIR)) {
 				break;
 			}
-			$root .= $dir._DIR;
+			$path .= $dir._DIR;
 		}
-		$this->root = substr($root, strlen(_LOCAL));
+		$this->dir = substr($path, strlen(_LOCAL));
 	}
 }
 ?>

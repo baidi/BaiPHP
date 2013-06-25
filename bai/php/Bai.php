@@ -529,7 +529,7 @@ abstract class Bai implements ArrayAccess
 		$this->stuff($this->preset);
 		### 检查依赖扩展
 		foreach ((array)$this->extensions as $item) {
-			if ($item != null && ! extension_loaded($item) && ! dl($item)) {
+			if ($item != null && ! extension_loaded($item)) {
 				$this->notice = Log::logf(__FUNCTION__, $item, __CLASS__, Log::ERROR);
 				trigger_error($this->notice, E_USER_ERROR);
 			}

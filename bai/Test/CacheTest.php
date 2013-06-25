@@ -1,67 +1,67 @@
 <?php
-return array
-(
-	### Cache测试：构建
-	array
-	(
-		Test::ITEM     => Cache::CACHE,
+/**
+ * 缓存工场测试场景
+ */
+global $config;
+$config[Work::TEST][Work::CACHE] = array(
+	### 构建
+	array(
+		Test::ITEM     => Work::CACHE,
 		Test::MODE     => Test::MODE_BUILD,
-		Test::PARAMS   => array(Cache::CACHE, true),
+		Test::PARAM    => array('valid' => true),
 	),
-	### Cache测试：entrust（缺少参数）
-	array
-	(
+	### entrust（缺少参数）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => false,
 	),
-	### Cache测试：entrust（存入）
-	array
-	(
+	### entrust（存入）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => true,
-		Test::PARAMS   => array('cache1', '缓存内容1'),
+		Test::PARAM    => array('cache1', '缓存内容1'),
 	),
-	### Cache测试：entrust（存入）
-	array
-	(
+	### entrust（更新）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => true,
-		Test::PARAMS   => array('cache1', '缓存内容1-1'),
+		Test::PARAM    => array('cache1', '缓存内容1-2'),
 	),
-	### Cache测试：取出
-	array
-	(
+	### entrust（取出）
+	array(
 		Test::ITEM     => 'entrust',
-		Test::EXPECTED => '缓存内容1-1',
-		Test::PARAMS   => 'cache1',
+		Test::EXPECTED => '缓存内容1-2',
+		Test::PARAM    => 'cache1',
 	),
-	### Cache测试：存入文件
-	array
-	(
+	### entrust（取出）
+	array(
 		Test::ITEM     => 'entrust',
-		Test::EXPECTED => true,
-		Test::PARAMS   => array('cache2', '缓存内容2', true),
+		Test::EXPECTED => false,
+		Test::PARAM    => 'cache-1',
 	),
-	### Cache测试：存入文件
-	array
-	(
+	### entrust（存入文件）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => true,
-		Test::PARAMS   => array('cache2', '缓存内容2-1', true),
+		Test::PARAM    => array('cache2', '缓存内容2', true),
 	),
-	### Cache测试：取出文件
-	array
-	(
+	### entrust（更新文件）
+	array(
 		Test::ITEM     => 'entrust',
-		Test::EXPECTED => '缓存内容2-1',
-		Test::PARAMS   => 'cache2',
+		Test::EXPECTED => true,
+		Test::PARAM    => array('cache2', '缓存内容2-2', true),
 	),
-	### Cache测试：清空
-	array
-	(
+	### entrust（取出文件）
+	array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => '缓存内容2-2',
+		Test::PARAM    => 'cache2',
+	),
+	### entrust（清空）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => Cache::CLEAR,
-		Test::PARAMS   => Cache::CLEAR,
+		Test::PARAM    => Cache::CLEAR,
 	),
 );
 ?>

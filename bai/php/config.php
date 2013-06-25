@@ -117,7 +117,7 @@ $config[LOG::LOG] = array(
 			'build'       => '对象未知：%s',
 			'__get'       => '属性未知：%s',
 			'__call'      => '方法未知：%s',
-			'__construct' => '%s扩展尚未安装或无法启动',
+			'__construct' => '%s扩展尚未安装或开启',
 		),
 		Work::TARGET      => array(
 			'entrust'     => '>>目标启动：%s<<',
@@ -291,10 +291,10 @@ $config[Work::CACHE] = array(
 	### 缓存时间：秒
 	'timeout'   => 600,
 	### 缓存目录
-	'root'      => Work::CACHE._DIR,
-	### 缓存项目
-	'items'     => array(
-		'home'  => true,
+	'dir'       => $config[_DEF][LOG::RUNTIME].Work::CACHE._DIR,
+	### 依赖扩展
+	'extensions' => array(
+		'apc',
 	),
 );
 
