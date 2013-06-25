@@ -272,7 +272,7 @@ class Test extends Work
 				&& is_array($expected) && $actual == $expected)) {
 			return $this->success;
 		}
-		Log::logf(__FUNCTION__, array($actual, $expected), __CLASS__);
+		Log::logf(__FUNCTION__, array(var_export($actual, true), var_export($expected, true)), __CLASS__);
 		return $this->failure;
 	}
 

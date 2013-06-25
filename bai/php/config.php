@@ -80,17 +80,18 @@ $config[Flow::CONTROL] = array(
 
 ### 全局配置：数据工场
 $config[Work::DATA] = array(
-	'dsn'      => 'mysql:host=localhost;dbname=baiphp',
-	'dbhost'   => 'localhost',
 	'dbtype'   => 'mysql',
+	'dbhost'   => 'localhost',
+	'dbport'   => '',
 	'dbname'   => 'bai',
 	'user'     => 'root',
 	'password' => '',
 	'charset'  => 'utf8',
-	'lasting'  => false,
-	'mysql'      => 'mysql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
-	'pgsql'      => 'pgsql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
-	'sqlite'     => 'sqlite:{$dbhost}',
+	'template' => array(
+		'mysql'    => 'mysql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
+		'pgsql'    => 'pgsql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
+		'sqlite'   => 'sqlite:{$dbhost}',
+	),
 );
 
 ### 全局配置：日志工场
@@ -155,6 +156,7 @@ $config[LOG::LOG] = array(
 		),
 		Work::DATA        => array(
 			Work::DATA    => '--数据工场--',
+			'config'      => '数据工场（Data）设置有误……',
 			'connect'     => '数据库连接失败……',
 			'entrust'     => 'SQL语句执行出错……',
 			'table'       => 'SQL数据表未指定……',
@@ -166,7 +168,7 @@ $config[LOG::LOG] = array(
 			'create'      => 'SQL追加<%d>条数据',
 			'update'      => 'SQL更新<%d>条数据',
 			'delete'      => 'SQL删除<%d>条数据',
-			'show'        => 'SQL描述<%d>条数据',
+			'show'        => 'SQL描述<%s>数据表',
 		),
 		Work::RECORD      => array(
 			'show'        => '',

@@ -41,12 +41,36 @@ $config[Work::TEST][Work::CHECK] = array(
 			array('input-risk' => 'risk'),
 		),
 	),
+	### entrust（风险字符检验）
+	array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('input-required' => 'risk'),
+		),
+	),
+	### entrust（风险字符检验）
+	array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('input-min[3]' => 'risk'),
+		),
+	),
 	### entrust（必须项检验）
 	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => false,
 		Test::PARAM    => array(
-			array('input-required' => 'risk required'),
+			array('input-required' => 'required'),
+		),
+	),
+	### entrust（必须项检验）
+	array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('input-min[3]' => 'required'),
 		),
 	),
 	### entrust（最小长度检验）
@@ -54,7 +78,7 @@ $config[Work::TEST][Work::CHECK] = array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => false,
 		Test::PARAM    => array(
-			array('input-min[3]' => 'risk required min=6'),
+			array('input-min[3]' => 'min=6'),
 		),
 	),
 	### entrust（最小长度检验）

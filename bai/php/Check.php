@@ -91,6 +91,7 @@ class Check extends Work
 			$this['value'] = $this->target[$item];
 			$this->notice = $this->checks();
 			if ($this->notice) {
+				#$this->target->notice = $this->notice;
 				return false;
 			}
 		}

@@ -146,7 +146,7 @@ set_exception_handler(function($e)
 	if (empty($config['Debug'])) {
 		ob_clean();
 	}
-	$file = basename($e->getFile()).':>'.$e->getLine().':>'.get_class($e);
+	$file = basename($e->getFile()).' :> '.$e->getLine().' :> '.get_class($e);
 	echo sprintf($config['Exception'], $file, $e->getMessage());
 });
 
@@ -161,7 +161,7 @@ register_shutdown_function(function()
 	}
 	$config = $GLOBALS['config'][_DEF];
 	$type = $error['type'];
-	$file = basename($error['file']).':>'.$error['line'];
+	$file = basename($error['file']).' :> '.$error['line'];
 	### 程序被迫中止时
 	if ($type == E_ERROR || $type == E_USER_ERROR || $type == E_CORE_ERROR
 			|| $type == E_COMPILE_ERROR || $type == E_PARSE

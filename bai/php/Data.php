@@ -20,15 +20,16 @@ class Data extends Work
 {
 	/** 数据库访问入口 */
 	protected $pdo = null;
-	/** 数据库 */
+
+	/** 数据库连接串 */
 	protected $dsn = null;
-	/** 用户 */
+	/** 用户名 */
 	protected $user = null;
 	/** 密码 */
 	protected $password = null;
 	/** 字符集 */
 	protected $charset = 'utf8';
-	/** 是否保持 */
+	/** 是否保持连接 */
 	protected $lasting = false;
 	/** 重复前缀 */
 	protected $pre = '_w_';
@@ -62,17 +63,14 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
 		if ($where != null && ! is_array($where)) {
-			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
@@ -84,12 +82,12 @@ class Data extends Work
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
-		if ($rows === false) {
-			return $rows;
+		if ($rows !== false) {
+			$count = (int) $rows[0]['TOTAL'];
+			Log::logf(__FUNCTION__, $count, __CLASS__);
+			return $count;
 		}
-		$count = (int) $rows[0]['TOTAL'];
-		Log::logf(__FUNCTION__, $count, __CLASS__);
-		return $count;
+		return $rows;
 	}
 
 	/**
@@ -108,17 +106,14 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
 		if ($where != null && ! is_array($where)) {
-			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
@@ -143,10 +138,9 @@ class Data extends Work
 
 		### 执行SQL语句
 		$rows = $data->entrust($sql, $where);
-		if ($rows === false) {
-			return $rows;
+		if ($rows !== false) {
+			Log::logf(__FUNCTION__, count($rows), __CLASS__);
 		}
-		Log::logf(__FUNCTION__, count($rows), __CLASS__);
 		return $rows;
 	}
 
@@ -163,17 +157,14 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 字段值
 		if ($values == null || ! is_array($values)) {
-			$data->error = Log::logs('values', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('values', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
@@ -207,28 +198,25 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 字段值
 		if ($values == null || ! is_array($values)) {
-			$data->error = Log::logs('values', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('values', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
 		if ($where == null || ! is_array($where)) {
-			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 排除重复键
 		foreach ($where as $item => $value) {
 			if (isset($values[$item])) {
-				$where[$this->pre.$item] = $where[$item];
+				$where[$data->pre.$item] = $where[$item];
 				unset($where[$item]);
 			}
 		}
@@ -262,17 +250,14 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 条件
 		if ($where == null || ! is_array($where)) {
-			$data->error = Log::logs('where', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('where', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
@@ -303,12 +288,9 @@ class Data extends Work
 	{
 		### 数据连接
 		$data = Data::access();
-		if ($data == null) {
-			return false;
-		}
 		### 数据表
 		if ($table == null) {
-			$data->error = Log::logs('table', __CLASS__, Log::EXCEPTION);
+			$data->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 
@@ -316,11 +298,10 @@ class Data extends Work
 		$sql = 'SHOW FULL COLUMNS FROM '.$data->field($table);
 
 		### 执行SQL语句
-		$rows = $data->entrust($sql, $where);
-		if ($rows === false) {
-			return $rows;
+		$rows = $data->entrust($sql);
+		if ($rows !== false) {
+			Log::logf(__FUNCTION__, $table, __CLASS__);
 		}
-		Log::logf(__FUNCTION__, count($rows), __CLASS__);
 		return $rows;
 	}
 
@@ -400,6 +381,9 @@ class Data extends Work
 		if ($field == null || ! is_string($field)) {
 			return '``';
 		}
+		if (strpos($field, $this->pre) === 0) {
+			$field = substr($field, strlen($this->pre));
+		}
 		$field = '`'.str_replace('`', '', $field).'`';
 		$field = str_replace('.', '`.`', $field);
 		return $field;
@@ -411,9 +395,18 @@ class Data extends Work
 	 */
 	protected function connect()
 	{
-		### 连接信息
+		### 数据库连接串
+		$template = $this->pick($this->dbtype, $this->template);
+		$params = array(
+			'dbtype' => $this->dbtype,
+			'dbhost' => $this->dbhost,
+			'dbport' => $this->dbport,
+			'dbname' => $this->dbname,
+		);
+		$this->dsn = Template::fetch($template, $params);
+		### 检查连接信息
 		if ($this->dsn == null || $this->user == null) {
-			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+			$this->notice = Log::logs('config', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		### 连接数据库
@@ -443,13 +436,21 @@ class Data extends Work
 	{
 		parent::__construct($setting);
 		### 连接数据库
-		$this->stuff(self::$ACCESS, $this->preset);
-		$this->stuff($setting, $this->preset);
-		$this->stuff($this->pick(_DEF, $this->preset));
 		if (! $this->connect()) {
 			$this->target->notice = $this->notice;
-			trigger_error($this->notice, E_USER_ERROR);
+			trigger_error($this->notice, E_USER_WARNING);
 		}
+	}
+
+	/**
+	 * <h4>撤销数据工场</h4>
+	 * <p>
+	 * 关闭数据库。
+	 * </p>
+	 */
+	public function __destruct()
+	{
+		$this->pdo = null;
 	}
 }
 ?>

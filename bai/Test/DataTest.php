@@ -2,310 +2,314 @@
 /**
  * 数据工场测试场景
  */
-return array
-(
-	### DB测试：构建（确少参数）
-	array
-	(
+global $config;
+$config[Work::TEST][Work::DATA] = array(
+	### 构建（即时连接）
+	array(
 		Test::ITEM     => 'Data',
 		Test::MODE     => Test::MODE_BUILD,
-		Test::PARAMS   => array(
-			'user'     => null,
+		Test::PARAM    => array(
+			'lasting' => false,
 		),
 	),
-	### DB测试：构建（连接失败）
-	array
-	(
+	### 构建（持久连接）
+	array(
 		Test::ITEM     => 'Data',
 		Test::MODE     => Test::MODE_BUILD,
-		Test::PARAMS   => array(
-			'user'     => 'user_',
-			'password' => 'user_',
+		Test::PARAM    => array(
+			'lasting' => true,
 		),
 	),
-	### DB测试：构建（即时连接）
-	array
-	(
-		Test::ITEM     => 'Data',
-		Test::MODE     => Test::MODE_BUILD,
-		Test::PARAMS   => array(
-			'persistent' => false,
-		),
-	),
-	### DB测试：构建（持久连接）
-	array
-	(
-		Test::ITEM     => 'Data',
-		Test::MODE     => Test::MODE_BUILD,
-		Test::PARAMS   => array(
-			'persistent' => true,
-		),
-	),
-	### DB测试：entrust（SQL缺失）
-	array
-	(
+	### entrust（SQL缺失）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => false,
 	),
-	### DB测试：entrust（SQL执行）
-	array
-	(
+	### entrust（建表）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => 0,
-		Test::PARAMS   => 
-			'CREATE TABLE IF NOT EXISTS `data` ('.
-			'  `id` int(3) unsigned NOT NULL,'.
+		Test::PARAM    =>
+			'CREATE TABLE IF NOT EXISTS `_Test` ('.
+			'  `id` int(3) unsigned NOT NULL AUTO_INCREMENT,'.
 			'  `name` varchar(20) NOT NULL,'.
 			'  `role` varchar(20) NOT NULL,'.
 			'  PRIMARY KEY (`id`)'.
 			') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 	),
-	### DB测试：entrust（SQL检索）
-	array
-	(
-		Test::ITEM     => 'entrust',
-		Test::EXPECTED => array(),
-		Test::PARAMS   => array(
-			'SELECT `id` FROM `data`',
-		),
-	),
-	### DB测试：entrust（成功）
-	array
-	(
+	### entrust（插入）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => 1,
-		Test::PARAMS   => array(
-			'insert into `data` (`id`, `name`, `role`) values (:id, :name, :role)',
-			array('id' => 1, 'name' => '张三', 'role' => '营销'),
+		Test::PARAM    => array(
+			'insert into `_Test` (`name`, `role`) values (:name, :role)',
+			array('name' => '张三', 'role' => '营销'),
 		),
 	),
-	### DB测试：entrust（失败）
-	array
-	(
+	### entrust（检索）
+	array(
+		Test::ITEM     => 'entrust',
+		Test::EXPECTED => array(
+			array('ID' => '1'),
+		),
+		Test::PARAM    => array(
+			'SELECT `id` FROM `_Test`',
+		),
+	),
+	### entrust（失败）
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'SELECT `id` IN `data`',
+		Test::PARAM    => array(
+			'SELECT `id` IN `_Test`',
 		),
 	),
-	### DB测试：create（缺少表名）
-	array
-	(
+	### create（缺少表名）
+	array(
 		Test::ITEM     => 'create',
 		Test::EXPECTED => false,
 	),
-	### DB测试：create（缺少字段值）
-	array
-	(
+	### create（缺少字段值）
+	array(
 		Test::ITEM     => 'create',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
-			'id'
+		Test::PARAM    => array(
+			'_Test',
 		),
 	),
-	### DB测试：create（成功）
-	array
-	(
+	### create（成功）
+	array(
 		Test::ITEM     => 'create',
-		Test::EXPECTED => 1,
-		Test::PARAMS   => array(
-			'data',
-			array('id' => 2, 'name' => '李四', 'role' => '研发'),
+		Test::EXPECTED => 2,
+		Test::PARAM    => array(
+			'_Test',
+			array('name' => '李四', 'role' => '研发'),
 		),
 	),
-	### DB测试：create（失败）
-	array
-	(
+	### create（失败）
+	array(
 		Test::ITEM     => 'create',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('id' => 2, 'name' => '李四', 'role' => '营销'),
 		),
 	),
-	### DB测试：update（缺少表名）
-	array
-	(
+	### update（缺少表名）
+	array(
 		Test::ITEM     => 'update',
 		Test::EXPECTED => false,
 	),
-	### DB测试：update（缺少字段值）
-	array
-	(
+	### update（缺少字段值）
+	array(
 		Test::ITEM     => 'update',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
-			'role',
+		Test::PARAM    => array(
+			'_Test',
 		),
 	),
-	### DB测试：update（缺少条件）
-	array
-	(
+	### update（缺少条件）
+	array(
 		Test::ITEM     => 'update',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role' => '营销'),
-			'id',
 		),
 	),
-	### DB测试：update（成功）
-	array
-	(
+	### update（成功）
+	array(
 		Test::ITEM     => 'update',
 		Test::EXPECTED => 1,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role' => '营销'),
-			array('id'   => 2),
+			array('role' => '研发'),
 		),
 	),
-	### DB测试：update（失败）
-	array
-	(
+	### update（失败）
+	array(
 		Test::ITEM     => 'update',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role_' => '营销_'),
 			array('id'    => 2),
 		),
 	),
-	### DB测试：count（缺少表名）
-	array
-	(
+	### count（缺少表名）
+	array(
 		Test::ITEM     => 'count',
 		Test::EXPECTED => false,
 	),
-	### DB测试：count（条件不符）
-	array
-	(
+	### count（条件不符）
+	array(
 		Test::ITEM     => 'count',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			'id'
 		),
 	),
-	### DB测试：count（成功）
-	array
-	(
+	### count（成功）
+	array(
 		Test::ITEM     => 'count',
 		Test::EXPECTED => 2,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role' => '营销'),
 		),
 	),
-	### DB测试：count（失败）
-	array
-	(
+	### count（失败）
+	array(
 		Test::ITEM     => 'count',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role_' => '营销'),
 		),
 	),
-	### DB测试：read（缺少表名）
-	array
-	(
+	### read（缺少表名）
+	array(
 		Test::ITEM     => 'read',
 		Test::EXPECTED => false,
 	),
-	### DB测试：read（条件不符）
-	array
-	(
+	### read（条件不符）
+	array(
 		Test::ITEM     => 'read',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			'role_',
 		),
 	),
-	### DB测试：read（成功）
-	array
-	(
+	### read（成功）
+	array(
 		Test::ITEM     => 'read',
 		Test::EXPECTED => array(
-			array('id' => '1', 'name' => '张三', 'role' => '营销'),
-			array('id' => '2', 'name' => '李四', 'role' => '营销'),
+			array('ID' => '1', 'NAME' => '张三', 'ROLE' => '营销'),
+			array('ID' => '2', 'NAME' => '李四', 'ROLE' => '营销'),
 		),
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('role' => '营销'),
-			'id'
-		),
-	),
-	### DB测试：read（成功）
-	array
-	(
-		Test::ITEM     => 'read',
-		Test::EXPECTED => array(
-			array('id' => '2', 'name' => '李四', 'role' => '营销'),
-		),
-		Test::PARAMS   => array(
-			'data',
-			array('role' => '营销'),
-			array('id'),
-			5,
-			1,
-		),
-	),
-	### DB测试：read（失败）
-	array
-	(
-		Test::ITEM     => 'read',
-		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data_',
-		),
-	),
-	### DB测试：delete（缺少表名）
-	array
-	(
-		Test::ITEM     => 'delete',
-		Test::EXPECTED => false,
-	),
-	### DB测试：delete（缺少条件）
-	array
-	(
-		Test::ITEM     => 'delete',
-		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
 			'id',
 		),
 	),
-	### DB测试：delete（成功）
-	array
-	(
+	### read（成功）
+	array(
+		Test::ITEM     => 'read',
+		Test::EXPECTED => array(
+			array('ID' => '2', 'NAME' => '李四', 'ROLE' => '营销'),
+		),
+		Test::PARAM    => array(
+			'_Test',
+			array('role' => '营销'),
+			array('id'),
+			1,
+			1,
+		),
+	),
+	### read（失败）
+	array(
+		Test::ITEM     => 'read',
+		Test::EXPECTED => false,
+		Test::PARAM    => array(
+			'Test_',
+		),
+	),
+	### show（缺少表名）
+	array(
+		Test::ITEM     => 'show',
+		Test::EXPECTED => false,
+	),
+	### show（成功）
+	array(
+		Test::ITEM     => 'show',
+		Test::EXPECTED => array(
+			array(
+				'FIELD' => 'id',
+				'TYPE' => 'int(3) unsigned',
+				'COLLATION' => NULL,
+				'NULL' => 'NO',
+				'KEY' => 'PRI',
+				'DEFAULT' => NULL,
+				'EXTRA' => 'auto_increment',
+				'PRIVILEGES' => 'select,insert,update,references',
+				'COMMENT' => '',
+			),
+			array(
+				'FIELD' => 'name',
+				'TYPE' => 'varchar(20)',
+				'COLLATION' => 'utf8_general_ci',
+				'NULL' => 'NO',
+				'KEY' => '',
+				'DEFAULT' => NULL,
+				'EXTRA' => '',
+				'PRIVILEGES' => 'select,insert,update,references',
+				'COMMENT' => '',
+			),
+			array (
+				'FIELD' => 'role',
+				'TYPE' => 'varchar(20)',
+				'COLLATION' => 'utf8_general_ci',
+				'NULL' => 'NO',
+				'KEY' => '',
+				'DEFAULT' => NULL,
+				'EXTRA' => '',
+				'PRIVILEGES' => 'select,insert,update,references',
+				'COMMENT' => '',
+			),
+		),
+		Test::PARAM    => array(
+			'_Test',
+		),
+	),
+	### show（失败）
+	array(
+		Test::ITEM     => 'show',
+		Test::EXPECTED => false,
+		Test::PARAM    => array(
+			'Test_',
+		),
+	),
+	### delete（缺少表名）
+	array(
+		Test::ITEM     => 'delete',
+		Test::EXPECTED => false,
+	),
+	### delete（缺少条件）
+	array(
+		Test::ITEM     => 'delete',
+		Test::EXPECTED => false,
+		Test::PARAM    => array(
+			'_Test',
+		),
+	),
+	### delete（成功）
+	array(
 		Test::ITEM     => 'delete',
 		Test::EXPECTED => 1,
-		Test::PARAMS   => array(
-			'data',
+		Test::PARAM    => array(
+			'_Test',
 			array('id' => 1),
 		),
 	),
-	### DB测试：delete（失败）
-	array
-	(
+	### delete（失败）
+	array(
 		Test::ITEM     => 'delete',
 		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			'data',
-			array('' => 2),
+		Test::PARAM    => array(
+			'_Test',
+			array('id_' => 2),
 		),
 	),
-	### DB测试：删除数据表
-	array
-	(
+	### 删除数据表
+	array(
 		Test::ITEM     => 'entrust',
 		Test::EXPECTED => 0,
-		Test::PARAMS   => array(
-			'DROP TABLE IF EXISTS data',
+		Test::PARAM    => array(
+			'DROP TABLE IF EXISTS _Test',
 		),
 	),
 );
