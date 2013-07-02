@@ -438,7 +438,7 @@ class Data extends Work
 		### 连接数据库
 		if (! $this->connect()) {
 			$this->target->notice = $this->notice;
-			trigger_error($this->notice, E_USER_WARNING);
+			trigger_error($this->notice, E_USER_ERROR);
 		}
 	}
 

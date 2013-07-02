@@ -1,140 +1,242 @@
 <?php
 /**
- * 原始虚类测试场景
+ * 原始对象测试场景
  */
-return array(
-	### Log测试：构建
+global $config;
+$config[Work::TEST][Work::BAI] = array(
+	### 构建
 	array(
-		Test::ITEM     => Page::PAGE,
+		Test::ITEM     => Flow::ACTION,
 		Test::MODE     => Test::MODE_BUILD,
-		Test::EXPECTED => Page::BAI,
-		Test::PARAMS   => array(
-			'css' => array('_test.css'),
-		),
+		Test::EXPECTED => Work::BAI,
 	),
-	### 测试情景：config（缺少项目）
-	array(
-		Test::ITEM     => 'config',
-		Test::EXPECTED => $GLOBALS['config'],
-	),
-	### 测试情景：config（未知项目）
+	### config（未知项目）
 	array(
 		Test::ITEM     => 'config',
 		Test::EXPECTED => null,
-		Test::PARAMS   => _DEF.Page::FLOW,
+		Test::PARAM    => '_None',
 	),
-	### 测试情景：config（多级项目）
+	### config（多级项目）
 	array(
 		Test::ITEM     => 'config',
-		Test::EXPECTED => $GLOBALS['config'][Page::FLOW][Page::CONTROL],
-		Test::PARAMS   => array(Page::FLOW, Page::CONTROL),
+		Test::EXPECTED => $config[Flow::FLOW][Flow::ACTION],
+		Test::PARAM    => array(Flow::FLOW, Flow::ACTION),
 	),
-	### 测试情景：pick（缺少项目）
+	### pick（缺少项目）
 	array(
 		Test::ITEM     => 'pick',
 		Test::EXPECTED => null,
 	),
-	### 测试情景：pick（从列表）
+	### pick（从列表）
 	array(
 		Test::ITEM     => 'pick',
 		Test::EXPECTED => 'av',
-		Test::PARAMS   => array(
+		Test::PARAM    => array(
 			'ak',
 			array('ak' => 'av', 'bk' => 'bv'),
 		),
 	),
-	### 测试情景：pick（从全局）
+	### pick（从全局）
 	array(
 		Test::ITEM     => 'pick',
-		Test::EXPECTED => $GLOBALS['config'][Page::FLOW],
-		Test::PARAMS   => array(
-			Page::FLOW,
-			null,
-			false,
+		Test::EXPECTED => $config[Flow::FLOW],
+		Test::PARAM    => array(
+			Flow::FLOW,
+		    null,
+			true,
 		),
 	),
-	### 测试情景：drop
+	### drop（从列表）
 	array(
 		Test::ITEM     => 'drop',
-		Test::EXPECTED => '',
-		Test::PARAMS   => array(
+		Test::EXPECTED => 'av',
+		Test::PARAM    => array(
 			'ak',
-			array('ak' => '', 'bk' => 'bv'),
+			array('ak' => 'av', 'bk' => 'bv'),
 		),
 	),
-	### 测试情景：stuff（缺少数据）
+	### stuff（缺少数据）
 	array(
 		Test::ITEM     => 'stuff',
 		Test::EXPECTED => false,
 	),
-	### 测试情景：stuff（填充对象自身）
+	### stuff（填充对象自身）
 	array(
 		Test::ITEM     => 'stuff',
 		Test::EXPECTED => true,
-		Test::PARAMS   => array(
+		Test::PARAM    => array(
 			array('ak' => 'av', 'bk' => array('ck' => 'cv', 'dk' => array('fk' => 'fv'))),
 		),
 	),
-	### 测试情景：build（类名无效）
+	### stuff（填充对象列表）
+	array(
+		Test::ITEM     => 'stuff',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('ak' => 'av', 'bk' => array('ck' => 'cv', 'dk' => array('fk' => 'fv'))),
+		    &$this->target->preset,
+		),
+	),
+	### stuff（递归填充对象列表）
+	array(
+		Test::ITEM     => 'stuff',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('ak' => 'av', 'bk' => array('ek' => 'ev', 'dk' => array('fk' => 'fv'))),
+		    &$this->target->preset,
+		),
+	),
+	### stuff（覆盖非列表）
+	array(
+		Test::ITEM     => 'stuff',
+		Test::EXPECTED => true,
+		Test::PARAM    => array(
+			array('ak' => 'av', 'bk' => array('ek' => 'ev', 'dk' => array('fk' => 'fv'))),
+		    &$this->target->preset['ak'],
+		),
+	),
+	### locate（缺少文件名）
+	array(
+		Test::ITEM     => 'locate',
+		Test::EXPECTED => null,
+	),
+	### locate（文件不存在）
+	array(
+		Test::ITEM     => 'locate',
+		Test::EXPECTED => array(),
+		Test::PARAM    => array(
+			'_none',
+		),
+	),
+	### locate（文件位置）
+	array(
+		Test::ITEM     => 'locate',
+		Test::EXPECTED => array(
+		    Work::BAI     => 'bai/php/config.php',
+		    Work::SERVICE => 'service/php/config.php',
+		),
+		Test::PARAM    => array(
+			'config.php',
+		    'php',
+		),
+	),
+	### load（缺少文件名）
+	array(
+		Test::ITEM     => 'load',
+		Test::EXPECTED => null,
+	),
+	### load（文件不存在）
+	array(
+		Test::ITEM     => 'load',
+		Test::EXPECTED => null,
+		Test::PARAM    => array(
+			'BaiTest',
+		),
+	),
+	### load（全部）
+	array(
+		Test::ITEM     => 'load',
+		Test::EXPECTED => '',
+		Test::PARAM    => array(
+			'BaiTest',
+		    true,
+			Work::TEST,
+		),
+	),
+	### load（用户文件优先）
+	array(
+		Test::ITEM     => 'load',
+		Test::EXPECTED => '',
+		Test::PARAM    => array(
+			'BaiTest',
+		    null,
+			Work::TEST,
+		),
+	),
+	### build（缺少类名）
 	array(
 		Test::ITEM     => 'build',
 		Test::EXPECTED => null,
-		Test::PARAMS   => 1
 	),
-	### 测试情景：build（对象未知）
+	### build（对象未知）
 	array(
 		Test::ITEM     => 'build',
 		Test::EXPECTED => null,
-		Test::PARAMS   => _DEF.Page::PAGE,
+		Test::PARAM    => _DEF.Flow::ACTION,
 	),
-	### 测试情景：build（分支对象）
-	array(
-		Test::ITEM     => 'build',
-		Test::EXPECTED => 'TestAction',
-		Test::PARAMS   => Page::ACTION,
-	),
-	### 测试情景：build（静态构建）
+	### build（静态构建）
 	array(
 		Test::ITEM     => 'build',
 		Test::EXPECTED => Work::LOG,
-		Test::PARAMS   => Work::LOG,
+		Test::PARAM    => Work::LOG,
 	),
-	### 测试情景：load（缺少文件）
+	### url（字符串）
 	array(
-		Test::ITEM     => 'load',
-		Test::EXPECTED => null,
+		Test::ITEM     => 'url',
+		Test::EXPECTED => _WEB.'?event=test&service=test&testee=bai',
+		Test::PARAM    => array(
+		    'test',
+		    'test',
+		    'testee=bai'
+		),
 	),
-	### 测试情景：load（无效文件）
+	### url（数组）
 	array(
-		Test::ITEM     => 'load',
-		Test::EXPECTED => null,
-		Test::PARAMS   => '$Test',
+		Test::ITEM     => 'url',
+		Test::EXPECTED => _WEB.'?event=test&service=test&testee=bai&file=bai',
+		Test::PARAM    => array(
+		    'test',
+		    'test',
+		    array(
+		        'testee' => 'bai',
+		        'file=bai'
+		    ),
+		),
 	),
-	### 测试情景：__get
+	### offsetGet
+	array(
+		Test::ITEM     => 'offsetGet',
+		Test::EXPECTED => null,
+		Test::PARAM    => '_None',
+	),
+	### offsetUnset
+	array(
+		Test::ITEM     => 'offsetUnset',
+		Test::EXPECTED => null,
+		Test::PARAM    => '_None',
+	),
+	### __get
 	array(
 		Test::ITEM     => '__get',
 		Test::EXPECTED => null,
-		Test::PARAMS   => '_test_',
+		Test::PARAM    => '_None',
 	),
-	### 测试情景：__toString
+	### __call
 	array(
-		Test::ITEM     => '__toString',
-		Test::EXPECTED => Page::PAGE,
-	),
-	### 测试情景：entrust
-	array(
-		Test::ITEM     => 'entrust',
-		Test::EXPECTED => false,
-		Test::PARAMS   => array(
-			array(
-				'css'      => Test::NIL,
-				'js'       => Test::NIL,
-				'html'     => Test::NIL,
-				'_test1'   => false,
-				'Data'     => false,
-				'_test2'   => null,
-			),
+		Test::ITEM     => '__call',
+		Test::EXPECTED => null,
+		Test::PARAM    => array(
+		    '_None',
+		    null,
 		),
 	),
+	### __toString
+	array(
+		Test::ITEM     => '__toString',
+		Test::EXPECTED => 'TestAction',
+	),
+// 	### entrust
+// 	array(
+// 		Test::ITEM     => 'entrust',
+// 		Test::EXPECTED => false,
+// 		Test::PARAM    => array(
+// 			array(
+// 				'check'    => Test::NIL,
+// 				'Cache'    => Test::NIL,
+// 				'data'     => false,
+// 				'engage'   => false,
+// 			),
+// 		),
+// 	),
 );
 ?>

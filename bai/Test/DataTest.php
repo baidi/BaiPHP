@@ -9,7 +9,7 @@ $config[Work::TEST][Work::DATA] = array(
 		Test::ITEM     => 'Data',
 		Test::MODE     => Test::MODE_BUILD,
 		Test::PARAM    => array(
-			'lasting' => false,
+			'lasting'  => false,
 		),
 	),
 	### 构建（持久连接）
@@ -17,7 +17,7 @@ $config[Work::TEST][Work::DATA] = array(
 		Test::ITEM     => 'Data',
 		Test::MODE     => Test::MODE_BUILD,
 		Test::PARAM    => array(
-			'lasting' => true,
+			'lasting'  => true,
 		),
 	),
 	### entrust（SQL缺失）

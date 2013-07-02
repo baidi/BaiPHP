@@ -59,6 +59,9 @@ class Test extends Work
 	/** 测试结果：出错 */
 	protected $error   = '|';
 
+	/** 模拟方法返回结果 */
+	protected $mock    = null;
+
 	/**
 	 * <h4>执行测试</h4>
 	 * <p>
@@ -114,6 +117,8 @@ class Test extends Work
 		### 启用代码统计
 		ini_set('xdebug.coverage_enable', 1);
 		xdebug_start_code_coverage(XDEBUG_CC_UNUSED + XDEBUG_CC_DEAD_CODE);
+		xdebug_start_error_collection();
+		ob_start();
 
 		$testee = $this['testee'];
 		$cases  = $this['cases'];
@@ -137,6 +142,13 @@ class Test extends Work
 			### 执行测试场景
 			Log::logf('test', $item, __CLASS__);
 			$result = $this->$mode();
+			$error = xdebug_get_collected_errors(true);
+			if ($error != null) {
+			    ### 测试过程中出错
+    			$results[self::RESULT][] = $this->error;
+			    Log::logf('error', strip_tags(implode('', $error)), __CLASS__);
+    			continue;
+			}
 			$results[self::RESULT][] = $result;
 			Log::logf('result', $result, __CLASS__);
 		}
@@ -144,6 +156,8 @@ class Test extends Work
 		### 关闭代码统计
 		$lines = xdebug_get_code_coverage();
 		xdebug_stop_code_coverage();
+		xdebug_stop_error_collection();
+		ob_end_clean();
 
 		### 代码覆盖
 		foreach ($lines as $file => $line) {
@@ -284,7 +298,7 @@ class Test extends Work
 	 */
 	public function __call($item, $params)
 	{
-		return $this->pick($item, $this->preset);
+		return $this->pick($item, $this->mock);
 	}
 }
 ?>

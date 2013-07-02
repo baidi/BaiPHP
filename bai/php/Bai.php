@@ -242,7 +242,7 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected function drop($item = null, $list = null, $extra = false)
 	{
-		return $this->pick($item, $list, $limit, true);
+		return $this->pick($item, $list, $extra, true);
 	}
 
 	/**
@@ -285,7 +285,7 @@ abstract class Bai implements ArrayAccess
 				$this->stuff($value, $master[$item]);
 				continue;
 			}
-			if ($all || $value != null || ! isset($master[$item])) {
+			if ($all || $value !== null || ! isset($master[$item])) {
 				$master[$item] = $value;
 			}
 		}
@@ -422,18 +422,28 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected function url($event = null, $service = null, $setting = null)
 	{
-		$url = array();
-		if ($service != null) {
-			$url[] = lcfirst(self::SERVICE).'='.$service;
-		}
+		$params = array();
 		if ($event != null) {
-			$url[] = lcfirst(self::EVENT).'='.$event;
+			$params[] = lcfirst(self::EVENT).'='.$event;
 		}
-		$this->stuff($setting, $url);
-		if ($url != null) {
-			$url = '?'.implode('&', $url);
+		if ($service != null) {
+			$params[] = lcfirst(self::SERVICE).'='.$service;
 		}
-		return $url == null ? _WEB : _WEB.$url;
+		if ($setting != null) {
+		    foreach ((array)$setting as $item => $value) {
+		        if (is_string($item)) {
+		            $params[] = $item.'='.$value;
+		        }
+		        if (is_int($item) && $value != null) {
+		            $params[] = $value;
+		        }
+		    }
+		}
+		$url = _WEB;
+		if ($params != null) {
+			$url .= '?'.implode('&', $params);
+		}
+		return $url;
 	}
 
 	/**
