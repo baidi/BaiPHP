@@ -156,7 +156,9 @@ class Style extends Work
 			Log::logf(__FUNCTION__, $service, __CLASS__);
 			$content .= file_get_contents(_LOCAL.$service);
 		}
-		$content = sprintf($template, $content);
+		if ($content != null) {
+		    $content = sprintf($template, $content);
+		}
 		return $content;
 	}
 
