@@ -325,18 +325,20 @@ $config[Work::TEST] = array(
 	),
 );
 
-### 全局配置：测试工场
+### 全局配置：模板工场
 $config[Work::TEMPLATE] = array(
-	'mode'      => '#\{\$(?<name>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<handle>[?!])\s*(?<first>[^|}]+)\s*(?:\|\s*(?<last>[^|}]+)\s*)?)?\}#',
+	'peg'       => '$',
+	'mode'      => '#\{\$(?<' . Template::ITEM . '>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<' . Template::HANDLE .
+			 '>[?!])\s*(?:(?<' . Template::PRIMARY . '>[^|}]+)\s*(?:\s\|\s(?<' . Template::SECORDARY .
+			 '>[^|}]+)\s*)?)?)?\}#',
 	'handler'   => array(
 		'?'     => 'choose',
 		'!'     => 'loop',
 	),
-	'peg'       => '$',
 	'looper'    => array('$value', '$key'),
-	'templates' => array(
-		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$value}</div>',
-		'p'     => '<p {$class ? class="$class"}>{$value}</p>',
+	'dic'       => array(
+		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$content}</div>',
+		'p'     => '<p {$class ? class="$class"}>{$content}</p>',
 	),
 );
 
