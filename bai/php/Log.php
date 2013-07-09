@@ -48,8 +48,8 @@ class Log extends Work
 	protected $dir    = null;
 	/** 日志级别 */
 	protected $level  = self::ALL;
-	/** 日志仓库 */
-	protected $store  = null;
+	/** 日志字典 */
+	protected $dic    = null;
 	/** 日志级别名 */
 	protected $names  = null;
 	/** 日志结束符 */
@@ -157,7 +157,7 @@ class Log extends Work
 			return $item;
 		}
 		### 读取预置日志
-		$message = $this->pick($type, $this->store);
+		$message = $this->pick($type, $this->dic);
 		$message = $this->pick($item, $message);
 		return $message;
 	}

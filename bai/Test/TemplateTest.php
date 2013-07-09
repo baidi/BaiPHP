@@ -34,7 +34,7 @@ $config[Work::TEST][Work::TEMPLATE] = array(
 	### entrust（判断）
 	array(
 		Test::ITEM => 'entrust',
-		Test::EXPECTED => '[T]',
+		Test::EXPECTED => '[T] ',
 		Test::PARAM => array(
 			'{$chooser ? [T] | [F]}',
 			array(

@@ -75,7 +75,7 @@ class Check extends Work
 		}
 
 		### 读取检验设置
-		$event = $this->pick("$this->target", $this->events);
+		$event = $this->config(__CLASS__, self::EVENT, "$this->target");
 		$this->stuff($setting, $event);
 		if ($event == null || ! is_array($event)) {
 			return true;

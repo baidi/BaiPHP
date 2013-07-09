@@ -26,4 +26,4 @@ global $config;
 $config[_DEF][Target::DEBUG] = true;
 
 ### 全局配置：检验工场
-
+$config[Work::CHECK][Work::EVENT] = array();

@@ -243,10 +243,6 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected function pick ($item = null, $list = null, $extra = false, $print = false)
 	{
-		### 项目名
-		if ($item == null) {
-			return null;
-		}
 		$value = null;
 		### 从自定列表中检值
 		if (is_array($list) && isset($list[$item])) {

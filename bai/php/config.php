@@ -75,7 +75,7 @@ $config[Flow::CONTROL] = array(
 	### 访问次数键值（用于$_SESSION）
 	'visitCount' => '_visit_count',
 	### 访问时间键值（用于$_SESSION）
-	'visitTime'  => '_visit_cime',
+	'visitTime'  => '_visit_time',
 );
 
 ### 全局配置：数据工场
@@ -110,7 +110,7 @@ $config[LOG::LOG] = array(
 		LOG::DEBUG     => ' [调试] ',
 		LOG::PERFORM   => ' [性能] ',
 	),
-	'store' => array(
+	'dic' => array(
 		Work::BAI         => array(
 			'run'         => '->执行方法：%s',
 			'entrust'     => '+>委托目标：%s',
@@ -329,32 +329,35 @@ $config[Work::TEST] = array(
 $config[Work::TEMPLATE] = array(
 	'peg'       => '$',
 	'mode'      => '#\{\$(?<' . Template::ITEM . '>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<' . Template::HANDLE .
-			 '>[?!])\s*(?:(?<' . Template::PRIMARY . '>[^|}]+)\s*(?:\s\|\s(?<' . Template::SECORDARY .
+			 '>[?!])\s*(?:(?<' . Template::PRIMARY . '>[^|}]+)\s*(?:\|\s*(?<' . Template::SECORDARY .
 			 '>[^|}]+)\s*)?)?)?\}#',
 	'handler'   => array(
+		null    => 'param',
 		'?'     => 'choose',
 		'!'     => 'loop',
 	),
 	'looper'    => array('$value', '$key'),
 	'dic'       => array(
-		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"} {$style ? style="$style"}>{$content}</div>',
+		'div'   => '<div {$id ? id="$id"} {$class ? class="$class"}>{$content}</div>',
 		'p'     => '<p {$class ? class="$class"}>{$content}</p>',
 	),
 );
 
 $config[Work::INPUT] = array(
-	'primary' => 'text',
-	'check'    => $config[Work::CHECK]['mode'],
-	'templates' => array(
-		'text' => '<input id="{$event}_{$item}" name="{$event}[{$item}]" {$type ? type="$type" | type="text"} {$value} {$class ? class="$class"} {$style ? style="$style"} {$check ? data-check="$check"} {$hint ? placeholder="$hint"} />',
+	'dic' => array(
+		'text' => '<input id="{$item}" name="{$item}" {$type ? type="$type" | type="text" }{$value ? $value }{$class ? class="$class" }{$check ? $check }{$hint ? placeholder="$hint" }/>',
+	),
+	'values' => array(
+		null => 'value="%s"',
 	),
 	'types'  => array(
+		null     => 'text',
 		'float'  => 'number',
 	),
 	'checks' => array(
+		_DEF => 'data-check="%s"',
 		'required' => 'required="required"',
 		'max' => 'maxlength="%d"',
-		_DEF => 'data-check="%s"',
 	),
 	'hints'  => array(
 		'required' => '非空',

@@ -22,16 +22,6 @@ class TestAction extends Action
 	 */
 	protected function engage()
 	{
-		### 测试数据
-		$this->target['input-risk'] = '%';
-		$this->target['input-required'] = '';
-		$this->target['input-min[3]'] = 'lt6';
-		$this->target['input-max[3]'] = 'gt6';
-		$this->target['input-max[3.3]'] = 'gt6.gt6';
-		$this->target['input-range[1-100]'] = '101';
-		$this->target['input-enum[a-d]'] = '1';
-		$this->target['input-set[a-d]'] = 'a,b,2';
-		### 执行测试
 		$testee = ucfirst($this->target['testee']);
 		$test = $this->build(Work::TEST);
 		$this->target[Flow::ACTION] = $test->entrust($testee, $testee.Work::TEST);

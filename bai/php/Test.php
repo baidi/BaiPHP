@@ -146,7 +146,7 @@ class Test extends Work
 			if ($error != null) {
 			    ### 测试过程中出错
     			$results[self::RESULT][] = $this->error;
-			    Log::logf('error', strip_tags(implode('', $error)), __CLASS__);
+			    Log::logf('error', strip_tags(html_entity_decode(implode('', $error))), __CLASS__);
     			continue;
 			}
 			$results[self::RESULT][] = $result;

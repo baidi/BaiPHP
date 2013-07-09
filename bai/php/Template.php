@@ -59,6 +59,7 @@ class Template extends Work
 	 * 模板解析器
 	 */
 	protected $handler = array(
+		null => 'param',
 		### 判断处理式
 		'?' => 'choose',
 		### 循环处理式
@@ -138,7 +139,7 @@ class Template extends Work
 			return $this->result;
 		}
 		### 非数组参数默认作为$content
-		if ($setting != null && ! is_array($setting)) {
+		if (! is_array($setting)) {
 			$setting = array('content' => "$setting");
 		}
 		krsort($setting);
@@ -173,18 +174,34 @@ class Template extends Work
 			$handler = $this->pick($handle, $this->handler);
 			if ($handler == null) {
 				### 参数直接置换
-				$template = str_replace($param[0], $value, $template);
+				$template = str_replace($param[0], '', $template);
 				continue;
 			}
 			### 调用解析器
+			$this['content'] = $param[0];
+			$this['value'] = $value;
 			$this[self::ITEM] = $item;
-			$this[$item] = $value;
 			$this[self::PRIMARY] = $this->pick(self::PRIMARY, $param);
 			$this[self::SECORDARY] = $this->pick(self::SECORDARY, $param);
 			### 参数处理式
 			$template = str_replace($param[0], $this->$handler(), $template);
 		}
 		return $template;
+	}
+
+	/**
+	 * <h4>模板解析器：参数</h4>
+	 *
+	 * @return string 参数输出片段
+	 */
+	protected function param ()
+	{
+		### 执行数据
+		$item = $this[self::ITEM];
+		$value = $this['value'];
+		$content = $this['content'];
+		### 表达式
+		return str_replace($this->peg . $item, $value, substr($content, 1, -1));
 	}
 
 	/**
@@ -196,7 +213,7 @@ class Template extends Work
 	{
 		### 执行数据
 		$item = $this[self::ITEM];
-		$value = $this[$item];
+		$value = $this['value'];
 		### 表达式
 		$content = $value ? $this[self::PRIMARY] : $this[self::SECORDARY];
 		if ($content == null) {
@@ -214,7 +231,7 @@ class Template extends Work
 	{
 		### 执行数据
 		$item = $this[self::ITEM];
-		$value = $this[$item];
+		$value = $this['value'];
 		$content = $this[self::PRIMARY];
 		### 参数非数组
 		if (! is_array($value)) {

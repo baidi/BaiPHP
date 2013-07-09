@@ -2,6 +2,16 @@
 /**
  * 检验工场测试场景
  */
+### 数据准备
+$this->target['input-risk'] = '%';
+$this->target['input-required'] = '';
+$this->target['input-min[3]'] = 'lt6';
+$this->target['input-max[3]'] = 'gt6';
+$this->target['input-max[3.3]'] = 'gt6.gt6';
+$this->target['input-range[1-100]'] = '101';
+$this->target['input-enum[a-d]'] = '1';
+$this->target['input-set[a-d]'] = 'a,b,2';
+### 测试场景
 global $config;
 $config[Work::TEST][Work::CHECK] = array(
 	### 构建

@@ -91,14 +91,14 @@ class Lang extends Work
 			return null;
 		}
 		### 预置语言内容
-		$dic = $this->{$this->primary};
+		$dic = $this->config(self::LANG, $this->primary);
 		### 当前目标语言内容
-		$event = $this->pick(_DEF . "$this->target", $dic);
+		$event = $this->config(self::LANG, $this->primary, self::EVENT, "$this->target");
 		$this->result = $this->pick($item, $event);
 		if ($this->result === null) {
 			$this->result = $this->pick($item, $dic);
 		}
-		$this->runtime[$item] = $this->result;
+		$this[$item] = $this->result;
 		return $this->result;
 	}
 
@@ -125,6 +125,5 @@ class Lang extends Work
 	{
 		parent::__construct($setting);
 		$this->load($this->primary, true);
-		$this->stuff($this->config(__CLASS__), $this, - 1);
 	}
 }
