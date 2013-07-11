@@ -1,11 +1,13 @@
 <?php
+
 /**
  * <b>化简PHP（BaiPHP）开发框架</b>
- * @author		白晓阳
- * @copyright	Copyright (c) 2011 - 2012, 白晓阳
- * @link		http://dacbe.com
- * @version    V1.0.0 2012/03/31 首版
- * <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
+ *
+ * @author 白晓阳
+ * @copyright Copyright (c) 2011 - 2012, 白晓阳
+ * @link http://dacbe.com
+ * @version V1.0.0 2012/03/31 首版
+ *          <p>版权所有，保留一切权力。未经许可，不得用于商业用途。</p>
  */
 
 /**
@@ -18,37 +20,71 @@
  */
 class Record extends Work
 {
-	/** 刷新数据 */
+	/**
+	 * 记录标识：项目
+	 */
+	const ITEM = 'ITEM';
+	/**
+	 * 记录标识：选项
+	 */
+	const PARAM = 'PARAM';
+	/**
+	 * 记录标识：刷新记录
+	 */
 	const REFRESH = 'refresh';
-	/** 保存数据 */
+	/**
+	 * 记录标识：保存记录
+	 */
 	const SAVE = 'save';
-	/** 删除数据 */
+	/**
+	 * 记录标识：删除记录
+	 */
 	const DELETE = 'delete';
 
-	/** 数据表名 */
+	/**
+	 * 记录表名
+	 */
 	protected $table = null;
-	/** 数据主键 */
-	protected $pk = null;
-	/** 数据键值 */
+	/**
+	 * 记录键值
+	 */
 	protected $id = null;
-	/** 数据状态 */
+	/**
+	 * 原始数据
+	 */
+	protected $data = array();
+	/**
+	 * 记录状态
+	 */
 	protected $status = null;
-	/** 数据字段 */
-	protected $columns = null;
-	/** 原始数据 */
-	protected $origin = array();
-	/** 更新数据 */
-	protected $update = array();
+	/**
+	 * 记录匹配式
+	 */
+	protected $mode = null;
+	/**
+	 * 记录类型转换
+	 */
+	protected $types = null;
 
 	/**
-	 * 数据的增删改查<br/>
+	 * 记录主键
+	 */
+	private $pk = null;
+	/**
+	 * 记录字段
+	 */
+	private $columns = null;
+
+	/**
+	 * <h4>记录的增删改查</h4>
+	 *
 	 * @param string $action 数据操作
-	 *     create： 插入； update： 更新； delete： 删除； 其他： 扩展；
-	*/
-	public function entrust($action = null)
+	 *        Record::REFRESH： 查询； Record::SAVE： 保存； Record::DELETE： 删除；
+	 */
+	public function entrust ($action = null)
 	{
 		try {
-			$this->$action();
+			return $this->$action();
 		} catch (Exception $e) {
 			### 数据操作异常
 			$message = Log::logf(__FUNCTION__, $action, __CLASS__);
@@ -62,54 +98,71 @@ class Record extends Work
 	 * <p>
 	 * 根据主键查询数据库并刷新当前数据。
 	 * </p>
+	 *
 	 * @return boolean
 	 */
-	protected function refresh()
+	protected function refresh ()
 	{
-		if ($this->id != null) {
-			$data = Data::read($this->table, array($this->pk => $this->id));
-			$this->origin = $data[0];
-			$this->status = self::REFRESH;
-			return true;
+		if ($this->id == null) {
+			$this->notice = Log::logs('id', __CLASS__, Log::NOTICE);
+			return false;
 		}
-		return false;
-	}
-
-	/**
-	 * <h4>保存数据</h4>
-	 * <p>
-	 * 如果没有原始数据，则建立新数据，否则更新变更项。
-	 * </p>
-	 * @return boolean
-	 */
-	protected function save()
-	{
-		if ($this->origin == null) {
-			$id = Data::create($this->table, $this->update);
-			$this->origin = $this->update;
-			$this->origin[$this->pk] = $id;
-			return true;
+		$data = Data::read($this->table, array($this->pk => $this->id));
+		if (! $data) {
+			return false;
 		}
-		$values = array();
-		foreach ($this->origin as $item => $value) {
-			if (isset($this->update[$item]) && $this->update[$item] !== $value) {
-				$update[$item] = $this->update[$item];
-			}
-		}
-		if ($values == null) {
-			return true;
-		}
-		$where = array($this->pk => $this->id);
-		Data::update($this->table, $values, $where);
-		$this->status = self::SAVE;
+		$this->data = $data[0];
+		$this->status = self::REFRESH;
+		Log::logs(__FUNCTION__, __CLASS__);
 		return true;
 	}
 
-	protected function check()
+	/**
+	 * <h4>保存记录</h4>
+	 * <p>
+	 * 如果没有原始数据，则建立新数据，否则更新变更项。
+	 * </p>
+	 *
+	 * @return boolean
+	 */
+	protected function save ()
 	{
-		foreach ($this->update as $item => $value) {
-
+		if ($this->data == null) {
+			if ($this->runtime == null) {
+				return false;
+			}
+			### 新建记录
+			if ($this->check($this->runtime)) {
+				$id = Data::create($this->table, $this->runtime);
+				if ($id) {
+					$this->runtime[$this->pk] = $this->id = $id;
+					$this->data = $this->runtime;
+					$this->status = self::SAVE;
+					Log::logs(__FUNCTION__, __CLASS__);
+					return true;
+				}
+			}
+			return false;
 		}
+		### 更新记录
+		if ($this->id == null) {
+			$this->notice = Log::logs('id', __CLASS__, Log::NOTICE);
+			return false;
+		}
+		$values = array_diff_assoc($this->runtime, $this->data);
+		if ($values == null) {
+			return true;
+		}
+		if ($this->check($values)) {
+			$result = Data::update($this->table, $values, array($this->pk => $this->id));
+			if ($result > 0) {
+				$this->stuff($this->runtime, $this->data);
+				$this->status = self::SAVE;
+				Log::logs(__FUNCTION__, __CLASS__);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -117,127 +170,164 @@ class Record extends Work
 	 * <p>
 	 * 根据主键删除当前数据。
 	 * </p>
+	 *
 	 * @return boolean
 	 */
-	protected function delete()
+	protected function delete ()
 	{
-		Data::delete($this->table, array($this->pk => $this->id));
-		$this->status = self::DELETE;
+		if ($this->id == null) {
+			$this->notice = Log::logs('id', __CLASS__, Log::NOTICE);
+			return false;
+		}
+		$result = Data::delete($this->table, array($this->pk => $this->id));
+		if ($result > 0) {
+			$this->status = self::DELETE;
+			Log::logs(__FUNCTION__, __CLASS__);
+			return true;
+		}
+		return false;
 	}
 
 	/**
-	 * <h4>获取数据字段</h4>
+	 * <h4>获取字段定义</h4>
 	 * <p>
-	 * 根据数据表名获取数据表字段定义。
+	 * 根据表名获取表字段定义。
 	 * </p>
+	 *
 	 * @return boolean
 	 */
-	protected function show()
+	protected function show ()
 	{
 		if ($this->table == null) {
-			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
+			$this->notice = Log::logs('table', __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		$columns = Data::show($this->table);
 		if (! $columns) {
+			$this->notice = Log::logs(__FUNCTION__, __CLASS__, Log::EXCEPTION);
 			return false;
 		}
 		foreach ($columns as $column) {
-			$column['Check'] = $this->type($column);
-			$this->columns[$column['Field']] = $column;
-			if ($column['Key'] == 'PRI') {
-				$this->pk = $column['field'];
+			$column['CHECK'] = $this->define($column);
+			$this->columns[strtoupper($column['FIELD'])] = $column;
+			if ($column['KEY'] == 'PRI') {
+				$this->pk = $column['FIELD'];
 			}
 		}
+		return true;
 	}
 
-	protected function type($column = null)
+	/**
+	 * <h4>检验字段值</h4>
+	 * <p>
+	 * 检验字段内容。
+	 * </p>
+	 *
+	 * @param array $columns 字段值
+	 */
+	protected function check ($columns = null)
 	{
-		if ($check == null || ! is_array($column)) {
-			return null;
+		$items = array();
+		foreach ($columns as $item => $value) {
+			$items[$item] = $this->columns[$item]['CHECK'];
 		}
-		$check = array();
-		if ($column['NULL'] == 'NO' && $column['DEFAULT'] === null && $column['EXTRA'] == null) {
-			$check[] = 'required';
+		$check = Check::access();
+		$result = $check->entrust($items, $columns);
+		if (! $result) {
+			$this->notice = $check->notice;
 		}
-		$mode = '#^(?<type>[A-Za-z_]+)(?<options>\([^)]\+))?#';
-		$def = strtoupper($column['TYPE']);
-		if (preg_match($mode, $def, $matches)) {
-			$type = $this->pick('type', $matches);
-			if (strpos('UNSIGNED', $def) !== false) {
-				$type .= '+';
+		return $result;
+	}
+
+	/**
+	 * <h4>解析字段检验</h4>
+	 * <p>
+	 * 根据字段定义生成检验项目（用于检验工场）。
+	 * </p>
+	 *
+	 * @param string $column 字段定义
+	 * @return string
+	 */
+	protected function define ($column = null)
+	{
+		$result = array();
+		### 必须检验
+		if ($column['NULL'] == 'NO' && $column['DEFAULT'] === null &&
+				 $column['EXTRA'] == null) {
+			$result[] = 'required';
+		}
+		$defined = strtoupper($column['TYPE']);
+		if (preg_match($this->mode, $defined, $matches)) {
+			### 类型检验
+			$item = $this->pick(self::ITEM, $matches);
+			if (strpos($defined, 'UNSIGNED') !== false) {
+				$item .= '+';
 			}
-			$options = $this->pick('options', $matches);
-			$check[] = 'type='.$this->pick($type, $this->types);
-			if ($type == 'ENUM' || $type == 'SET') {
-				$check[] = 'options='.$options;
-			} else if ($options != null) {
-				$check[] = 'max='.$options;
+			$result[] = $this->pick($item, $this->types);
+			### 其他检验
+			$param = $this->pick(self::PARAM, $matches);
+			if ($item == 'ENUM' || $item == 'SET') {
+				### 选项检验
+				$result[] = strtolower($item) . '=' . $param;
+			} else if ($param != null) {
+				### 最大长度检验
+				$result[] = 'max=' . $param;
 			}
 		}
+		return implode(' ', $result);
 	}
 
 	/**
 	 * <h3>读取项目</h3>
+	 *
 	 * @param string $item 项目名
 	 * @return mixed 项目值
 	 */
-	public function offsetGet($item)
+	public function offsetGet ($item)
 	{
-		if (isset($this->update[$item])) {
-			return $this->update[$item];
+		$item = strtoupper($item);
+		if (isset($this->runtime[$item])) {
+			return $this->runtime[$item];
 		}
-		if (isset($this->origin[$item])) {
-			return $this->origin[$item];
+		if (isset($this->data[$item])) {
+			return $this->data[$item];
 		}
 		return null;
 	}
 
 	/**
 	 * <h3>设定项目</h3>
+	 *
 	 * @param string $item 项目名
 	 * @param mixed $value 项目值
 	 * @return void
 	 */
-	public function offsetSet($item, $value)
+	public function offsetSet ($item, $value)
 	{
+		$item = strtoupper($item);
 		$column = $this->pick($item, $this->columns);
 		if ($column != null) {
-			$this->update[$item] = $value;
+			$this->runtime[$item] = $value;
 		}
-	}
-
-	/**
-	 * 属性未知时，返回空（null）。
-	 */
-	public function __get($item)
-	{
-		return $this->offsetGet($item);
-	}
-
-	/**
-	 * 属性未知时，返回空（null）。
-	 */
-	public function __set($item, $value)
-	{
-		$this->offsetSet($item, $value);
+		return $this->runtime[$item];
 	}
 
 	/**
 	 * <h3>构建记录工场</h3>
+	 *
 	 * @param array $setting 即时配置
-	 *   table：表名
-	 *   id：主键值
-	 *   origin：原始数据
+	 *        table：表名
+	 *        id：主键值
+	 *        data：原始数据
 	 */
-	public function __construct($setting = null)
+	public function __construct ($setting = null)
 	{
 		parent::__construct($setting);
-		if (! $this->show()) {
-			$this->target->notice = $this->notice;
-			trigger_error($this->notice, E_USER_ERROR);
+		if ($this->show()) {
+			$this->refresh();
+			return;
 		}
-		$this->refresh();
+		trigger_error($this->notice, E_USER_WARNING);
 	}
 }
 ?>

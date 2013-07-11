@@ -48,7 +48,7 @@ class Test extends Work
 	/** 测试方式：模拟 */
 	const MODE_MOCK   = 'testMock';
 	/** 测试方式：引用 */
-	const MODE_REFER  = '$&&';
+	const MODE_REFER  = 'testRefer';
 
 	/** 测试结果：通过 */
 	protected $success = '-';
@@ -91,10 +91,20 @@ class Test extends Work
 			return $this->result;
 		}
 
+		### 启用代码统计
+		ini_set('xdebug.coverage_enable', 1);
+		xdebug_start_code_coverage(XDEBUG_CC_UNUSED + XDEBUG_CC_DEAD_CODE);
+		xdebug_start_error_collection();
+
 		### 执行测试
 		$this['testee'] = $testee;
 		$this['cases']  = $cases;
 		$this->result = $this->tests();
+
+		### 关闭代码统计
+		xdebug_stop_code_coverage();
+		xdebug_stop_error_collection();
+
 		return $this->result;
 	}
 
@@ -114,12 +124,6 @@ class Test extends Work
 	 */
 	protected function tests()
 	{
-		### 启用代码统计
-		ini_set('xdebug.coverage_enable', 1);
-		xdebug_start_code_coverage(XDEBUG_CC_UNUSED + XDEBUG_CC_DEAD_CODE);
-		xdebug_start_error_collection();
-		ob_start();
-
 		$testee = $this['testee'];
 		$cases  = $this['cases'];
 		### 执行测试
@@ -141,7 +145,9 @@ class Test extends Work
 			$this['case'] = $case;
 			### 执行测试场景
 			Log::logf('test', $item, __CLASS__);
+			ob_start();
 			$result = $this->$mode();
+			$output = ob_get_clean();
 			$error = xdebug_get_collected_errors(true);
 			if ($error != null) {
 			    ### 测试过程中出错
@@ -151,15 +157,13 @@ class Test extends Work
 			}
 			$results[self::RESULT][] = $result;
 			Log::logf('result', $result, __CLASS__);
+			if (strlen($output) > 3) {
+				Log::logf('output', $output, __CLASS__);
+			}
 		}
 
-		### 关闭代码统计
-		$lines = xdebug_get_code_coverage();
-		xdebug_stop_code_coverage();
-		xdebug_stop_error_collection();
-		ob_end_clean();
-
 		### 代码覆盖
+		$lines = xdebug_get_code_coverage();
 		foreach ($lines as $file => $line) {
 			if (strcasecmp(basename($file), $testee._EXT) == 0) {
 				$results[self::SOURCE] = $file;
@@ -168,11 +172,10 @@ class Test extends Work
 			}
 		}
 
-		### 项目统计
 		### 完成的测试
 		$count = count(array_intersect($results[self::RESULT], array($this->success)));
 		$results[self::COUNT][self::RESULT] = $count;
-		### 覆盖的代码
+		### 完成的代码
 		$count = count(array_intersect($results[self::LINES], array(1)));
 		$results[self::COUNT][self::LINES] = $count;
 		return $results;
@@ -228,7 +231,7 @@ class Test extends Work
 		### 检查测试对象
 		if ($this->$testee == null || ! method_exists($this->$testee, $item)) {
 			Log::logf('testee', $item, __CLASS__);
-			return $this->skip;
+			return $this->error;
 		}
 		### 执行测试
 		if ($param === null) {
@@ -244,30 +247,31 @@ class Test extends Work
 	/**
 	 * <h4>引用场景</h4>
 	 * <p>
-	 * 将引用参数置换成实际参数。
+	 * 调用引用参数相关方法，用于准备测试环境。
 	 * </p>
-	 * @param mixed $params 引用参数
-	 *//*
-	protected function testRefer($params = null)
+	 */
+	protected function testRefer()
 	{
-		if ($params == null) {
-			return $params;
+		### 执行数据
+		$case     = $this['case'];
+		$item     = $this->pick(self::ITEM, $case);
+		$param    = $this->pick(self::PARAM, $case);
+		$expected = $this->pick(self::EXPECTED, $case);
+		### 检查引用对象
+		if ($expected == null || $this->$expected == null || ! method_exists($this->$expected, $item)) {
+			Log::logf('refer', $item, __CLASS__);
+			return $this->error;
 		}
-		if (! is_array($params)) {
-			if (is_string($params) && strpos($params, self::MODE_REFER) === 0) {
-				$params = substr($params, strlen(self::MODE_REFER));
-				return $this->$params;
-			}
-			return $params;
+		### 执行测试
+		if ($param === null) {
+			$this->$expected->$item();
+		} else if (! is_array($param)) {
+			$this->$expected->$item($param);
+		} else {
+			call_user_func_array(array($this->$expected, $item), $param);
 		}
-		foreach ($params as &$param) {
-			if (is_string($param) && strpos($param, self::MODE_REFER) === 0) {
-				$param = substr($param, strlen(self::MODE_REFER));
-				$param = $this->$param;
-			}
-		}
-		return $params;
-	}*/
+		return $this->skip;
+	}
 
 	/**
 	 * <h4>比较场景</h4>

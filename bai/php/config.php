@@ -171,7 +171,12 @@ $config[LOG::LOG] = array(
 			'show'        => 'SQL描述<%s>数据表',
 		),
 		Work::RECORD      => array(
-			'show'        => '',
+			'table'       => '记录工场：表名未设置……',
+			'show'        => '记录工场：字段配置读取失败……',
+			'id'          => '记录工场：记录ID未设置',
+			'refresh'     => '记录工场：记录刷新成功',
+			'save'        => '记录工场：记录保存成功',
+			'delete'      => '记录工场：记录删除成功',
 		),
 		Work::CACHE       => array(
 			Work::CACHE   => '--缓存工场--',
@@ -186,11 +191,13 @@ $config[LOG::LOG] = array(
 		),
 		Work::TEST        => array(
 			Work::TEST    => '--测试工场--',
-			'testee'      => '测试对象无效：%s',
+			'testee'      => '测试对象或方法无效：%s',
 			'source'      => '测试文件无效：%s',
 			'case'        => '测试场景无效：%s',
+			'refer'       => '引用对象无效：%s',
 			'test'        => '执行测试：%s',
 			'result'      => '测试结果：%s',
+			'output'      => '测试中产生输出：%s',
 			'error'       => '执行测试出错：%s',
 			'testResult'  => '实际：%s <预期：%s>',
 		),
@@ -210,7 +217,7 @@ $config[Work::CHECK] = array(
 		### 风险字符
 		'risk'    => '/[<>&%\'\\\\]+/',
 		### 整数
-		'integer' => '/^[1-9]\d*$/',
+		'integer' => '/^[+-]?[1-9]\d*$/',
 		### 小数
 		'float'   => '/^[+-]?\d+(?:\.\d+)?$/',
 		### 英文字母
@@ -264,7 +271,7 @@ $config[Flow::PAGE] = array(
 		'$errorcolor$'  => '#ff0000',
 		'$noticecolor$' => '#99cc99',
 		'$lockedcolor$' => '#cccccc',
-		'$message$'     => json_encode($config[Work::LOG]['store']),
+		'$message$'     => json_encode($config[Work::LOG]['dic']),
 		'$type$'        => json_encode($config[Work::CHECK]['types']),
 	),
 	### 页面修整
@@ -380,22 +387,23 @@ $config['Lang'] = array(
 	'primary' => Lang::ZH,
 );
 
-$config['Record'] = array(
+$config[Work::RECORD] = array(
+	'mode'    => '#^(?<'.Record::ITEM.'>[A-Za-z_]+)(?:\((?<'.Record::PARAM.'>[^()]+)\))?#',
 	'types'   => array(
 		### 整数
-		'TINYINT'    => 'type=number range=-128,127',
-		'SMALLINT'   => 'type=number range=-32768,32767',
-		'MEDIUMINT'  => 'type=number range=-8388608,8388607',
-		'INT'        => 'type=number range=-2147483648,2147483647',
-		'INTEGER'    => 'type=number range=-2147483648,2147483647',
-		'BIGINT'     => 'type=number',
+		'TINYINT'    => 'type=integer range=-128,127',
+		'SMALLINT'   => 'type=integer range=-32768,32767',
+		'MEDIUMINT'  => 'type=integer range=-8388608,8388607',
+		'INT'        => 'type=integer range=-2147483648,2147483647',
+		'INTEGER'    => 'type=integer range=-2147483648,2147483647',
+		'BIGINT'     => 'type=integer',
 		### 非负整数
-		'TINYINT+'   => 'type=number range=0,255',
-		'SMALLINT+'  => 'type=number range=0,65535',
-		'MEDIUMINT+' => 'type=number range=0,16777215',
-		'INT+'       => 'type=number range=0,4294967295',
-		'INTEGER+'   => 'type=number range=0,4294967295',
-		'BIGINT+'    => 'type=number range=0,',
+		'TINYINT+'   => 'type=integer range=0,255',
+		'SMALLINT+'  => 'type=integer range=0,65535',
+		'MEDIUMINT+' => 'type=integer range=0,16777215',
+		'INT+'       => 'type=integer range=0,4294967295',
+		'INTEGER+'   => 'type=integer range=0,4294967295',
+		'BIGINT+'    => 'type=integer range=0,',
 		### 小数
 		'FLOAT'      => 'type=float',
 		'REAL'       => 'type=float',
@@ -412,17 +420,17 @@ $config['Record'] = array(
 		'DEC+'       => 'type=float range=0,',
 		'NUMERIC+'   => 'type=float range=0,',
 		'FIXED+'     => 'type=float range=0,',
-		### 日期日期
+		### 日期时间
 		'DATE'       => 'type=date',
 		'DATETIME'   => 'type=datetime',
 		'TIMESTAMP'  => 'type=datetime',
 		'TIME'       => 'type=time',
-		'YEAR'       => 'type=number max=4 range=1901,2155',
+		'YEAR'       => 'type=integer max=4 range=1901,2155',
 		### 真假
 		'BOOL'       => 'type=checkbox',
 		'BOOLEAN'    => 'type=checkbox',
 		### 文本
 		'ENUM'       => 'type=select',
-		'SET'        => 'type=list',
+		'SET'        => 'type=select',
 	),
 );

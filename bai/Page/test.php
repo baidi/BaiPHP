@@ -11,9 +11,15 @@ $lines = $this->pick(Test::LINES, $action);
 ### 项目统计
 $counts = $this->pick(Test::COUNT, $action);
 ### 通过的测试
-$resultCount = $this->pick(Test::RESULT, $counts);
+$resultCovered = $this->pick(Test::RESULT, $counts);
 ### 覆盖的代码
-$lineCount   = $this->pick(Test::LINES, $counts);
+$lineCovered   = $this->pick(Test::LINES, $counts);
+$resultCount   = count($results);
+$lineCount     = count($lines);
+$linePercent = '100%';
+if ($lineCovered != $lineCount) {
+	$linePercent = number_format($lineCovered * 100 / $lineCount, 1).'%';
+}
 ?>
 <style type="text/css">
 .covered {background-color:#f0fff0;}
@@ -23,15 +29,15 @@ $lineCount   = $this->pick(Test::LINES, $counts);
 	<div class="t">
 		<?php echo $testee; ?>
 		<span class="fg">|</span>
-		<?php echo $resultCount, '/', count($results); ?>
+		<?php echo $resultCovered, '/', $resultCount; ?>
 	</div>
 	<div class="text"><?php echo implode('', $results); ?></div>
 	<div class="t">
 		<?php echo $this['codes']; ?>
 		<span class="fg">|</span>
-		<?php echo $lineCount, '/', count($lines); ?>
+		<?php echo $lineCovered, '/', $lineCount; ?>
 		<span class="fg">|</span>
-		<?php echo number_format($lineCount * 100 / count($lines), 1), '%'; ?>
+		<?php echo $linePercent; ?>
 		<pre class="fr"><?php echo $this['normal']; ?></pre>
 		<pre class="uncovered fr"><?php echo $this['uncovered']; ?></pre>
 		<pre class="covered fr"><?php echo $this['covered']; ?></pre>

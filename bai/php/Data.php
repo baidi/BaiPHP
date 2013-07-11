@@ -179,8 +179,9 @@ class Data extends Work
 			return $count;
 		}
 		Log::logf(__FUNCTION__, $count, __CLASS__);
+		$id = $data->pdo->lastInsertId();
 		$data->pdo->commit();
-		return $data->pdo->lastInsertId();
+		return $id;
 	}
 
 	/**
