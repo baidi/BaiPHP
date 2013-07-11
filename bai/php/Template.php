@@ -113,6 +113,22 @@ class Template extends Work
 	}
 
 	/**
+	 * <h4>获取模板文件输出</h4>
+	 * <p>
+	 * 根据模板文件，解析嵌入参数生成最终输出。
+	 * </p>
+	 *
+	 * @param string $item 模板文件
+	 * @param array $setting 嵌入参数
+	 * @return string 输出片段
+	 */
+	public static function file ($item = null, $setting = null)
+	{
+		$template = Template::access();
+		return $template->entrust($this->load($item), $setting);
+	}
+
+	/**
 	 * <h4>生成模板输出</h4>
 	 * <p>
 	 * 根据模板项选择相应模板，并解析嵌入参数生成最终输出。

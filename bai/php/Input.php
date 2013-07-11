@@ -21,7 +21,7 @@
  *
  * @author 白晓阳
  */
-class Input extends Template
+class Input extends Work
 {
 	/**
 	 * 检验匹配式
@@ -43,6 +43,10 @@ class Input extends Template
 	 * 输入值
 	 */
 	protected $values = null;
+	/**
+	 * 输入模板
+	 */
+	protected $templates = null;
 
 	/**
 	 * 输入工场静态入口
@@ -93,6 +97,10 @@ class Input extends Template
 		if ($item == null) {
 			return null;
 		}
+		$template = $this->pick($template, $this->templates);
+		if ($template == null) {
+			return null;
+		}
 		### 非数组参数默认作为$content
 		if (! is_array($setting)) {
 			$setting = array(
@@ -120,7 +128,7 @@ class Input extends Template
 		$setting['item'] = $item;
 		$setting['value'] = $this->value($this->pick('type', $setting), $this->target[$item]);
 		### 解析模板
-		$this->result = parent::entrust($template, $setting);
+		$this->result = Template::fetch($template, $setting);
 		return $this->result;
 	}
 
@@ -229,7 +237,6 @@ class Input extends Template
 	 */
 	protected function __construct ($setting = null)
 	{
-		$this->stuff($this->config(Work::TEMPLATE));
 		parent::__construct($setting);
 	}
 }

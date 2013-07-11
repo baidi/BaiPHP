@@ -87,7 +87,7 @@ $config[Work::DATA] = array(
 	'user'     => 'root',
 	'password' => '',
 	'charset'  => 'utf8',
-	'template' => array(
+	'templates' => array(
 		'mysql'    => 'mysql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
 		'pgsql'    => 'pgsql:host={$dbhost};{$dbport ? port=$dbport;}dbname={$dbname}',
 		'sqlite'   => 'sqlite:{$dbhost}',
@@ -351,7 +351,7 @@ $config[Work::TEMPLATE] = array(
 );
 
 $config[Work::INPUT] = array(
-	'dic' => array(
+	'templates' => array(
 		'text' => '<input id="{$item}" name="{$item}" {$type ? type="$type" | type="text" }{$value ? $value }{$class ? class="$class" }{$check ? $check }{$hint ? placeholder="$hint" }/>',
 	),
 	'values' => array(

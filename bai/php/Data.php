@@ -397,7 +397,7 @@ class Data extends Work
 	protected function connect()
 	{
 		### 数据库连接串
-		$template = $this->pick($this->dbtype, $this->template);
+		$template = $this->pick($this->dbtype, $this->templates);
 		$params = array(
 			'dbtype' => $this->dbtype,
 			'dbhost' => $this->dbhost,
