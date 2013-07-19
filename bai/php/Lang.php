@@ -66,7 +66,7 @@ class Lang extends Work
 	 * @param boolean $print 是否输出
 	 * @return string
 	 */
-	public static function fetch ($item = null, $print = true)
+	public static function cut ($item = null, $print = true)
 	{
 		$lang = Lang::access();
 		$result = $lang->entrust($item);

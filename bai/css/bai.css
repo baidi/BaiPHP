@@ -11,6 +11,10 @@ a {
 	text-decoration: none;
 }
 
+a:hover {
+	text-decoration: underline;
+}
+
 button {
 	
 }
@@ -21,6 +25,7 @@ h1,h2,h3,h4,h5 {
 }
 
 hr {
+	margin: 0 0.2em;
 	border: none;
 	border-bottom: 1px solid $darkline$;
 }
@@ -75,7 +80,7 @@ table td, table th {
 table tr:nth-child(even) {
 	background-color: $darkarea$;
 }
-table tr:hover {
+table.data tr:hover {
 	background-color: $lightarea$;
 }
 
@@ -91,13 +96,42 @@ textarea {
 	font-weight: bold;
 }
 
+.back {
+	background-color: $backarea$;
+	opacity: 0.6;
+}
+
+.bd {
+	background-color: $darkarea$;
+}
+
+.bl {
+	background-color: $lightarea$;
+}
+
 .c {
 	margin-left: auto;
 	margin-right: auto;
 }
 
 .cl {
+	height: 2px;
 	clear: both;
+}
+
+.cv {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.e {
+	padding: 0.3em 0.5em;
+	border-top: 1px solid $lightline$;
+}
+
+.f {
+	width: 100%;
+	height: 100%;
 }
 
 .fl {
@@ -106,10 +140,6 @@ textarea {
 
 .fr {
 	float: right;
-}
-
-.fg {
-	color: #f04000;
 }
 
 .h {
@@ -145,16 +175,23 @@ textarea {
 	border-radius: 0.5em;
 }
 
+.s {
+	box-shadow: 0 3px 6px $lightline$;
+}
+
 .t {
 	font-size: 1.25em;
 	font-weight: bold;
-	margin-top: 0.5em;
-	padding-bottom: 0.2em;
+	padding: 0.3em 0;
 	border-bottom: 1px solid $darkline$;
 }
 
 .tc {
 	text-align: center;
+}
+
+.tg {
+	color: #f04000;
 }
 
 .tl {
@@ -164,12 +201,18 @@ textarea {
 .tr {
 	text-align: right;
 }
+
+.tpl {
+	display: none;
+}
 /*--- 通用 ---*/
 
 
 /*--- 页面布局 ---*/
 .page {
+	position: relateve;
 	margin: 0 auto;
+	clear: both;
 	min-width: $min$;
 	max-width: $max$; /* 全局宽度 */
 }
@@ -221,6 +264,13 @@ header, footer {
 
 
 /*--- 内容格式 ---*/
+.item {
+	border-bottom: 1px solid $lightline$;
+}
+.item:last-child {
+	border-bottom: none;
+}
+
 .label {
 	font-style: italic;
 	text-align: right;
@@ -232,6 +282,7 @@ header, footer {
 }
 
 .row {
+	margin: 0.5em;
 	padding: 0.5em;
 }
 
@@ -301,16 +352,25 @@ header, footer {
 }
 /*--- 宽度 ---*/
 
-.header {
-	clear:both;
+.footer {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	bottom: 0;
 	width: 100%;
-	z-index: 2;
-	background: $darkarea$;
 	border-top: 1px solid $lightline$;
-	text-align: right;
+}
+.header {
+	position: relative;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
 	border-bottom: 2px solid $darkline$;
 }
 .header .logo {
+	position: absolute;
+	z-index: 1;
 	float: left;
 }
 .header a {
@@ -328,7 +388,32 @@ header, footer {
 	border-bottom: 2px solid #f04000;
 	margin-bottom: -2px;
 }
-.footer {
-	border-top: 1px solid $lightline$;
-	background: $darkarea$;
+
+.screen {
+	display: none;
+	position: fixed;
+	z-index: 4;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: url(bai/img/screen.png) repeat;
+}
+
+.dialog {
+	display: inline-block;
+	min-width: 400px;
+	border: 1px solid $darkline$;
+	background-color: #ffffff;
+	opacity: 1;
+}
+.dialog .title {
+	padding: 0.3em;
+	font-size: 1.5em;
+	font-weight: bold;
+	background-color: $darkarea$;
+	border-bottom: 1px solid $darkline$;
+}
+.dialog .content {
+	padding: 1em;
 }

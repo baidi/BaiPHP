@@ -34,5 +34,5 @@ define('_START', microtime(true));
 require 'bai/php/engine.php';
 
 ### 启动目标并委托，输出交付结果
-$target = new Target(array('config.php'));
+$target = new Target('config.php');
 echo $target->entrust();

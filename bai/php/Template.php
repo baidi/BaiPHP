@@ -106,7 +106,7 @@ class Template extends Work
 	 * @param array $setting 嵌入参数
 	 * @return string 输出片段
 	 */
-	public static function fetch ($item = null, $setting = null)
+	public static function cut ($item = null, $setting = null)
 	{
 		$template = Template::access();
 		return $template->entrust($item, $setting);

@@ -57,6 +57,9 @@ $config[Bai::TARGET] = array(
 	'service' => 'service'._DIR,
 	### 当前事项
 	'event'   => 'home',
+	'configs' => array(
+		'config-auto.php',
+	),
 	### 数据过滤
 	'filters' => array(
 		'#<script.*>.*</script\s*>#Ui' => '',
@@ -267,6 +270,7 @@ $config[Flow::PAGE] = array(
 		'$darkline$'    => '#99cc99',
 		'$lightarea$'   => '#f0fff0',
 		'$darkarea$'    => '#f6fcf6',
+		'$backarea$'    => '#f0f0f0',
 		'$shadowcolor$' => '#d0f9d0',
 		'$errorcolor$'  => '#ff0000',
 		'$noticecolor$' => '#99cc99',

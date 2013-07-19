@@ -95,6 +95,10 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected $notice = null;
 	/**
+	 * 首页
+	 */
+	protected $home = 'home.php';
+	/**
 	 * 提示页面
 	 */
 	protected $board = '_notice.php';
@@ -338,7 +342,7 @@ abstract class Bai implements ArrayAccess
 	 * </p>
 	 *
 	 * @param string $item 文件名
-	 * @param string $branch 扩展分支名
+	 * @param string $branch 扩展分支路径
 	 * @return array 文件路径，最多包含两项内容：self::Bai指向框架核心文件路径，self::Service指向用户服务文件路径
 	 */
 	protected function locate ($item = null, $branch = null)
@@ -482,7 +486,7 @@ abstract class Bai implements ArrayAccess
 				}
 			}
 		}
-		$url = _WEB;
+		$url = _WEB . $this->home;
 		if ($params != null) {
 			$url .= '?' . implode('&', $params);
 		}

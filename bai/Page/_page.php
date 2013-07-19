@@ -2,19 +2,17 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<meta name="author" content="<?php echo $this['author']; ?>" />
-<meta name="keywords" content="<?php echo $this['keywords']; ?>" />
-<meta name="description" content="<?php echo $this['description']; ?>" />
+<meta name="author" content="<?php Lang::cut('author'); ?>" />
+<meta name="keywords" content="<?php Lang::cut('keywords'); ?>" />
+<meta name="description" content="<?php Lang::cut('description'); ?>" />
 <link rel="icon" href="<?php echo Style::img('favicon.ico'); ?>" />
-<title><?php echo $this['title']; ?></title>
+<title><?php Lang::cut('title'); ?></title>
 <?php echo Style::css($this['css'], true); ?>
 <?php echo Style::js($this['js'], true); ?>
 </head>
 <body>
-	<header>
-		<!-- 页眉 -->
-		<?php echo $this->load('_header.php'); ?>
-	</header>
+	<!-- 页眉 -->
+	<?php echo $this->load('_header.php'); ?>
 	<div class="page">
 		<!-- 页面 -->
 		<?php if ($this['lside']) { ?>
@@ -34,9 +32,7 @@
 			<?php echo $this->load("$this->target"); ?>
 		</div>
 	</div>
-	<footer>
-		<!-- 页脚 -->
-		<?php echo $this->load('_footer.php'); ?>
-	</footer>
+	<!-- 页脚 -->
+	<?php echo $this->load('_footer.php'); ?>
 </body>
 </html>

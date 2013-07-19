@@ -83,7 +83,7 @@ class Page extends Flow
 	{
 		if (! isset($this->runtime[$item])) {
 			### 从语言工场取值
-			$this->runtime[$item] = Lang::fetch($item, false);
+			$this->runtime[$item] = Lang::cut($item, false);
 		}
 		return $this->runtime[$item];
 	}

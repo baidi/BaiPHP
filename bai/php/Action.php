@@ -35,7 +35,9 @@ class Action extends Flow
 	protected function check()
 	{
 		$check = $this->build(Work::CHECK);
-		return $check->entrust();
+		$result = $check->entrust();
+		$this->notice = $check->notice;
+		return $result;
 	}
 
 	/**

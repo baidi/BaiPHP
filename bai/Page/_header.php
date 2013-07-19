@@ -1,8 +1,11 @@
-<div class="header"><div class="page">
-	<img class="logo" alt="<?php echo $this['logo']; ?>" src="<?php echo Style::img('logo.png'); ?>" />
-	<a class="on">首页</a>
-	<a>设置</a>
-	<a>管理</a>
-	<a>帮助</a>
+<div class="header bd"><div class="page">
+	<img class="logo" alt="<?php Lang::cut('logo'); ?>" src="<?php echo Style::img('logo.png'); ?>" />
+	<div class="tr">
+	<?php
+	foreach (Lang::cut('nav', false) as $item => $value) {
+		echo '<a href="">', $value, '</a>';
+	}
+	?>
+	</div>
 </div></div>
 <br/>
