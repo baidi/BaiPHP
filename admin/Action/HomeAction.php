@@ -24,7 +24,7 @@ class HomeAction extends Action
 
 	protected function engage()
 	{
-		header('Location: '.$this->url('service', $this->target['service']));
+		header('Location: '.$this->url('basin', $this->target['service']));
 	}
 }
 ?>

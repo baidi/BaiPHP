@@ -74,10 +74,10 @@ span {
 	word-break: break-all;
 }
 
-table td, table th {
+table.data td, table.data th {
 	border: 1px solid $darkline$;
 }
-table tr:nth-child(even) {
+table.data tr:nth-child(even) {
 	background-color: $darkarea$;
 }
 table.data tr:hover {
@@ -92,21 +92,24 @@ textarea {
 
 
 /*--- 通用 ---*/
+.ad {
+	background-color: $darkarea$;
+}
+
+.al {
+	background-color: $lightarea$;
+}
+
 .b {
 	font-weight: bold;
 }
 
-.back {
-	background-color: $backarea$;
-	opacity: 0.6;
-}
-
 .bd {
-	background-color: $darkarea$;
+	border: 1px solid $darkline$;
 }
 
 .bl {
-	background-color: $lightarea$;
+	border: 1px solid $lightline$;
 }
 
 .c {
@@ -124,14 +127,10 @@ textarea {
 	vertical-align: middle;
 }
 
-.e {
-	padding: 0.3em 0.5em;
-	border-top: 1px solid $lightline$;
-}
-
 .f {
-	width: 100%;
-	height: 100%;
+	padding: 0.3em 0.5em;
+	text-align: right;
+	border-top: 1px solid $lightline$;
 }
 
 .fl {
@@ -163,7 +162,7 @@ textarea {
 }
 
 .p {
-	padding: 0.5em;
+	padding: 0.3em;
 }
 
 .q {
@@ -176,7 +175,11 @@ textarea {
 }
 
 .s {
-	box-shadow: 0 3px 6px $lightline$;
+	box-shadow: 0 3px 8px $lightline$;
+}
+
+.sc {
+	box-shadow: 0 0 8px $lightline$;
 }
 
 .t {
@@ -353,7 +356,7 @@ header, footer {
 /*--- 宽度 ---*/
 
 .footer {
-	position: absolute;
+	position: fixed;
 	z-index: 1;
 	left: 0;
 	bottom: 0;
@@ -395,6 +398,7 @@ header, footer {
 	z-index: 4;
 	left: 0;
 	top: 0;
+	vertical-align: middle;
 	width: 100%;
 	height: 100%;
 	background: url(bai/img/screen.png) repeat;
@@ -405,7 +409,6 @@ header, footer {
 	min-width: 400px;
 	border: 1px solid $darkline$;
 	background-color: #ffffff;
-	opacity: 1;
 }
 .dialog .title {
 	padding: 0.3em;
@@ -416,4 +419,18 @@ header, footer {
 }
 .dialog .content {
 	padding: 1em;
+}
+
+.button {
+	display: inline-block;
+	padding: 0 0.5em;
+}
+.button:hover {
+	background-color: $lightline$;
+}
+.default {
+	border: 1px solid $lightline$;
+}
+.default:hover {
+	border: 1px solid $darkline$;
 }

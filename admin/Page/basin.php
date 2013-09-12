@@ -1,7 +1,7 @@
 <div class="box">
 	<div class="t">
-		<span>服务一览</span>
-		<a class="fr tg" onclick="aservice.call(this)">新建</a>
+		<span>流域</span>
+		<a class="fr tg" onclick="dialog.call(this)">新建</a>
 	</div>
 	<div id="services">
 		<div class="text item tpl">
@@ -32,31 +32,35 @@ BOX;
 	</div>
 </div>
 <div class="q row">
-	<span class="tg b">&raquo;</span>
-	新建服务主要包含php、js、css、img、Action、Page等目录，其中Action目录用于存放事件处理流程，Page目录用于存放事件页面内容。
+	<span class="tg b">::</span>
+	<span>流域是相关流程的集合，主要包含php、js、css、img、Action（事件处理流程）、Page（页面内容页面内容）等目录，初始系统包含bai、service和admin三个流域。</span>
 </div>
 <table class="screen cv"><tr><td>
 	<div class="dialog s">
-		<div class="t bd tg">标题</div>
-		<div class="text tl">
-			<label>请输入服务名：</label>
-			<div>
-				<input type="text" id="aservice" name="aservice" />
-			</div>
+		<div class="dialog-title t ad tg">新建流域</div>
+		<div class="dialog-content text tl">
+			<label>流域名：</label>
+			<input type="text" id="aservice" name="aservice" />
 		</div>
-		<div class="e bl tr">
-			<a>确定</a>
-			<a>取消</a>
+		<div class="f al">
+			<a class="button default" onclick="$('.screen').hide();">确定</a>
+			<a class="button" onclick="$('.screen').hide();">取消</a>
 		</div>
 	</div>
 </td></tr></table>
 
 <script type="text/javascript">
 <!--
-function aservice(service) {
-	var tpl = $('#services .tpl').clone();
-	tpl.removeClass('tpl');
-	$('#services').append(tpl);
+function dialog(title, content) {
+	var screen = $('.screen');
+	var dialog = $('.dialog', screen);
+	if (title) {
+		$('.dialog-title', dialog).html(title);
+	}
+	if (content) {
+		$('.dialog-content', dialog).html(content);
+	}
+	screen.show();
 }
 //-->
 </script>

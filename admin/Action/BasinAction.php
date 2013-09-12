@@ -15,12 +15,12 @@
  * </p>
  * @author 白晓阳
  */
-class ServiceAction extends Action
+class BasinAction extends Action
 {
 	/**
 	 * 排除的目录
 	 */
-	protected $exclude = array();
+	protected $exclude = null;
 
 	protected function engage()
 	{

@@ -79,6 +79,27 @@ body {
 	border-bottom: 2px solid #f04000;
 	margin-bottom: -2px;
 }
+.ani
+{
+border: 1px solid #99cc99;
+position:relative;
+animation:mymove 3s infinite;
+-webkit-animation:mymove 3s infinite; /*Safari and Chrome*/
+}
+
+@keyframes mymove
+{
+0% {background-color: #f0fff0;}
+50% {background-color: #99cc99;}
+100% {background-color: #f0fff0;}
+}
+
+@-webkit-keyframes mymove /*Safari and Chrome*/
+{
+0% {background-color: #f0fff0;}
+50% {background-color: #99cc99;}
+100% {background-color: #f0fff0;}
+}
 </style>
 <script type="text/javascript">
 </script>
@@ -115,6 +136,10 @@ body {
 		<a>菜单</a>
 		<a>菜单</a>
 		<div class="edge"></div>
+	</div>
+	<div class="ani">
+	<p>qwe</p>
+	<p>123</p>
 	</div>
 	<!--div class="header-bar">
 		<span class="header-menu">Menu1</span>

@@ -10,71 +10,36 @@
 
 /**
  * <b>化简PHP（BaiPHP）开发框架</b><br/>
- * <b>流程处理流程</b>
+ * <b>事件处理流程</b>
  * <p>
  * </p>
  * @author 白晓阳
  */
 class FlowAction extends Action
 {
+	/**
+	 * 包含的目录
+	 */
+	protected $include = array();
+
 	protected function engage()
 	{
-		$aevent = $this->target['aevent'];
-		$aservice = $this->target['aservice'];
-		$this->mockConfig($aservice);
-		$this->target[Flow::ACTION] = $this->flow($aevent, self::TARGET);
-		$this->mockConfig($aservice, false);
-	}
-
-	private function mockConfig($service = null, $mock = true)
-	{
-		global $config;
-		if (! $mock) {
-			if ($this['config'] != null) {
-				$config = $this['config'];
-			}
-			return;
-		}
-		$this['config'] = $config;
-		$config = array(_DEF => $config[_DEF]);
-		$config[_DEF][self::SERVICE] = $service._DIR;
-		$target = new Target('config.php');
-	}
-
-	private function flow($event = null, $from = null)
-	{
-		if ($event == null || $from == null) {
-			return null;
-		}
-		$event = ucfirst($event);
-		$flow = $this->config(self::FLOW, $event.$from);
-		if ($flow == null) {
-			$flow = $this->config(self::FLOW, $from);
-		}
-		$class = $from;
-		while (($flow == null || ! is_array($flow)) && ($class = get_parent_class($class))) {
-			$flow = $this->config(self::FLOW, $class);
-		}
-		if (! is_array($flow)) {
-			return null;
-		}
-		$class = class_exists($event.$from) ? $event.$from : $from;
+		$service = _LOCAL.$this->target['aservice']._DIR;
 		$result = array();
-		foreach ($flow as $item => $mode) {
-			if ($mode === self::NIL) {
+		foreach ($this->include as $item => $mode) {
+			$files = scandir($service.$item);
+			if (! is_array($files)) {
 				continue;
 			}
-			if (method_exists($class, $item)) {
-				$result[$class][$item] = '方法';
-			} else if (class_exists($item)) {
-				$result[$class][$item] = '委托';
-				$this->stuff($this->flow($event, $item), $result);
-			}
-			if (! $mode) {
-				break;
+			foreach ($files as $file) {
+				if (! preg_match($mode, $file, $match) || ! is_file($service.$item._DIR.$file)) {
+					continue;
+				}
+				$event = lcfirst($this->pick(self::EVENT, $match));
+				$result[$event][$item] = $file;
 			}
 		}
-		return $result;
+		$this->target[Flow::ACTION] = $result;
 	}
 }
 ?>

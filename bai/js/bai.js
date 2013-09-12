@@ -17,11 +17,11 @@
  */
 
 /** BaiPHP - 简单PHP */
-var $Bai = $Bai || function() {
+var Bai = Bai || function() {
 	/** 调试开关 */
 	var _debug = false;
 	/** 请求就绪开关 */
-	var _cool = true;
+	var _ready = true;
 	/** 保守错误信息 */
 	var _error = "一不小心出错啦=_=...";
 	/** 全局配置，来自PHP全局配置 */
@@ -45,7 +45,7 @@ var $Bai = $Bai || function() {
 	 */
 	Baijs.prototype.assign = function(event, box, callback) {
 		// 请求尚未就绪
-		if (! _cool) {
+		if (! _ready) {
 			return false;
 		}
 		// 清除布告信息
@@ -69,7 +69,7 @@ var $Bai = $Bai || function() {
 			data[input[i].name] = input[i].value;
 		}
 		// 请求开始
-		_cool = false;
+		_ready = false;
 		$.post("/", data, function(response) {
 			if (box != null) {
 				if (_debug) {
@@ -87,7 +87,7 @@ var $Bai = $Bai || function() {
 				}
 			}
 			// 请求完成
-			_cool = true;
+			_ready = true;
 		});
 		return true;
 	};
@@ -339,6 +339,10 @@ var $Bai = $Bai || function() {
 	Baijs.prototype.ready = true;
 	return Baijs;
 }();
+
+Bai.dialog = function(title, content) {
+	
+};
 
 /**
  * 主函数

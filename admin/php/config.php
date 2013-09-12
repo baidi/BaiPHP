@@ -28,16 +28,16 @@ $config[Flow::PAGE]['js'][] = 'jquery.js';
 
 ### 全局配置：检验工场
 $config[Work::CHECK][Work::EVENT] = array(
-	'event' => array(
+	'flow' => array(
 		'aservice' => 'required type=char',
 	),
-	'flow' => array(
+	'action' => array(
 		'aservice' => 'required type=char',
 		'aevent' => 'required type=char',
 	),
 );
 
-$config['ServiceAction'] = array(
+$config['BasinAction'] = array(
 	'exclude' => array(
 		'.' => true,
 		'..' => true,
@@ -47,7 +47,7 @@ $config['ServiceAction'] = array(
 		'bai' => true
 	)
 );
-$config['EventAction'] = array(
+$config['FlowAction'] = array(
 	'include' => array(
 		Flow::ACTION => '#^(?<'.Bai::EVENT.'>[a-zA-Z0-9_\x7f-\xff]+)Action\.php$#i',
 		Flow::PAGE => '#^(?<'.Bai::EVENT.'>[a-zA-Z0-9_\x7f-\xff]+)\.php$#i',

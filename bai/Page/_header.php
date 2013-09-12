@@ -1,4 +1,4 @@
-<div class="header bd"><div class="page">
+<div class="header ad"><div class="page">
 	<img class="logo" alt="<?php Lang::cut('logo'); ?>" src="<?php echo Style::img('logo.png'); ?>" />
 	<div class="tr">
 	<?php
