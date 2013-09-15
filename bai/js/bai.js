@@ -340,9 +340,7 @@ var Bai = Bai || function() {
 	return Baijs;
 }();
 
-Bai.dialog = function(title, content) {
-	
-};
+
 
 /**
  * 主函数

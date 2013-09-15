@@ -5,39 +5,140 @@
 <title>JS</title>
 <style type="text/css">
 </style>
-<script type="text/javascript" src="js/sizzle.js"></script>
 <script type="text/javascript">
-String.prototype.trim = function() {
-	return this.replace(/^\s+|\s+$/g, '');
-}
-Array.prototype.each = function(action) {
-	if (action == null || action.)
-}
-Document.prototype.pick = Element.prototype.pick = function(item, last) {
-	return this.querySelector(item);
-}
-Element.prototype.get = function(item) {
-	if (item == null || ! item) {
+(function(p) {
+	if (p.bai != null) {
+		return;
+	}
+
+	Object.prototype.pick = Object.prototype.each = function() {
 		return null;
 	}
-	if (this.hasAttribute(item)) {
-		return this.getAttribute(item);
+	/** 字符串去除首尾空格 */
+	String.prototype.trim = function() {
+		return this.replace(/^\s+|\s+$/g, '');
 	}
-	return this[item];
-}
-Element.prototype.set = function(item, value) {
-	if (item == null || ! item) {
-		return null;
+	/** 数组依次执行方法 */
+	Array.prototype.each = NodeList.prototype.each = function(action) {
+		if (action == null || action.constructor != Function) {
+			return;
+		}
+		var result = null;
+		for (var i = 0, m = this.length; i < m; i++) {
+			result = action.call(this[i], i);
+			if (result === false) {
+				break;
+			}
+		}
 	}
-	return this[item] = value;
+	/** 筛选元素 */
+	Document.prototype.pick = Element.prototype.pick = function(query, one) {
+		if (query == null || query.constructor != String) {
+			return null;
+		}
+		if (one) {
+			return this.querySelector(query);
+		}
+		return this.querySelectorAll(query);
+	}
+	/** 读取属性 */
+	Element.prototype.get = function(item) {
+		if (item == null || item.constructor != String) {
+			return null;
+		}
+		if (this.hasAttribute(item)) {
+			return this.getAttribute(item);
+		}
+		return this[item];
+	}
+	/** 设置属性 */
+	Element.prototype.set = function(item, value) {
+		if (item == null || item.constructor != String) {
+			return null;
+		}
+		return this[item] = value;
+	}
+	Element.prototype.on = function(item, action) {
+		
+	}
+	Element.prototype.to = function(options, duration) {
+
+	}
+
+	var bai = {
+		name: 'Bai',
+		verson: '1.0.0',
+		date: '2012-7-30',
+		author: '白晓阳',
+		history: ''
+	}, $own = {
+		
+	}, $configs = {};
+	var error = '一不小心出错啦=_=...';
+	bai.assign = function(item, value) {
+		if (item == null) {
+			return null;
+		}
+		if (value === undefined) {
+			return bai[item];
+		}
+		return bai[item] = value;
+	};
+	bai.own = function(item, value) {
+		if (item == null) {
+			return null;
+		}
+		if (value === undefined) {
+			return own[item];
+		}
+		return own[item] = value;
+	}
+	bai.config = function() {
+		var value = $configs;
+		// 逐层读取配置
+		for ( var i = 0, m = arguments.length; i < m; i++) {
+			value = value[arguments[i]];
+			if (value == null) {
+				return value;
+			}
+		}
+		return value;
+	}
+	bai.ajax = function(scope) {
+
+	}
+	p.B = p.bai = bai;
+})(window);
+
+if (window.bai != null) {
+	bai.check = function(scope) {
+		if (scope != null && scope.constructor == String) {
+			scope = document.pick(scope, 1);
+		}
+		if (scope.constructor != Element) {
+			return;
+		}
+		var inputs = scope.pick('input, select');
+		if (! inputs.length) {
+			return;
+		}
+		var data = {};
+		for (var i = 0, m = inputs.length; i < m; i++) {
+			data[inputs[i].name] = inputs[i].value;
+		}
+
+	}
 }
-Element.prototype.on = function(item, action) {
-	
-}
+
 function test() {
-	var m = document.pick("#menu1")[0];
+	var m = document.pick("#menu1", 1);
 	m.set('data-c', 'a');
-	alert(m.get('data-b'));
+	var c = m.get('data-b');
+	document.pick('span').each(function(i) {
+		this.style='border:1px solid #'+i*4+i*4+i*4;
+	});
+	bai.private('asd', 1);
+	bai.private('asd');
 }
 </script>
 </head>
