@@ -65,69 +65,149 @@
 
 	}
 
-	var bai = {
+	var $bai = {
 		name: 'Bai',
 		verson: '1.0.0',
 		date: '2012-7-30',
 		author: '白晓阳',
 		history: ''
-	}, $own = {
-		
-	}, $configs = {};
-	var error = '一不小心出错啦=_=...';
-	bai.assign = function(item, value) {
-		if (item == null) {
-			return null;
-		}
-		if (value === undefined) {
-			return bai[item];
-		}
-		return bai[item] = value;
 	};
-	bai.own = function(item, value) {
+	var $own = {};
+	var $config = {};
+	var error = '一不小心出错啦=_=...';
+	$bai.own = function(item, value) {
 		if (item == null) {
 			return null;
 		}
 		if (value === undefined) {
-			return own[item];
+			return $own[item];
 		}
-		return own[item] = value;
+		return $own[item] = value;
 	}
-	bai.config = function() {
-		var value = $configs;
+	$bai.config = function() {
+		var value = $config;
 		// 逐层读取配置
 		for ( var i = 0, m = arguments.length; i < m; i++) {
 			value = value[arguments[i]];
 			if (value == null) {
-				return value;
+				return null;
 			}
 		}
 		return value;
 	}
-	bai.ajax = function(scope) {
+	$bai.ajax = function(scope) {
 
 	}
-	p.B = p.bai = bai;
+	p.B = p.bai = $bai;
 })(window);
 
 if (window.bai != null) {
-	bai.check = function(scope) {
-		if (scope != null && scope.constructor == String) {
-			scope = document.pick(scope, 1);
-		}
-		if (scope.constructor != Element) {
-			return;
-		}
-		var inputs = scope.pick('input, select');
-		if (! inputs.length) {
-			return;
-		}
-		var data = {};
-		for (var i = 0, m = inputs.length; i < m; i++) {
-			data[inputs[i].name] = inputs[i].value;
-		}
+	bai.check = function() {
+		/** 输入项非空检验 */
+		var required = function(item) {
+			if (item == null || (item.constructor == String && item.trim() == "")
+					|| (item.constructor == Array && item.length == 0)) {
+				return this.config('Log', 'required');
+			}
+			return false;
+		};
 
-	}
+		/** 输入项风险字符检验 */
+		var risk = function(item) {
+			if (item.constructor == Array) {
+				item = item.join('');
+			}
+			var matcher = new RegExp(this.config('Check', 'risk'));
+			if (matcher.exec(item) == null) {
+				return this.config('Log', 'risk');
+			}
+			return false;
+		};
+
+		/** 输入项最小长度检验 */
+		var min = function(item, len) {
+			if (item.constructor == String && item.trim().length < len
+					|| item.constructor == Array && item.length < len) {
+				return this.config('Log', 'min').replace('%s', len);
+			}
+			return false;
+		};
+
+		/** 输入项最大长度检验 */
+		var max = function(item, len) {
+			if (item.constructor == String && item.trim().length > len
+					|| item.constructor == Array && item.length > len) {
+				return this.config('Log', 'max').replace('%s', len);
+			}
+			return false;
+		};
+
+		/** 输入项属性检验 */
+		var type = function(item, type) {
+			var matcher = new RegExp(this.config('Check', type));
+			if (matcher.exec(item) == null) {
+				return this.config('Log', 'type');
+			}
+			return this.config('Log', 'type');
+		};
+
+		var checkInput = function() {
+			var checks = this.get('data-check') || '';
+			checks = checks.split(' ');
+			for (var i = 0, m = checks.length; i < m; i++) {
+				var params = checks[i].split('=');
+				var check = params[0] + "('" + this.value + "'";
+				for ( var j = 1; j < params.length; j++) {
+					check += ",'" + params[j] + "'";
+				}
+				check += ")";
+				if (_debug) {
+					alert(check);
+				}
+				try {
+					message = eval(check);
+				} catch (e) {
+					if (_debug) {
+						alert(e.description);
+					}
+				}
+				if (message) {
+					notice.call(this, message);
+					return message;
+				}
+			}
+		}
+		
+		var $check = function(scope) {
+			if (scope != null && scope.constructor == String) {
+				scope = document.pick(scope, 1);
+			}
+			if (scope.constructor != Element) {
+				return null;
+			}
+			var types = ['input', 'textarea', 'select'];
+			var inputs = null;
+			if (types.indexOf(scope.tagName) < 0) {
+				inputs = scope.pick('.input');
+				if (! inputs.length) {
+					return null;
+				}
+			} else {
+				inputs = [scope];
+			}
+			var data = {};
+			var result = false;
+			for (var i = 0, m = inputs.length; i < m; i++) {
+				data[inputs[i].name] = inputs[i].value;
+				result = checkInput.call(inputs[i]);
+				if (result) {
+					break;
+				}
+			}
+			return {input: inputs[i], result: result};
+		};
+		return $check;
+	}.call(bai);
 }
 
 function test() {
@@ -137,8 +217,8 @@ function test() {
 	document.pick('span').each(function(i) {
 		this.style='border:1px solid #'+i*4+i*4+i*4;
 	});
-	bai.private('asd', 1);
-	bai.private('asd');
+	bai.own('asd', 1);
+	bai.own('asd');
 }
 </script>
 </head>
