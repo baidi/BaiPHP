@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <title>JS</title>
 <style type="text/css">
+div {border: 1px solid #99cc99;}
 </style>
 <script type="text/javascript">
 (function(p, debug) {
@@ -11,14 +12,16 @@
 		return;
 	}
 
-	Object.prototype.pick = Object.prototype.each = function() {
-		return null;
-	}
-	/** 字符串去除首尾空格 */
+	//Object.prototype.pick = Object.prototype.each = function() {
+	//	return null;
+	//}
+
+	/** 字符串：去除首尾空格 */
 	String.prototype.trim = function() {
 		return this.replace(/^\s+|\s+$/g, '');
 	}
-	/** 数组依次执行方法 */
+
+	/** 数组：依次执行方法 */
 	Array.prototype.each = NodeList.prototype.each = function(action) {
 		if (action == null || action.constructor != Function) {
 			return;
@@ -31,8 +34,9 @@
 			}
 		}
 	}
-	/** 筛选元素 */
-	Document.prototype.pick = Element.prototype.pick = function(query, one) {
+
+	/** 元素：执行CSS选择器 */
+	HTMLElement.prototype.pick = HTMLDocument.prototype.pick = function(query, one) {
 		if (query == null || query.constructor != String) {
 			return null;
 		}
@@ -41,8 +45,9 @@
 		}
 		return this.querySelectorAll(query);
 	}
-	/** 读取属性 */
-	Element.prototype.get = function(item) {
+
+	/** 元素：读取自身属性 */
+	HTMLElement.prototype.get = function(item) {
 		if (item == null || item.constructor != String) {
 			return null;
 		}
@@ -51,23 +56,31 @@
 		}
 		return this[item];
 	}
-	/** 设置属性 */
-	Element.prototype.set = function(item, value) {
+
+	/** 元素：设置自身属性 */
+	HTMLElement.prototype.set = function(item, value) {
 		if (item == null || item.constructor != String) {
 			return null;
 		}
 		return this[item] = value;
 	}
-	Element.prototype.css = function(options) {
+
+	/** 元素：设置自身样式 */
+	HTMLElement.prototype.css = function(options) {
 		
 	}
-	Element.prototype.on = function(item, action) {
+
+	/** 元素：绑定事件 */
+	HTMLElement.prototype.on = function(item, action) {
 		
 	}
-	Element.prototype.to = function(options, duration) {
+
+	/** 元素：执行CSS变换 */
+	HTMLElement.prototype.to = function(options, duration) {
 
 	}
 
+	/** 化简JS - BaiJS */
 	var $bai = {
 		name: 'Bai',
 		verson: '1.0.0',
@@ -75,7 +88,7 @@
 		author: '白晓阳',
 		history: ''
 	};
-	var $own = {};
+	/** 化简JS：全局配置 */
 	var $config = {
 		Check: {
 			mode:'/([^\\s=]+)(?:=([^\\s]+))?/i',
@@ -85,15 +98,10 @@
 			}
 		}
 	};
-	$bai.own = function(item, value) {
-		if (item == null) {
-			return null;
-		}
-		if (value === undefined) {
-			return $own[item];
-		}
-		return $own[item] = value;
-	}
+	/** 化简JS：私有属性 */
+	var $own = {};
+
+	/** 化简JS：读取全局配置 */
 	$bai.config = function() {
 		var value = $config;
 		// 逐层读取配置
@@ -105,16 +113,35 @@
 		}
 		return value;
 	}
+
+	/** 化简JS：访问私有属性 */
+	$bai.own = function(item, value) {
+		if (item == null) {
+			return null;
+		}
+		if (value === undefined) {
+			return $own[item];
+		}
+		return $own[item] = value;
+	}
+
+	/** 化简JS：输出信息 */
+	$bai.log = function() {
+		if (console && console.log && console.log.constructor == Function) {
+			console.log.apply(this, arguments);
+		}
+	}
+
+	/** 化简JS：执行CSS选择器 */
 	$bai.pick = function(query, one) {
 		return document.pick(query, one);
 	}
-	$bai.ajax = function(scope) {
 
-	}
 	p.B = p.bai = $bai;
 })(window, false);
 
 if (bai != null) {
+	/** 化简JS：输入项检验 */
 	bai.check = function() {
 		/** 输入项非空检验 */
 		var required = function(item) {
@@ -182,7 +209,7 @@ if (bai != null) {
 				}
 				params = [this.value];
 				if (check[2] != null) {
-					params.concat(check[2].split(gap))
+					params = params.concat(check[2].split(gap))
 				}
 				result = action.apply(this, params);
 				if (result) {
@@ -215,17 +242,89 @@ if (bai != null) {
 			} else {
 				inputs = [scope];
 			}
-			//var data = {};
+			var data = {};
 			var result = false;
 			for (var i = 0, m = inputs.length; i < m; i++) {
-				//data[inputs[i].name] = inputs[i].value;
+				data[inputs[i].name] = inputs[i].value;
 				if (result = checkInput.call(inputs[i], callback)) {
 					return {input: inputs[i], result: result};
 				}
 			}
-			return {input: null, result: false};
+			return data;
 		};
 		return $check;
+	}();
+}
+
+if (bai != null) {
+	/** 化简JS：异步访问 */
+	bai.ajax = function() {
+		/** 访问过期时间（毫秒） */
+		var timeout = parseInt(bai.config('Bai', 'timeout')) || 5000;
+
+		/** 访问后手处理 */
+		var action = function(success, failure) {
+			var _action = function() {
+				if (this.readyState != 4) {
+					return false;
+				}
+				if (this.status == 200) {
+					if (success && success.constructor == Function) {
+						return success(this.responseText);
+					}
+					return false;
+				}
+				if (failure && failure.constructor == Function) {
+					return failure(this.responseText);
+				}
+				return false;
+			}
+			return _action;
+		}
+
+		/** 访问数据检验 */
+		var validate = function(data) {
+			if (data == null || data == $ajax.POST) {
+				return false;
+			}
+		}
+
+		var $ajax = function(url, data, success, failure) {
+			if (window.XMLHttpRequest == null || url == null) {
+				return false;
+			}
+			if (url.constructor != String) {
+				data = data || url['data'];
+				success = success || url['success'];
+				failure = failure || url['failure'];
+				url = url['url'];
+				if (url == null || url.constructor != String) {
+					return false;
+				}
+			}
+			var type;
+			if (data == null || data == $ajax.GET) {
+				type = $ajax.GET;
+				data = null;
+			} else if (data.constructor == Function) {
+				if (success) {
+					failure = success;
+				}
+				success = data;
+				data = null;
+			} else {
+				type = $ajax.POST;
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = action(success, failure);
+			xhr.open(type, url, true);
+			xhr.send(data);
+		}
+
+		$ajax.GET = 'GET';
+		$ajax.POST = 'POST';
+		return $ajax;
 	}();
 }
 
@@ -234,7 +333,7 @@ function test() {
 	m.set('data-c', 'a');
 	var c = m.get('data-b');
 	document.pick('span').each(function(i) {
-		this.style='border:1px solid #'+i*4+i*4+i*4;
+		this.style = 'border:1px solid #' + i * 4 + i * 4 + i * 4;
 	});
 	bai.own('asd', 1);
 	bai.own('asd');
