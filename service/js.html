@@ -6,7 +6,7 @@
 <style type="text/css">
 </style>
 <script type="text/javascript">
-(function(p) {
+(function(p, debug) {
 	if (p.bai != null) {
 		return;
 	}
@@ -58,6 +58,9 @@
 		}
 		return this[item] = value;
 	}
+	Element.prototype.css = function(options) {
+		
+	}
 	Element.prototype.on = function(item, action) {
 		
 	}
@@ -73,8 +76,15 @@
 		history: ''
 	};
 	var $own = {};
-	var $config = {};
-	var error = '一不小心出错啦=_=...';
+	var $config = {
+		Check: {
+			mode:'/([^\\s=]+)(?:=([^\\s]+))?/i',
+			gap:',',
+			types:{
+				risk:"/[<>&%'\\\\]+/"
+			}
+		}
+	};
 	$bai.own = function(item, value) {
 		if (item == null) {
 			return null;
@@ -95,19 +105,22 @@
 		}
 		return value;
 	}
+	$bai.pick = function(query, one) {
+		return document.pick(query, one);
+	}
 	$bai.ajax = function(scope) {
 
 	}
 	p.B = p.bai = $bai;
-})(window);
+})(window, false);
 
-if (window.bai != null) {
+if (bai != null) {
 	bai.check = function() {
 		/** 输入项非空检验 */
 		var required = function(item) {
 			if (item == null || (item.constructor == String && item.trim() == "")
 					|| (item.constructor == Array && item.length == 0)) {
-				return this.config('Log', 'required');
+				return bai.config('Log', 'required');
 			}
 			return false;
 		};
@@ -117,9 +130,9 @@ if (window.bai != null) {
 			if (item.constructor == Array) {
 				item = item.join('');
 			}
-			var matcher = new RegExp(this.config('Check', 'risk'));
-			if (matcher.exec(item) == null) {
-				return this.config('Log', 'risk');
+			var mode = eval(this.config('Check', 'types', 'risk'));
+			if (mode.constructor != RegExp || mode.test(item)) {
+				return bai.config('Log', 'risk');
 			}
 			return false;
 		};
@@ -128,7 +141,7 @@ if (window.bai != null) {
 		var min = function(item, len) {
 			if (item.constructor == String && item.trim().length < len
 					|| item.constructor == Array && item.length < len) {
-				return this.config('Log', 'min').replace('%s', len);
+				return bai.config('Log', 'min').replace('%s', len);
 			}
 			return false;
 		};
@@ -137,55 +150,62 @@ if (window.bai != null) {
 		var max = function(item, len) {
 			if (item.constructor == String && item.trim().length > len
 					|| item.constructor == Array && item.length > len) {
-				return this.config('Log', 'max').replace('%s', len);
+				return bai.config('Log', 'max').replace('%s', len);
 			}
 			return false;
 		};
 
 		/** 输入项属性检验 */
 		var type = function(item, type) {
-			var matcher = new RegExp(this.config('Check', type));
-			if (matcher.exec(item) == null) {
-				return this.config('Log', 'type');
+			var mode = eval(this.config('Check', 'types', type));
+			if (mode.constructor != RegExp || ! mode.test(item)) {
+				return bai.config('Log', 'type');
 			}
-			return this.config('Log', 'type');
+			return bai.config('Log', 'type');
 		};
-
-		var checkInput = function() {
-			var checks = this.get('data-check') || '';
-			checks = checks.split(' ');
-			for (var i = 0, m = checks.length; i < m; i++) {
-				var params = checks[i].split('=');
-				var check = params[0] + "('" + this.value + "'";
-				for ( var j = 1; j < params.length; j++) {
-					check += ",'" + params[j] + "'";
+		
+		/** 输入项目检验 */
+		var checkInput = function(callback) {
+			var mode = bai.config('Check', 'mode');
+			if (mode == null || (mode = eval(mode + 'g')).constructor != RegExp) {
+				return false;
+			}
+			var checks = this.get('data-check');
+			if (checks == null || checks == '') {
+				return false;
+			}
+			var gap = bai.config('Check', 'gap');
+			var check, action, params, result;
+			while ((check = mode.exec(checks)) != null) {
+				if ((action = eval(check[1])).constructor != Function) {
+					continue;
 				}
-				check += ")";
-				if (_debug) {
-					alert(check);
+				params = [this.value];
+				if (check[2] != null) {
+					params.concat(check[2].split(gap))
 				}
-				try {
-					message = eval(check);
-				} catch (e) {
-					if (_debug) {
-						alert(e.description);
+				result = action.apply(this, params);
+				if (result) {
+					if (callback != null && callback.constructor == Function) {
+						callback(this, result);
 					}
-				}
-				if (message) {
-					notice.call(this, message);
-					return message;
+					return result;
 				}
 			}
+			return false;
 		}
 		
-		var $check = function(scope) {
+		var $check = function(scope, callback) {
+			if (scope == null) {
+				scope = document;
+			}
 			if (scope != null && scope.constructor == String) {
 				scope = document.pick(scope, 1);
 			}
-			if (scope.constructor != Element) {
+			if (scope.nodeType == null || scope.nodeType != 1 && scope.nodeType != 9) {
 				return null;
 			}
-			var types = ['input', 'textarea', 'select'];
+			var types = ['INPUT', 'SELECT', 'TEXTAREA'];
 			var inputs = null;
 			if (types.indexOf(scope.tagName) < 0) {
 				inputs = scope.pick('.input');
@@ -195,19 +215,18 @@ if (window.bai != null) {
 			} else {
 				inputs = [scope];
 			}
-			var data = {};
+			//var data = {};
 			var result = false;
 			for (var i = 0, m = inputs.length; i < m; i++) {
-				data[inputs[i].name] = inputs[i].value;
-				result = checkInput.call(inputs[i]);
-				if (result) {
-					break;
+				//data[inputs[i].name] = inputs[i].value;
+				if (result = checkInput.call(inputs[i], callback)) {
+					return {input: inputs[i], result: result};
 				}
 			}
-			return {input: inputs[i], result: result};
+			return {input: null, result: false};
 		};
 		return $check;
-	}.call(bai);
+	}();
 }
 
 function test() {
@@ -227,6 +246,7 @@ function test() {
 		<span id="menu1">Menu1</span>
 		<span>Menu2</span>
 		<span>Menu3</span>
+		<input type="text" name="input" class="input" value="abc" data-check="required min=2 max=5" />
 	</div>
 	<br>
 	<div>

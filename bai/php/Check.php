@@ -139,11 +139,11 @@ class Check extends Work
 			return false;
 		}
 		foreach ($cases as $case) {
-			$check = $this->pick(self::ITEM, $case);
+			$check = $this->pick(1, $case);
 			if ($check !== 'required' && $value == null) {
 				continue;
 			}
-			$param = $this->pick(self::PARAM, $case);
+			$param = $this->pick(2, $case);
 			if ($param != null) {
 				$param = explode($this->gap, $param);
 			}
