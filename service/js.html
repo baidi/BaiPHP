@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <title>JS</title>
-<style type="text/css">
+<style id="baicss" type="text/css">
 div {border: 1px solid #99cc99;}
 </style>
 <script type="text/javascript">
-(function(p, debug) {
+(function(p) {
 	if (p.bai != null) {
 		return;
 	}
 
-	//Object.prototype.pick = Object.prototype.each = function() {
+	//Object.prototype.pick = function() {
 	//	return null;
 	//}
 
@@ -21,7 +21,24 @@ div {border: 1px solid #99cc99;}
 		return this.replace(/^\s+|\s+$/g, '');
 	}
 
-	/** 数组：依次执行方法 */
+	/** 对象：依次处理属性 */
+	Object.prototype.each = function(action) {
+		if (action == null || action.constructor != Function) {
+			return;
+		}
+		var result = null;
+		for (var i in this) {
+			if (i == null || this.i != null && this.i.constructor == Function) {
+				continue;
+			}
+			result = action.call(this.i, i);
+			if (result === false) {
+				break;
+			}
+		}
+	}
+
+	/** 数组：依次处理项目 */
 	Array.prototype.each = NodeList.prototype.each = function(action) {
 		if (action == null || action.constructor != Function) {
 			return;
@@ -36,7 +53,7 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：执行CSS选择器 */
-	HTMLElement.prototype.pick = HTMLDocument.prototype.pick = function(query, one) {
+	Element.prototype.pick = Document.prototype.pick = function(query, one) {
 		if (query == null || query.constructor != String) {
 			return null;
 		}
@@ -47,7 +64,7 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：读取自身属性 */
-	HTMLElement.prototype.get = function(item) {
+	Element.prototype.get = function(item) {
 		if (item == null || item.constructor != String) {
 			return null;
 		}
@@ -58,7 +75,7 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：设置自身属性 */
-	HTMLElement.prototype.set = function(item, value) {
+	Element.prototype.set = function(item, value) {
 		if (item == null || item.constructor != String) {
 			return null;
 		}
@@ -66,17 +83,17 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：设置自身样式 */
-	HTMLElement.prototype.css = function(options) {
+	Element.prototype.css = function(options) {
 		
 	}
 
 	/** 元素：绑定事件 */
-	HTMLElement.prototype.on = function(item, action) {
+	Element.prototype.on = function(item, action) {
 		
 	}
 
 	/** 元素：执行CSS变换 */
-	HTMLElement.prototype.to = function(options, duration) {
+	Element.prototype.to = function(options, duration) {
 
 	}
 
@@ -138,11 +155,11 @@ div {border: 1px solid #99cc99;}
 	}
 
 	p.B = p.bai = $bai;
-})(window, false);
+})(window);
 
-if (bai != null) {
+if (window.bai != null) {
 	/** 化简JS：输入项检验 */
-	bai.check = function() {
+	window.bai.check = function() {
 		/** 输入项非空检验 */
 		var required = function(item) {
 			if (item == null || (item.constructor == String && item.trim() == "")
@@ -242,10 +259,10 @@ if (bai != null) {
 			} else {
 				inputs = [scope];
 			}
-			var data = {};
+			var data = [];
 			var result = false;
 			for (var i = 0, m = inputs.length; i < m; i++) {
-				data[inputs[i].name] = inputs[i].value;
+				data.push(inputs[i].name + '=' + inputs[i].value);
 				if (result = checkInput.call(inputs[i], callback)) {
 					return {input: inputs[i], result: result};
 				}
@@ -256,9 +273,9 @@ if (bai != null) {
 	}();
 }
 
-if (bai != null) {
+if (window.bai != null) {
 	/** 化简JS：异步访问 */
-	bai.ajax = function() {
+	window.bai.ajax = function() {
 		/** 访问过期时间（毫秒） */
 		var timeout = parseInt(bai.config('Bai', 'timeout')) || 5000;
 
@@ -282,11 +299,36 @@ if (bai != null) {
 			return _action;
 		}
 
-		/** 访问数据检验 */
-		var validate = function(data) {
-			if (data == null || data == $ajax.POST) {
-				return false;
+		/** 访问数据打包 */
+		var pack = function(data) {
+			if (data == null || data.constructor == String) {
+				return data;
 			}
+			if (data.constructor == Array) {
+				return data.join('&');
+			}
+			if (data.constructor == Object) {
+				var result = [];
+				for (var i in data) {
+					if (i == null) {
+						continue;
+					}
+					if (data.i == null) {
+						result.push(i + '=');
+						continue
+					}
+					if (data.i.constructor == Function) {
+						continue;
+					}
+					if (data.i.constructor == Boolean) {
+						result.push(i + '=' + (data.i ? 1 : 0));
+						continue;
+					}
+					result.push(i + '=' + data.i.toString());
+				}
+				return result.join('&');
+			}
+			return data.toString();
 		}
 
 		var $ajax = function(url, data, success, failure) {
@@ -294,17 +336,16 @@ if (bai != null) {
 				return false;
 			}
 			if (url.constructor != String) {
-				data = data || url['data'];
-				success = success || url['success'];
-				failure = failure || url['failure'];
+				data = url['data'];
+				success = url['success'];
+				failure = url['failure'];
 				url = url['url'];
 				if (url == null || url.constructor != String) {
 					return false;
 				}
 			}
-			var type;
+			var type = $ajax.GET;
 			if (data == null || data == $ajax.GET) {
-				type = $ajax.GET;
 				data = null;
 			} else if (data.constructor == Function) {
 				if (success) {
@@ -314,11 +355,16 @@ if (bai != null) {
 				data = null;
 			} else {
 				type = $ajax.POST;
+				data = pack(data);
 			}
 
 			var xhr = new XMLHttpRequest();
+			xhr.timeout = timeout;
 			xhr.onreadystatechange = action(success, failure);
 			xhr.open(type, url, true);
+			if (type == $ajax.POST) {
+				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			}
 			xhr.send(data);
 		}
 
