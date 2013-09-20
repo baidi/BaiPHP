@@ -17,12 +17,14 @@ div {border: 1px solid #99cc99;}
 	//}
 
 	/** 字符串：去除首尾空格 */
-	String.prototype.trim = function() {
-		return this.replace(/^\s+|\s+$/g, '');
+	if (String.prototype.trim == null) {
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g, '');
+		}
 	}
 
 	/** 对象：依次处理属性 */
-	Object.prototype.each = function(action) {
+	/*Object.prototype.each = function(action) {
 		if (action == null || action.constructor != Function) {
 			return;
 		}
@@ -36,7 +38,7 @@ div {border: 1px solid #99cc99;}
 				break;
 			}
 		}
-	}
+	}*/
 
 	/** 数组：依次处理项目 */
 	Array.prototype.each = NodeList.prototype.each = function(action) {
@@ -83,8 +85,31 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：设置自身样式 */
-	Element.prototype.css = function(options) {
-		
+	Element.prototype.css = function(item, value) {
+		if (item == null) {
+			return null;
+		}
+		var search = /-[a-z]/g;
+		var replace = function(prefix) {
+			return prefix[1].toUpperCase();
+		}
+		if (item.constructor == String) {
+			item = item.toLowerCase().replace(search, replace);
+			if (value === undefined) {
+				return this.style.item;
+			}
+			return this.style[item] = value || '';
+		}
+		if (item.constructor == Object) {
+			var i, j;
+			for (i in item) {
+				if (i == null) {
+					continue;
+				}
+				j = i.toLowerCase().replace(search, replace);
+				this.style[j] = item[i] || '';
+			}
+		}
 	}
 
 	/** 元素：绑定事件 */
@@ -94,7 +119,13 @@ div {border: 1px solid #99cc99;}
 
 	/** 元素：执行CSS变换 */
 	Element.prototype.to = function(options, duration) {
-
+		if (document.styleSheets.length == 0) {
+			document.head.innerHTML += '<style type="text/css"></style>';
+		}
+		var style = document.styleSheets[0];
+		style.insertRule('@keyframes kf {0% {} 100%{' + options + '}}');
+		style.insertRule('@-webkit-keyframes kf {0% {} 100%{' + options + '}}');
+		this.css('animation', options + ' ' + duration);
 	}
 
 	/** 化简JS - BaiJS */
