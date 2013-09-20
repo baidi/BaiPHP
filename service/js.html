@@ -4,17 +4,12 @@
 <meta charset="utf-8" />
 <title>JS</title>
 <style id="baicss" type="text/css">
-div {border: 1px solid #99cc99;}
 </style>
 <script type="text/javascript">
 (function(p) {
 	if (p.bai != null) {
 		return;
 	}
-
-	//Object.prototype.pick = function() {
-	//	return null;
-	//}
 
 	/** 字符串：去除首尾空格 */
 	if (String.prototype.trim == null) {
@@ -23,27 +18,10 @@ div {border: 1px solid #99cc99;}
 		}
 	}
 
-	/** 对象：依次处理属性 */
-	/*Object.prototype.each = function(action) {
-		if (action == null || action.constructor != Function) {
-			return;
-		}
-		var result = null;
-		for (var i in this) {
-			if (i == null || this.i != null && this.i.constructor == Function) {
-				continue;
-			}
-			result = action.call(this.i, i);
-			if (result === false) {
-				break;
-			}
-		}
-	}*/
-
-	/** 数组：依次处理项目 */
+	/** 数组：依次处理子项目 */
 	Array.prototype.each = NodeList.prototype.each = function(action) {
 		if (action == null || action.constructor != Function) {
-			return;
+			return false;
 		}
 		var result = null;
 		for (var i = 0, m = this.length; i < m; i++) {
@@ -52,6 +30,7 @@ div {border: 1px solid #99cc99;}
 				break;
 			}
 		}
+		return true;
 	}
 
 	/** 元素：执行CSS选择器 */
@@ -79,9 +58,34 @@ div {border: 1px solid #99cc99;}
 	/** 元素：设置自身属性 */
 	Element.prototype.set = function(item, value) {
 		if (item == null || item.constructor != String) {
-			return null;
+			return false;
 		}
-		return this[item] = value;
+		value = value || '';
+		if (value.constructor != String) {
+			value = value.toString();
+		}
+		if (item == 'class') {
+			var list = this.get(item).split(' ');
+			if (value[0] == '+') {
+				value = value.substr(1);
+				if (list.indexOf(value) < 0) {
+					list.push(value);
+				}
+				this[item] = list.join(' ');
+				return true;
+			}
+			if (value[0] == '-') {
+				value = value.substr(1);
+				var i = -1;
+				while ((i = list.indexOf(value)) >= 0) {
+					list = list.slice(0, i).concat(list.slice(i + 1));
+				}
+				this[item] = list.join(' ');
+				return true;
+			}
+		}
+		this[item] = value;
+		return true;
 	}
 
 	/** 元素：设置自身样式 */
@@ -89,27 +93,32 @@ div {border: 1px solid #99cc99;}
 		if (item == null) {
 			return null;
 		}
-		var search = /-[a-z]/g;
-		var replace = function(prefix) {
+		var pre = /-[a-z]/g;
+		var post = function(prefix) {
 			return prefix[1].toUpperCase();
 		}
 		if (item.constructor == String) {
-			item = item.toLowerCase().replace(search, replace);
+			if (item.indexOf('-') >= 0) {
+				item = item.toLowerCase().replace(pre, post);
+			}
 			if (value === undefined) {
 				return this.style.item;
 			}
 			return this.style[item] = value || '';
 		}
 		if (item.constructor == Object) {
-			var i, j;
-			for (i in item) {
-				if (i == null) {
+			var key, proper;
+			for (key in item) {
+				if (key == null) {
 					continue;
 				}
-				j = i.toLowerCase().replace(search, replace);
-				this.style[j] = item[i] || '';
+				if (key.indexOf('-') >= 0) {
+					proper = key.toLowerCase().replace(pre, post);
+				}
+				this.style[proper] = item[key] || '';
 			}
 		}
+		return null;
 	}
 
 	/** 元素：绑定事件 */
@@ -118,11 +127,12 @@ div {border: 1px solid #99cc99;}
 	}
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(options, duration) {
+	Element.prototype.to = function(css, duration) {
 		if (document.styleSheets.length == 0) {
-			document.head.innerHTML += '<style type="text/css"></style>';
+			document.head.innerHTML += '<style id="BaiCSS" type="text/css"></style>';
 		}
 		var style = document.styleSheets[0];
+		style.baicss = style.baicss || {};
 		style.insertRule('@keyframes kf {0% {} 100%{' + options + '}}');
 		style.insertRule('@-webkit-keyframes kf {0% {} 100%{' + options + '}}');
 		this.css('animation', options + ' ' + duration);
@@ -130,9 +140,9 @@ div {border: 1px solid #99cc99;}
 
 	/** 化简JS - BaiJS */
 	var $bai = {
-		name: 'Bai',
-		verson: '1.0.0',
-		date: '2012-7-30',
+		name: 'BaiJS',
+		verson: '2.0.0',
+		date: '2013-7-30',
 		author: '白晓阳',
 		history: ''
 	};
@@ -184,6 +194,29 @@ div {border: 1px solid #99cc99;}
 	$bai.pick = function(query, one) {
 		return document.pick(query, one);
 	}
+
+	/** 化简JS：转换对象 */
+	$bai.to = function(origin, form) {
+		if (origin == null) {
+			return '';
+		}
+		if (origin.constructor != Object) {
+			return origin.toString();
+		}
+		if (form == $bai.to.CSS) {
+			
+		}
+		if (form == $bai.to.POST) {
+			
+		}
+		if (form == $bai.to.JSON) {
+			
+		}
+		return origin.toString();
+	}
+	$bai.to.CSS = 'CSS';
+	$bai.to.POST = 'POST';
+	$bai.to.JSON = 'JSON';
 
 	p.B = p.bai = $bai;
 })(window);
