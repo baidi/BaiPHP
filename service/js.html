@@ -127,15 +127,55 @@
 	}
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(css, duration) {
+	Element.prototype.to = function(css, duration, replay, alt, mode) {
+		if (css == null) {
+			return false;
+		}
+		if (duration == null || ! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
+			duration = '1s';
+		}
+		if (replay == null || isNaN(replay) || replay == 0) {
+			replay = 'infinite';
+		}
 		if (document.styleSheets.length == 0) {
 			document.head.innerHTML += '<style id="BaiCSS" type="text/css"></style>';
 		}
 		var style = document.styleSheets[0];
-		style.baicss = style.baicss || {};
-		style.insertRule('@keyframes kf {0% {} 100%{' + options + '}}');
-		style.insertRule('@-webkit-keyframes kf {0% {} 100%{' + options + '}}');
-		this.css('animation', options + ' ' + duration);
+		if (style.baicss == null) {
+			style.baicss = {};
+		}
+		if (css.constructor == String) {
+			if (style.baicss[css] == null) {
+				if (navigator.userAgent.indexOf('AppleWebKit') >= 0) {
+					style.insertRule('@-webkit-keyframes "' + css + '" {from {} to {' + css + '}}');
+				} else {
+					style.insertRule('@keyframes "' + css + '" {from {} to {' + css + '}}');
+				}
+				style.baicss[css] = true;
+			}
+			var animation = ['"' + css + '"', duration, replay].join(' ');
+			this.css({animation: animation, '-webkit-animation': animation});
+			return true;
+		}
+		var scss = [];
+		for (var i in css) {
+			if (i == null) {
+				continue;
+			}
+			scss.push(i + css[i]);
+		}
+		scss = scss.join();
+		if (style.baicss[scss] == null) {
+			if (navigator.userAgent.indexOf('AppleWebKit') >= 0) {
+				style.insertRule('@-webkit-keyframes "' + css + '" {from {} to {' + css + '}}');
+			} else {
+				style.insertRule('@keyframes "' + css + '" {from {} to {' + css + '}}');
+			}
+			style.baicss[scss] = true;
+		}
+		var animation = ['"' + scss + '"', duration, replay].join(' ');
+		this.css({animation: animation, '-webkit-animation': animation});
+		return true;
 	}
 
 	/** 化简JS - BaiJS */
@@ -443,10 +483,9 @@ function test() {
 	m.set('data-c', 'a');
 	var c = m.get('data-b');
 	document.pick('span').each(function(i) {
-		this.style = 'border:1px solid #' + i * 4 + i * 4 + i * 4;
+		this.style = 'background-color: #' + i * 4 + i * 4 + i * 4;
 	});
-	bai.own('asd', 1);
-	bai.own('asd');
+	bai.pick('#menu1',1).to('background-color:#f04000;', '2s', '5');
 }
 </script>
 </head>
