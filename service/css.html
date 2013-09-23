@@ -83,8 +83,8 @@ body {
 {
 border: 1px solid #99cc99;
 position:relative;
-animation:mymove 3s infinite;
--webkit-animation:mymove 3s infinite; /*Safari and Chrome*/
+animation:"background-color:#f04000;" 3s infinite;
+-webkit-animation:"background-color:#f04000;" 3s infinite; /*Safari and Chrome*/
 }
 
 @keyframes mymove
@@ -99,6 +99,14 @@ animation:mymove 3s infinite;
 0% {}
 50% {background-color: #99cc99;}
 100% {}
+}
+@keyframes "background-color:#f04000;" {
+	0% {}
+	100% {background: #f04000;}
+}
+@-webkit-keyframes "background-color:#f04000;" {
+	0% {}
+	100% {background: #f04000;}
 }
 </style>
 <script type="text/javascript">
