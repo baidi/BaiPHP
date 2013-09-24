@@ -71,7 +71,7 @@ progress {
 }
 
 span {
-	word-break: break-all;
+	word-wrap: break-word;
 }
 
 table.data td, table.data th {
@@ -213,7 +213,7 @@ textarea {
 
 /*--- 页面布局 ---*/
 .page {
-	position: relateve;
+	position: relative;
 	margin: 0 auto;
 	clear: both;
 	min-width: $min$;
@@ -393,14 +393,14 @@ header, footer {
 }
 
 .screen {
-	display: none;
 	position: fixed;
 	z-index: 4;
 	left: 0;
 	top: 0;
-	vertical-align: middle;
 	width: 100%;
 	height: 100%;
+	text-align: center;
+	vertical-align: middle;
 	background: url(bai/img/screen.png) repeat;
 }
 

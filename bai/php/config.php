@@ -257,26 +257,6 @@ $config[Flow::PAGE] = array(
 	'js'      => array(
 		'bai.js',
 	),
-	### 页面版式
-	'formats' => array(
-		'$min$'         => '480px',
-		'$max$'         => '980px',
-		'$font$'        => '14px/20px "verdana", "helvetica", "arial", sans-serif',
-		'$color$'       => '#333f33',
-		'$background$'  => 'transparent',
-		'$lightanchor$' => '#009f3c',
-		'$darkanchor$'  => '#008000',
-		'$lightline$'   => '#cceccc',
-		'$darkline$'    => '#99cc99',
-		'$lightarea$'   => '#f9fff9',
-		'$darkarea$'    => '#f6fcf6',
-		'$shadowcolor$' => '#d0f9d0',
-		'$errorcolor$'  => '#ff0000',
-		'$noticecolor$' => '#99cc99',
-		'$lockedcolor$' => '#cccccc',
-		'$message$'     => json_encode($config[Work::LOG]['dic']),
-		'$type$'        => json_encode($config[Work::CHECK]['types']),
-	),
 	### 页面修整
 	'trims' => array(
 		### HTML注释
@@ -292,6 +272,31 @@ $config[Flow::PAGE] = array(
 		### 空行
 		'#\n[\r\n]+#'       => '\n',
 	),
+);
+
+$config['CSS'] = array(
+	'$min$'         => '480px',
+	'$max$'         => '980px',
+	'$font$'        => '14px/20px "verdana", "helvetica", "arial", sans-serif',
+	'$color$'       => '#333f33',
+	'$background$'  => 'transparent',
+	'$lightanchor$' => '#009f3c',
+	'$darkanchor$'  => '#008000',
+	'$lightline$'   => '#cceccc',
+	'$darkline$'    => '#99cc99',
+	'$lightarea$'   => '#f9fff9',
+	'$darkarea$'    => '#f6fcf6',
+	'$shadowcolor$' => '#d0f9d0',
+	'$errorcolor$'  => '#ff0000',
+	'$noticecolor$' => '#99cc99',
+	'$lockedcolor$' => '#cccccc',
+);
+
+$config['JS'] = array(
+	'$config$' => json_encode(array(
+		Work::CHECK => $config[Work::CHECK],
+		Work::LOG => $config[Work::LOG],
+	)),
 );
 
 ### 全局配置：缓存工场

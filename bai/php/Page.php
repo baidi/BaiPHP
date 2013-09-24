@@ -22,6 +22,8 @@
  */
 class Page extends Flow
 {
+	const JS = 'JS';
+	const CSS = 'CSS';
 	/** 页面布局 */
 	protected $layout  = '_page.php';
 	/** 页面样式 */
@@ -61,8 +63,13 @@ class Page extends Flow
 	{
 		$page = $this->result;
 		### 应用页面版式
-		if ($this->formats && is_array($this->formats)) {
-			$page = str_replace(array_keys($this->formats), array_values($this->formats), $page);
+		$csses = $this->config(self::CSS);
+		if (is_array($csses)) {
+			$page = str_replace(array_keys($csses), array_values($csses), $page);
+		}
+		$jses = $this->config(self::JS);
+		if (is_array($jses)) {
+			$page = str_replace(array_keys($jses), array_values($jses), $page);
 		}
 		### 应用页面修整
 		if ($this->trims && is_array($this->trims)) {

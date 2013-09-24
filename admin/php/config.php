@@ -23,9 +23,6 @@ global $config;
 ### 调试模式
 $config[_DEF][Target::DEBUG] = true;
 
-### 全局配置：页面流程
-$config[Flow::PAGE]['js'][] = 'jquery.js';
-
 ### 全局配置：检验工场
 $config[Work::CHECK][Work::EVENT] = array(
 	'flow' => array(
@@ -34,6 +31,9 @@ $config[Work::CHECK][Work::EVENT] = array(
 	'action' => array(
 		'aservice' => 'required type=char',
 		'aevent' => 'required type=char',
+	),
+	'basinCreate' => array(
+		'abasin' => 'required max=20 type=char',
 	),
 );
 
@@ -45,6 +45,16 @@ $config['BasinAction'] = array(
 		'.runtime' => true,
 		'.settings' => true,
 		'bai' => true
+	)
+);
+$config['BasinCreateAction'] = array(
+	'include' => array(
+		'php' => true,
+		'css' => true,
+		'js' => true,
+		Flow::PAGE => true,
+		Flow::ACTION => true,
+		Work::LANG => true,
 	)
 );
 $config['FlowAction'] = array(

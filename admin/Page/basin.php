@@ -35,16 +35,16 @@ BOX;
 	<span class="tg b">::</span>
 	<span>流域是相关流程的集合，主要包含php、js、css、img、Action（事件处理流程）、Page（页面内容页面内容）等目录，初始系统包含bai、service和admin三个流域。</span>
 </div>
-<table class="screen cv"><tr><td>
+<table class="screen h"><tr><td>
 	<div class="dialog s">
 		<div class="dialog-title t ad tg">新建流域</div>
 		<div class="dialog-content text tl">
 			<label>流域名：</label>
 			<input type="text" id="aservice" name="aservice" />
 		</div>
-		<div class="f al">
-			<a class="button default" onclick="$('.screen').hide();">确定</a>
-			<a class="button" onclick="$('.screen').hide();">取消</a>
+		<div class="dialog-toolbar-okcancel f al">
+			<a class="button default" onclick="bai.pick('.screen', 1).set('class', '+h');">确定</a>
+			<a class="button" onclick="bai.pick('.screen', 1).set('class', '+h');">取消</a>
 		</div>
 	</div>
 </td></tr></table>
@@ -52,15 +52,15 @@ BOX;
 <script type="text/javascript">
 <!--
 function dialog(title, content) {
-	var screen = $('.screen');
-	var dialog = $('.dialog', screen);
+	var screen = bai.pick('.screen', 1);
+	var dialog = screen.pick('.dialog', 1);
 	if (title) {
-		$('.dialog-title', dialog).html(title);
+		dialog.pick('.dialog-title', 1).set('innerHTML', title);
 	}
 	if (content) {
-		$('.dialog-content', dialog).html(content);
+		dialog.pick('.dialog-content', 1).set('innerHTML', content);
 	}
-	screen.show();
+	screen.set('class', '-h');
 }
 //-->
 </script>

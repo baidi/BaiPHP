@@ -76,22 +76,13 @@
 			value = value.toString();
 		}
 		if (item == 'class') {
-			var list = this.get(item).split(' ');
+			var list = this.classList;
 			if (value[0] == '+') {
-				value = value.substr(1);
-				if (list.indexOf(value) < 0) {
-					list.push(value);
-				}
-				this[item] = list.join(' ');
+				list.add(value.substr(1));
 				return true;
 			}
 			if (value[0] == '-') {
-				value = value.substr(1);
-				var i = -1;
-				while ((i = list.indexOf(value)) >= 0) {
-					list = list.slice(0, i).concat(list.slice(i + 1));
-				}
-				this[item] = list.join(' ');
+				list.remove(value.substr(1));
 				return true;
 			}
 		}
@@ -214,15 +205,7 @@
 		history: ''
 	};
 	/** 化简JS：全局配置 */
-	var $config = {
-		Check: {
-			mode:'/([^\\s=]+)(?:=([^\\s]+))?/i',
-			gap:',',
-			types:{
-				risk:"/[<>&%'\\\\]+/"
-			}
-		}
-	};
+	var $config = $config$ || {};
 	/** 化简JS：私有属性 */
 	var $own = {};
 
@@ -611,7 +594,3 @@ var notice = function(message) {
 	// setTimeout("$('.notice:first').click();", c("timeout"));
 };
 
-
-bai.pick('body', 1).onload = function() {
-	
-};
