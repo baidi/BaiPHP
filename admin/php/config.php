@@ -63,3 +63,8 @@ $config['FlowAction'] = array(
 		Flow::PAGE => '#^(?<'.Bai::EVENT.'>[a-zA-Z0-9_\x7f-\xff]+)\.php$#i',
 	)
 );
+
+$config['JS']['$config$'] = json_encode(array(
+	Work::CHECK => $config[Work::CHECK],
+	Work::LOG => $config[Work::LOG],
+));

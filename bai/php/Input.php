@@ -75,7 +75,7 @@ class Input extends Work
 	 * @param string $template 模板
 	 * @return string 输入项（HTML）
 	 */
-	public static function fetch ($item = null, $setting = null, $template = 'text')
+	public static function cut ($item = null, $setting = null, $template = 'text')
 	{
 		$input = Input::access();
 		return $input->entrust($item, $setting, $template);
@@ -128,7 +128,7 @@ class Input extends Work
 		$setting['item'] = $item;
 		$setting['value'] = $this->value($this->pick('type', $setting), $this->target[$item]);
 		### 解析模板
-		$this->result = Template::fetch($template, $setting);
+		$this->result = Template::cut($template, $setting);
 		return $this->result;
 	}
 

@@ -20,7 +20,7 @@ class BasinCreateAction extends Action
 	/**
 	 * 子目录
 	 */
-	private $include = null;
+	protected $include = null;
 
 	protected function engage()
 	{

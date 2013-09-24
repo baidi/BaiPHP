@@ -37,6 +37,7 @@ $config[Flow::FLOW] = array(
 		'error'       => false,
 	),
 	Flow::ACTION      => array(
+		'prepare'     => true,
 		'check'       => Flow::PAGE,
 		#'Cache'      => true,
 		'data'        => true,

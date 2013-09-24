@@ -26,11 +26,11 @@ class Check extends Work
 	/**
 	 * 检验工场标识：检验项目
 	 */
-	const ITEM = 'ITEM';
+	const ITEM = 1;
 	/**
 	 * 检验工场标识：检验参数
 	 */
-	const PARAM = 'PARAM';
+	const PARAM = 2;
 
 	/**
 	 * 字符编码
@@ -139,11 +139,11 @@ class Check extends Work
 			return false;
 		}
 		foreach ($cases as $case) {
-			$check = $this->pick(1, $case);
+			$check = $this->pick(self::ITEM, $case);
 			if ($check !== 'required' && $value == null) {
 				continue;
 			}
-			$param = $this->pick(2, $case);
+			$param = $this->pick(self::PARAM, $case);
 			if ($param != null) {
 				$param = explode($this->gap, $param);
 			}
