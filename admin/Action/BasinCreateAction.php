@@ -22,6 +22,15 @@ class BasinCreateAction extends Action
 	 */
 	protected $include = null;
 
+	protected function prepare()
+	{
+		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+			$this->skip = true;
+			$page = $this->load("$this->target", false, self::PAGE);
+			return $page;
+		}
+	}
+
 	protected function engage()
 	{
 		$basin = _LOCAL.$this->target['abasin']._DIR;

@@ -102,6 +102,7 @@ abstract class Bai implements ArrayAccess
 	 * 提示页面
 	 */
 	protected $board = '_notice.php';
+	protected $skip = false;
 
 	/**
 	 * <h4>委托目标</h4>
@@ -164,6 +165,9 @@ abstract class Bai implements ArrayAccess
 					$this->result = $step->entrust();
 					$this->notice = $step->notice;
 				}
+			}
+			if ($this->skip) {
+				return $this->result;
 			}
 			### 执行正常
 			if ($this->notice == null) {

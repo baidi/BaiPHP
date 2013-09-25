@@ -12,7 +12,7 @@
 </head>
 <body>
 	<!-- 页眉 -->
-	<?php echo $this->load('_header.php'); ?>
+	<?php //echo $this->load('_header.php'); ?>
 	<div class="page">
 		<!-- 页面 -->
 		<?php if ($this['lside']) { ?>
@@ -33,6 +33,7 @@
 		</div>
 	</div>
 	<!-- 页脚 -->
-	<?php echo $this->load('_footer.php'); ?>
+	<?php //echo $this->load('_footer.php'); ?>
+	<?php echo $this->load('_dialog.php'); ?>
 </body>
 </html>

@@ -24,18 +24,6 @@
  */
 class Action extends Flow
 {
-
-	/**
-	 * <h4>异步请求预处理</h4>
-	 * @return boolean
-	 */
-	protected function prepare()
-	{
-		if ($this->target['ajax'] && $_SERVER['REQUEST_METHOD'] == 'GET') {
-			return $this->load("$this->target");
-		}
-	}
-
 	/**
 	 * <h4>检验输入</h4>
 	 * <p>

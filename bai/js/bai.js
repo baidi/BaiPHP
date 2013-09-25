@@ -438,6 +438,16 @@ if (window.bai != null) {
 			return _action;
 		};
 
+		var load = function(box) {
+			if (! box.nodeType) {
+				return null;
+			}
+			var _load = function(data) {
+				box.innerHTML = data;
+			};
+			return _load;
+		};
+
 		/** 访问数据打包 */
 		var pack = function(data) {
 			if (data == null || data.constructor == String) {
@@ -483,6 +493,7 @@ if (window.bai != null) {
 					return false;
 				}
 			}
+			url += (url.indexOf('?' > 0) ? '&ajax=1' : '?ajax=1');
 			var type = this.ajax.GET;
 			if (data == null || data == this.ajax.GET) {
 				data = null;
@@ -491,6 +502,12 @@ if (window.bai != null) {
 					failure = success;
 				}
 				success = data;
+				data = null;
+			} else if (data.nodeType) {
+				if (success) {
+					failure = success;
+				}
+				success = load(data);
 				data = null;
 			} else {
 				type = this.ajax.POST;
@@ -505,11 +522,54 @@ if (window.bai != null) {
 				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 			}
 			xhr.send(data);
+			return null;
 		};
 
 		$ajax.GET = 'GET';
 		$ajax.POST = 'POST';
 		return $ajax;
+	}();
+}
+
+if (window.bai != null) {
+	window.bai.dialog = function() {
+		var load = function(content, title) {
+			if (content == null || ! content.nodeType) {
+				return null;
+			}
+			var _load = function(data) {
+				if (data == '') {
+					return false;
+				}
+				content.innerHTML = data;
+				var atitle = content.pick('.title', 1);
+				if (atitle != null && title != null && title.nodeType) {
+					title.innerHTML = atitle.innerHTML;
+				}
+				return true;
+			};
+			return _load;
+		};
+
+		var $dialog = function(content, title) {
+			var screen = document.pick('.screen', 1);
+			var dialog = screen.pick('.dialog', 1);
+			var dtitle = dialog.pick('.dialog-title', 1);
+			var dcontent = dialog.pick('.dialog-content', 1);
+			if (/^https?:\/\//i.test(content)) {
+				bai.ajax(content, load(dcontent, dtitle));
+			} else if (content != null) {
+				dcontent.innerHTML = content;
+			}
+			if (title != null) {
+				dtitle.innerHTML = title;
+			}
+			screen.set('class', '-h');
+		};
+		$dialog.OKCANCEL = 'OKCANCEL';
+		$dialog.YESNO = 'YESNO';
+
+		return $dialog;
 	}();
 }
 

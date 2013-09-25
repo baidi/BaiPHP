@@ -42,6 +42,14 @@ abstract class Flow extends Bai
 	const PAGE    = 'Page';
 
 	/**
+	 * <h4>预处理</h4>
+	 * @return boolean
+	 */
+	protected function prepare()
+	{
+		return true;
+	}
+	/**
 	 * <h4>自定义事务</h4>
 	 * @return boolean
 	 */
@@ -50,4 +58,3 @@ abstract class Flow extends Bai
 		return true;
 	}
 }
-?>

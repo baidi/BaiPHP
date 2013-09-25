@@ -4,8 +4,8 @@
 		<div class="dialog-content text tl">
 		</div>
 		<div class="dialog-toolbar-okcancel f al">
-			<a class="button default">确定</a>
-			<a class="button">取消</a>
+			<a class="button default" onclick="bai.pick('.screen', 1).set('class', '+h');">确定</a>
+			<a class="button" onclick="bai.pick('.screen', 1).set('class', '+h');">取消</a>
 		</div>
 	</div>
 </td></tr></table>
