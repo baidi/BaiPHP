@@ -275,31 +275,6 @@ $config[Flow::PAGE] = array(
 	),
 );
 
-$config['CSS'] = array(
-	'$min$'         => '480px',
-	'$max$'         => '980px',
-	'$font$'        => '14px/20px "verdana", "helvetica", "arial", sans-serif',
-	'$color$'       => '#333f33',
-	'$background$'  => 'transparent',
-	'$lightanchor$' => '#009f3c',
-	'$darkanchor$'  => '#008000',
-	'$lightline$'   => '#cceccc',
-	'$darkline$'    => '#99cc99',
-	'$lightarea$'   => '#f9fff9',
-	'$darkarea$'    => '#f6fcf6',
-	'$shadowcolor$' => '#d0f9d0',
-	'$errorcolor$'  => '#ff0000',
-	'$noticecolor$' => '#99cc99',
-	'$lockedcolor$' => '#cccccc',
-);
-
-$config['JS'] = array(
-	'$config$' => json_encode(array(
-		Work::CHECK => $config[Work::CHECK],
-		Work::LOG => $config[Work::LOG],
-	)),
-);
-
 ### 全局配置：缓存工场
 $config[Work::CACHE] = array(
 	### 是否开启
@@ -328,6 +303,38 @@ $config[Work::STYLE] = array(
 		'css' => '<link rel="stylesheet" type="text/css" href="%s"/>',
 		'js'  => '<script type="text/javascript" src="%s"></script>',
 	),
+);
+
+$config['CSS'] = array(
+	'$min$'         => '480px',
+	'$max$'         => '980px',
+	'$font$'        => '14px/20px "verdana", "helvetica", "arial", sans-serif',
+	'$color$'       => '#333f33',
+	'$background$'  => 'transparent',
+	'$lightanchor$' => '#009f3c',
+	'$darkanchor$'  => '#006000',
+	'$lightline$'   => '#cceccc',
+	'$darkline$'    => '#99cc99',
+	'$lightarea$'   => '#f9fff9',
+	'$darkarea$'    => '#f6fcf6',
+	'$shadowcolor$' => '#d0f9d0',
+	'$errorcolor$'  => '#ff0000',
+	'$noticecolor$' => '#99cc99',
+	'$lockedcolor$' => '#cccccc',
+);
+
+$config['JS'] = array(
+	'$config$' => json_encode(array(
+		Work::CHECK => $config[Work::CHECK],
+		Work::LOG => $config[Work::LOG],
+		'bubble' => array(
+			'title' => '提示',
+			'content' => '也许，这是悄悄话……',
+			'load' => '请稍候，正在加载……',
+			'fail' => '内容加载失败……',
+			'blank' => '加载完成，但是没有内容……',
+		),
+	)),
 );
 
 ### 全局配置：测试工场

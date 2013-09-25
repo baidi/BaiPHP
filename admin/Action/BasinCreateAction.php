@@ -25,7 +25,7 @@ class BasinCreateAction extends Action
 	protected function prepare()
 	{
 		if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-			$this->skip = true;
+			$this->end = true;
 			$page = $this->load("$this->target", false, self::PAGE);
 			return $page;
 		}

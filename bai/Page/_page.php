@@ -34,6 +34,6 @@
 	</div>
 	<!-- 页脚 -->
 	<?php //echo $this->load('_footer.php'); ?>
-	<?php echo $this->load('_dialog.php'); ?>
+	<?php echo $this->load('_bubble.php'); ?>
 </body>
 </html>

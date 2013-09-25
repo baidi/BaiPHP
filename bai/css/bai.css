@@ -392,7 +392,7 @@ header, footer {
 	margin-bottom: -2px;
 }
 
-.screen {
+.cover {
 	position: fixed;
 	z-index: 4;
 	left: 0;
@@ -404,20 +404,20 @@ header, footer {
 	background: url(bai/img/screen.png) repeat;
 }
 
-.dialog {
+.bubble {
 	display: inline-block;
 	min-width: 400px;
 	border: 1px solid $darkline$;
 	background-color: #ffffff;
 }
-.dialog .title {
+.bubble .title {
 	padding: 0.3em;
 	font-size: 1.5em;
 	font-weight: bold;
 	background-color: $darkarea$;
 	border-bottom: 1px solid $darkline$;
 }
-.dialog .content {
+.bubble .content {
 	padding: 1em;
 }
 

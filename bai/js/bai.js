@@ -236,7 +236,7 @@
 	/** 化简JS：输出信息 */
 	$bai.log = function() {
 		if (console && console.log && console.log.constructor == Function) {
-			console.log.apply(this, arguments);
+			console.log.apply(bai, arguments);
 		}
 	};
 
@@ -313,7 +313,7 @@ if (window.bai != null) {
 			if (item.constructor == Array) {
 				item = item.join('');
 			}
-			var mode = eval(this.config('Check', 'types', 'risk'));
+			var mode = eval(bai.config('Check', 'types', 'risk'));
 			if (mode.constructor != RegExp || mode.test(item)) {
 				return bai.config('Log', 'risk');
 			}
@@ -340,7 +340,7 @@ if (window.bai != null) {
 
 		/** 输入项属性检验 */
 		var type = function(item, type) {
-			var mode = eval(this.config('Check', 'types', type));
+			var mode = eval(bai.config('Check', 'types', type));
 			if (mode.constructor != RegExp || ! mode.test(item)) {
 				return bai.config('Log', 'type');
 			}
@@ -415,11 +415,15 @@ if (window.bai != null) {
 if (window.bai != null) {
 	/** 化简JS：异步访问 */
 	window.bai.ajax = function() {
+		Element.prototype.load = function(url) {
+			bai.ajax(url, this);
+		};
+
 		/** 访问过期时间（毫秒） */
 		var timeout = parseInt(bai.config('Bai', 'timeout')) || 5000;
 
 		/** 访问后手处理 */
-		var action = function(success, failure) {
+		var callback = function(success, failure) {
 			var _action = function() {
 				if (this.readyState != 4) {
 					return false;
@@ -438,6 +442,7 @@ if (window.bai != null) {
 			return _action;
 		};
 
+		/** 元素加载处理 */
 		var load = function(box) {
 			if (! box.nodeType) {
 				return null;
@@ -494,8 +499,8 @@ if (window.bai != null) {
 				}
 			}
 			url += (url.indexOf('?' > 0) ? '&ajax=1' : '?ajax=1');
-			var type = this.ajax.GET;
-			if (data == null || data == this.ajax.GET) {
+			var type = bai.ajax.GET;
+			if (data == null || data == bai.ajax.GET) {
 				data = null;
 			} else if (data.constructor == Function) {
 				if (success) {
@@ -510,15 +515,15 @@ if (window.bai != null) {
 				success = load(data);
 				data = null;
 			} else {
-				type = this.ajax.POST;
+				type = bai.ajax.POST;
 				data = pack(data);
 			}
 
 			var xhr = new XMLHttpRequest();
 			xhr.timeout = timeout;
-			xhr.onreadystatechange = action(success, failure);
+			xhr.onreadystatechange = callback(success, failure);
 			xhr.open(type, url, true);
-			if (type == this.ajax.POST) {
+			if (type == bai.ajax.POST) {
 				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 			}
 			xhr.send(data);
@@ -532,44 +537,75 @@ if (window.bai != null) {
 }
 
 if (window.bai != null) {
-	window.bai.dialog = function() {
-		var load = function(content, title) {
-			if (content == null || ! content.nodeType) {
-				return null;
-			}
-			var _load = function(data) {
-				if (data == '') {
-					return false;
+	/** 化简JS：浮动框 */
+	window.bai.bubble = function() {
+		/** 加载后手处理 */
+		var show = function(data) {
+			var bcover = bai.own('bubble-cover');
+			var btitle = bai.own('bubble-title');
+			var bcontent = bai.own('bubble-content');
+			if (data == '') {
+				bcontent.innerHTML = bai.config('bubble', 'blank');
+			} else {
+				bcontent.innerHTML = data;
+				var burl = bai.own('bubble-url');
+				var bubbled = bcover.pick('.bubbled li[id="' + burl + '"]', 1)
+						|| bcover.pick('.bubbled', 1);
+				if (bubbled != null && bubbled.id == '') {
+					bubbled.innerHTML += '<li id="' + burl + '">' + data + '</li>';
 				}
-				content.innerHTML = data;
-				var atitle = content.pick('.title', 1);
-				if (atitle != null && title != null && title.nodeType) {
-					title.innerHTML = atitle.innerHTML;
-				}
-				return true;
-			};
-			return _load;
-		};
-
-		var $dialog = function(content, title) {
-			var screen = document.pick('.screen', 1);
-			var dialog = screen.pick('.dialog', 1);
-			var dtitle = dialog.pick('.dialog-title', 1);
-			var dcontent = dialog.pick('.dialog-content', 1);
-			if (/^https?:\/\//i.test(content)) {
-				bai.ajax(content, load(dcontent, dtitle));
-			} else if (content != null) {
-				dcontent.innerHTML = content;
 			}
+			var title = bcontent.pick('.bubble-title', 1);
 			if (title != null) {
-				dtitle.innerHTML = title;
+				btitle.innerHTML = title.innerHTML;
 			}
-			screen.set('class', '-h');
+			bcover.set('class', '-h');
+			return true;
 		};
-		$dialog.OKCANCEL = 'OKCANCEL';
-		$dialog.YESNO = 'YESNO';
 
-		return $dialog;
+		/** 失败后手处理 */
+		var fail = function(data) {
+			var bcover = bai.own('bubble-cover');
+			var btitle = bai.own('bubble-title');
+			var bcontent = bai.own('bubble-content');
+			btitle.innerHTML = bai.config('bubble', 'title');
+			bcontent.innerHTML = bai.config('bubble', 'fail');
+			bcover.set('class', '-h');
+			return true;
+		};
+
+		var $bubble = function(content, title) {
+			var bcover = document.pick('.cover', 1);
+			if (bcover == null) {
+				return false;
+			}
+			var btitle = bcover.pick('.bubble .title', 1);
+			var bcontent = bcover.pick('.bubble .content', 1);
+			if (btitle == null || bcontent == null) {
+				return false;
+			}
+			bai.own('bubble-cover', bcover);
+			bai.own('bubble-title', btitle);
+			bai.own('bubble-content', bcontent);
+			btitle.innerHTML = title || bai.config('bubble', 'title');
+			if (! /^https?:\/\//i.test(content)) {
+				bcontent.innerHTML = content || bai.config('bubble', 'content');
+				bcover.set('class', '-h');
+				return true;
+			}
+			bai.own('bubble-url', content);
+			var bubbled = bcover.pick('.bubbled li[id="' + content + '"]', 1);
+			if (bubbled != null) {
+				show(bubbled.innerHTML);
+			} else {
+				bai.ajax(content, show, fail);
+			}
+			return true;
+		};
+		$bubble.OKCANCEL = 'OKCANCEL';
+		$bubble.YESNO = 'YESNO';
+
+		return $bubble;
 	}();
 }
 

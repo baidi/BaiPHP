@@ -95,14 +95,17 @@ abstract class Bai implements ArrayAccess
 	 */
 	protected $notice = null;
 	/**
-	 * 首页
+	 * 结束标签
+	 */
+	protected $end = false;
+	/**
+	 * 默认首页
 	 */
 	protected $home = 'home.php';
 	/**
 	 * 提示页面
 	 */
 	protected $board = '_notice.php';
-	protected $skip = false;
 
 	/**
 	 * <h4>委托目标</h4>
@@ -166,7 +169,7 @@ abstract class Bai implements ArrayAccess
 					$this->notice = $step->notice;
 				}
 			}
-			if ($this->skip) {
+			if ($this->end) {
 				return $this->result;
 			}
 			### 执行正常
