@@ -64,7 +64,31 @@ $config['FlowAction'] = array(
 	)
 );
 
-$config['JS']['$config$'] = json_encode(array(
-	Work::CHECK => $config[Work::CHECK],
-	Work::LOG => $config[Work::LOG],
-));
+$config ['JS'] = array (
+	'$config$' => json_encode ( array (
+		'alt' => array(
+			'class' => 'className',
+			'html' => 'innerHTML',
+		),
+		'check' => $config [Work::CHECK],
+		'ajax' => array(
+			'timeout' => 5000,
+		),
+		'bubble' => array (
+			'shade' => '.shade',
+			'title' => '.bubble .title',
+			'content' => '.bubble .content',
+			'bubbled' => '.bubbled',
+		),
+		'message' => array (
+			'check' => $config [Work::LOG] ['dic'] [Work::CHECK],
+			'bubble' => array (
+				'title' => '提示',
+				'content' => '没有内容……',
+				'load' => '请稍候，正在加载……',
+				'fail' => '内容加载失败……',
+				'blank' => '加载完成，但是没有内容……',
+			),
+		),
+	) )
+);

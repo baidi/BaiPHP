@@ -166,6 +166,7 @@ textarea {
 }
 
 .q {
+	margin-top: 0.5em;
 	background-color: $darkarea$;
 	border: 1px dashed $darkline$;
 }

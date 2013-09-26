@@ -323,20 +323,6 @@ $config['CSS'] = array(
 	'$lockedcolor$' => '#cccccc',
 );
 
-$config['JS'] = array(
-	'$config$' => json_encode(array(
-		Work::CHECK => $config[Work::CHECK],
-		Work::LOG => $config[Work::LOG],
-		'bubble' => array(
-			'title' => '提示',
-			'content' => '没有内容……',
-			'load' => '请稍候，正在加载……',
-			'fail' => '内容加载失败……',
-			'blank' => '加载完成，但是没有内容……',
-		),
-	)),
-);
-
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
 	'success'    => '过',
