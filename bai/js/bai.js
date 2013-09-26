@@ -541,7 +541,7 @@ if (window.bai != null) {
 	window.bai.bubble = function() {
 		/** 加载后手处理 */
 		var show = function(data) {
-			var bcover = bai.own('bubble-cover');
+			var bshade = bai.own('bubble-shade');
 			var btitle = bai.own('bubble-title');
 			var bcontent = bai.own('bubble-content');
 			if (data == '') {
@@ -549,8 +549,8 @@ if (window.bai != null) {
 			} else {
 				bcontent.innerHTML = data;
 				var burl = bai.own('bubble-url');
-				var bubbled = bcover.pick('.bubbled li[id="' + burl + '"]', 1)
-						|| bcover.pick('.bubbled', 1);
+				var bubbled = bshade.pick('.bubbled li[id="' + burl + '"]', 1)
+						|| bshade.pick('.bubbled', 1);
 				if (bubbled != null && bubbled.id == '') {
 					bubbled.innerHTML += '<li id="' + burl + '">' + data + '</li>';
 				}
@@ -559,42 +559,42 @@ if (window.bai != null) {
 			if (title != null) {
 				btitle.innerHTML = title.innerHTML;
 			}
-			bcover.set('class', '-h');
+			bshade.set('class', '-h');
 			return true;
 		};
 
 		/** 失败后手处理 */
 		var fail = function(data) {
-			var bcover = bai.own('bubble-cover');
+			var bshade = bai.own('bubble-shade');
 			var btitle = bai.own('bubble-title');
 			var bcontent = bai.own('bubble-content');
 			btitle.innerHTML = bai.config('bubble', 'title');
 			bcontent.innerHTML = bai.config('bubble', 'fail');
-			bcover.set('class', '-h');
+			bshade.set('class', '-h');
 			return true;
 		};
 
 		var $bubble = function(content, title) {
-			var bcover = document.pick('.cover', 1);
-			if (bcover == null) {
+			var bshade = document.pick('.shade', 1);
+			if (bshade == null) {
 				return false;
 			}
-			var btitle = bcover.pick('.bubble .title', 1);
-			var bcontent = bcover.pick('.bubble .content', 1);
+			var btitle = bshade.pick('.bubble .title', 1);
+			var bcontent = bshade.pick('.bubble .content', 1);
 			if (btitle == null || bcontent == null) {
 				return false;
 			}
-			bai.own('bubble-cover', bcover);
+			bai.own('bubble-shade', bshade);
 			bai.own('bubble-title', btitle);
 			bai.own('bubble-content', bcontent);
 			btitle.innerHTML = title || bai.config('bubble', 'title');
 			if (! /^https?:\/\//i.test(content)) {
 				bcontent.innerHTML = content || bai.config('bubble', 'content');
-				bcover.set('class', '-h');
+				bshade.set('class', '-h');
 				return true;
 			}
 			bai.own('bubble-url', content);
-			var bubbled = bcover.pick('.bubbled li[id="' + content + '"]', 1);
+			var bubbled = bshade.pick('.bubbled li[id="' + content + '"]', 1);
 			if (bubbled != null) {
 				show(bubbled.innerHTML);
 			} else {

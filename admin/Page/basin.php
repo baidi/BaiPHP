@@ -1,11 +1,12 @@
 <?php
 $service = $this->target['service'];
 $adata = $this->target[Flow::ACTION];
+$basinCreate = $this->url('basinCreate', $service);
 ?>
 <div class="box">
 	<div class="t">
 		<span>流域</span>
-		<a class="fr tg" onclick="bai.bubble('<?php echo $this->url('basinCreate', $service); ?>')">新建</a>
+		<a class="fr tg" onclick="bai.bubble('<?php echo $basinCreate; ?>')">新建</a>
 	</div>
 	<div id="services">
 		<div class="text item tpl">

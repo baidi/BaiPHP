@@ -392,7 +392,7 @@ header, footer {
 	margin-bottom: -2px;
 }
 
-.cover {
+.shade {
 	position: fixed;
 	z-index: 4;
 	left: 0;

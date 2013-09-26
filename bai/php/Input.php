@@ -127,6 +127,7 @@ class Input extends Work
 		$setting['event'] = $event;
 		$setting['item'] = $item;
 		$setting['value'] = $this->value($this->pick('type', $setting), $this->target[$item]);
+		$setting['class'] = empty($setting['class']) ? 'input' : $setting['class'].' input';
 		### 解析模板
 		$this->result = Template::cut($template, $setting);
 		return $this->result;

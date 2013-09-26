@@ -1,4 +1,4 @@
-<table class="cover h"><tr><td>
+<table class="shade h"><tr><td>
 	<div class="bubble s">
 		<div class="title ad tg"></div>
 		<div class="content text tl">
