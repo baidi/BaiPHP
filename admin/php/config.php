@@ -33,8 +33,14 @@ $config[Work::CHECK][Work::EVENT] = array(
 		'aevent' => 'required type=char',
 	),
 	'basinCreate' => array(
-		'abasin' => 'required max=20 type=char',
+		'abasin' => 'required min=3 max=20 type=char',
 	),
+);
+
+$config[Work::LOG]['dic']['BasinCreateAction'] = array(
+	'engage' => '该流域已存在……',
+	'basin' => '新建流域：%s',
+	'fail' => '流域创建失败……',
 );
 
 $config['BasinAction'] = array(
@@ -44,7 +50,6 @@ $config['BasinAction'] = array(
 		'.git' => true,
 		'.runtime' => true,
 		'.settings' => true,
-		'bai' => true
 	)
 );
 $config['BasinCreateAction'] = array(
@@ -69,6 +74,7 @@ $config ['JS'] = array (
 		'alt' => array(
 			'class' => 'className',
 			'html' => 'innerHTML',
+			'text' => 'innerText',
 		),
 		'check' => $config [Work::CHECK],
 		'ajax' => array(

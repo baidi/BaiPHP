@@ -60,6 +60,10 @@
 		if (item == null || item.constructor != String) {
 			return null;
 		}
+		var alt = bai.config(bai.alt);
+		if (alt != null && alt[item] != null) {
+			item = alt[item];
+		}
 		if (this.hasAttribute(item)) {
 			return this.getAttribute(item);
 		}
@@ -71,11 +75,15 @@
 		if (item == null || item.constructor != String) {
 			return false;
 		}
+		var alt = bai.config(bai.alt);
+		if (alt != null && alt[item] != null) {
+			item = alt[item];
+		}
 		value = value || '';
 		if (value.constructor != String) {
 			value = value.toString();
 		}
-		if (item == 'class') {
+		if (item == 'className') {
 			var list = this.classList;
 			if (value[0] == '+') {
 				list.add(value.substr(1));
@@ -95,7 +103,7 @@
 		if (item == null) {
 			return null;
 		}
-		var pre = /-[a-z]/g;
+		var pre = /-[a-z]/gi;
 		var post = function(prefix) {
 			return prefix[1].toUpperCase();
 		};
@@ -202,11 +210,12 @@
 		verson: '2.0.0',
 		date: '2013-7-30',
 		author: '白晓阳',
-		history: '',
-		message: 'message'
+		history: ''
 	};
+	$bai.alt = 'alt';
+	$bai.message = 'message';
 	/** 化简JS：全局配置 */
-	var $config = $config$;
+	var $config = $config$ || {};
 	/** 化简JS：私有属性 */
 	var $own = {};
 
@@ -288,6 +297,20 @@
 	$bai.to.CSS = 'CSS';
 	$bai.to.POST = 'POST';
 	$bai.to.JSON = 'JSON';
+	
+	$bai.json = function(origin) {
+		if (origin == null || origin.constructor == Object) {
+			return origin;
+		}
+		if (origin.constructor != String || JSON == null) {
+			return false;
+		}
+		try {
+			return JSON.parse(origin);
+		} catch(e) {
+			return false;
+		}
+	};
 
 	/** 化简JS：执行CSS选择器 */
 	$bai.pick = function(query, one) {
@@ -301,12 +324,13 @@ if (window.bai != null) {
 	/** 化简JS：输入项检验 */
 	window.bai.check = function() {
 		var $name = 'check';
+		var $message = bai.message;
 
 		/** 输入项非空检验 */
 		var required = function(item) {
 			if (item == null || (item.constructor == String && item.trim() == "")
 					|| (item.constructor == Array && item.length == 0)) {
-				return bai.config(bai.message, $name, 'required');
+				return bai.config($message, $name, 'required');
 			}
 			return false;
 		};
@@ -318,7 +342,7 @@ if (window.bai != null) {
 			}
 			var mode = eval(bai.config($name, 'types', 'risk'));
 			if (mode.constructor != RegExp || mode.test(item)) {
-				return bai.config(bai.message, $name, 'risk');
+				return bai.config($message, $name, 'risk');
 			}
 			return false;
 		};
@@ -327,7 +351,7 @@ if (window.bai != null) {
 		var min = function(item, len) {
 			if (item.constructor == String && item.trim().length < len
 					|| item.constructor == Array && item.length < len) {
-				return bai.config(bai.message, $name, 'min').replace('%s', len);
+				return bai.config($message, $name, 'min').replace('%s', len);
 			}
 			return false;
 		};
@@ -336,7 +360,7 @@ if (window.bai != null) {
 		var max = function(item, len) {
 			if (item.constructor == String && item.trim().length > len
 					|| item.constructor == Array && item.length > len) {
-				return bai.config(bai.message, $name, 'max').replace('%s', len);
+				return bai.config($message, $name, 'max').replace('%s', len);
 			}
 			return false;
 		};
@@ -345,9 +369,9 @@ if (window.bai != null) {
 		var type = function(item, type) {
 			var mode = eval(bai.config($name, 'types', type));
 			if (mode.constructor != RegExp || ! mode.test(item)) {
-				return bai.config(bai.message, $name, 'type');
+				return bai.config($message, $name, 'type');
 			}
-			return bai.config(bai.message, $name, 'type');
+			return false;
 		};
 
 		/** 输入项目检验 */
@@ -418,7 +442,8 @@ if (window.bai != null) {
 if (window.bai != null) {
 	/** 化简JS：异步访问 */
 	window.bai.ajax = function() {
-		$name = 'ajax';
+		var $name = 'ajax';
+		var $message = bai.message;
 
 		Element.prototype.load = function(url) {
 			bai.ajax(url, this);
@@ -434,8 +459,16 @@ if (window.bai != null) {
 					return false;
 				}
 				if (this.status == 200) {
+					var data = this.responseText;
+					if (data[0] == '{' && data[data.length - 1] == '}') {
+						try {
+							data = eval(data);
+						} catch(e) {
+							data = this.responseText;
+						}
+					}
 					if (success && success.constructor == Function) {
-						return success(this.responseText);
+						return success(data);
 					}
 					return false;
 				}
@@ -542,23 +575,29 @@ if (window.bai != null) {
 }
 
 if (window.bai != null) {
-	/** 化简JS：浮动框体 */
+	/** 化简JS：浮出框体 */
 	window.bai.bubble = function() {
 		var $name = 'bubble';
+		var $message = bai.message;
+		var $url = 'bubble-url';
+		var $shade = 'bubble-shade';
+		var $title = 'bubble-title';
+		var $content = 'bubble-content';
+		var $success = 'bubble-success';
+		var $failure = 'bubble-failure';
 
-		/** 加载后手处理 */
-		var show = function(data) {
-			var bshade = bai.own('bubble-shade');
-			var btitle = bai.own('bubble-title');
-			var bcontent = bai.own('bubble-content');
+		/** 加载框体 */
+		var show = function(data, id) {
+			var bshade = bai.own($shade);
+			var btitle = bai.own($title);
+			var bcontent = bai.own($content);
 			if (data == '') {
-				bcontent.innerHTML = bai.config(bai.message, $name, 'blank');
+				bcontent.innerHTML = bai.config($message, $name, 'blank');
 			} else {
 				bcontent.innerHTML = data;
-				var burl = bai.own('bubble-url');
-				var bubbled = bshade.pick('.bubbled li[id="' + burl + '"]', 1)
-						|| bshade.pick('.bubbled', 1);
-				if (bubbled != null && bubbled.id == '') {
+				if (id == null) {
+					var burl = bai.own($url);
+					var bubbled = bshade.pick('.bubbled', 1);
 					bubbled.innerHTML += '<li id="' + burl + '">' + data + '</li>';
 				}
 			}
@@ -572,31 +611,34 @@ if (window.bai != null) {
 
 		/** 失败后手处理 */
 		var fail = function(data) {
-			var bshade = bai.own('bubble-shade');
-			var btitle = bai.own('bubble-title');
-			var bcontent = bai.own('bubble-content');
-			btitle.innerHTML = bai.config(bai.message, $name, 'title');
-			bcontent.innerHTML = bai.config(bai.message, $name, 'fail');
+			var bshade = document.pick('.shade', 1);
+			var bcontent = bshade.pick('.bubble .content', 1);
+			bcontent.innerHTML = bai.config($message, $name, 'fail');
 			bshade.set('class', '-h');
 			return true;
 		};
 
 		/** 关闭框体 */
-		var calm = function(e) {
-			var bshade = bai.own('bubble-shade');
-			bshade.set('class', '+h');
+		var close = function(e) {
+			bai.pick('.shade', 1).set('class', '+h');
 		};
 
 		var submit = function(e) {
-			var bcontent = bai.own('bubble-content');
+			var bcontent = bai.own($content);
 			var check = bai.check(bcontent);
 			if (check != null && check.input != null) {
 				check.input.nextSibling.pick(':last-child', 1).innerHTML = check.result;
 				check.input.nextSibling.set('class', '-h');
+				return false;
 			}
+			var burl = bai.own($url);
+			bai.ajax(burl, check.result, function(){
+				
+			});
+			close(e);
 		};
 
-		var $bubble = function(content, title) {
+		var $bubble = function(content, title, success, failure) {
 			var bshade = document.pick('.shade', 1);
 			if (bshade == null) {
 				return false;
@@ -606,21 +648,29 @@ if (window.bai != null) {
 			if (btitle == null || bcontent == null) {
 				return false;
 			}
-			bai.own('bubble-shade', bshade);
-			bai.own('bubble-title', btitle);
-			bai.own('bubble-content', bcontent);
-			btitle.innerHTML = title || bai.config(bai.message, $name, 'title');
+			bai.own($shade, bshade);
+			bai.own($title, btitle);
+			bai.own($content, bcontent);
+			if (title != null && bai.is(title, bai.is.Function)) {
+				failure = success;
+				success = title;
+				title = null;
+			}
+			bai.own($success, bshade);
+			bai.own($failure, btitle);
+			btitle.innerHTML = title || bai.config($message, $name, 'title');
 			bshade.pick('.bok', 1).onclick = submit;
-			bshade.pick('.bcancel', 1).onclick = calm;
+			bshade.pick('.bcancel', 1).onclick = close;
+			bshade.pick('.bclose', 1).onclick = close;
 			if (! /^https?:\/\//i.test(content)) {
-				bcontent.innerHTML = content || bai.config(bai.message, $name, 'content');
+				bcontent.innerHTML = content || bai.config($message, $name, 'content');
 				bshade.set('class', '-h');
 				return true;
 			}
-			bai.own('bubble-url', content);
+			bai.own($url, content);
 			var bubbled = bshade.pick('.bubbled li[id="' + content + '"]', 1);
 			if (bubbled != null) {
-				show(bubbled.innerHTML);
+				show(bubbled.innerHTML, content);
 			} else {
 				bai.ajax(content, show, fail);
 			}

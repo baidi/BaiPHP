@@ -33,22 +33,28 @@ class BasinCreateAction extends Action
 
 	protected function engage()
 	{
+		$this->end = true;
 		$basin = _LOCAL.$this->target['abasin']._DIR;
 		$result = array();
 		if (is_dir($basin)) {
 			$result['status'] = false;
-			return false;
+			$result['notice'] = Log::logs(__FUNCTION__, __CLASS__);
+			return $result;
 		}
-		mkdir($basin);
-		if (is_array($this->include)) {
+		Log::logf('basin', $basin, __CLASS__);
+		$status = mkdir($basin, 0755);
+		if ($status && is_array($this->include)) {
 			foreach ($this->include as $item => $flag) {
 				if (! $flag) {
 					continue;
 				}
-				mkdir($basin.$item);
+				$status = $status && mkdir($basin.$item, 0755);
 			}
 		}
-		$result['status'] = true;
-		$this->target[Flow::ACTION] = $result;
+		$result['status'] = $status;
+		if (! $status) {
+			$result['notice'] = Log::logs('fail', __CLASS__);
+		}
+		return $result;
 	}
 }

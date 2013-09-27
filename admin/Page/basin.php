@@ -3,15 +3,27 @@ $service = $this->target['service'];
 $adata = $this->target[Flow::ACTION];
 $basinCreate = $this->url('basinCreate', $service);
 ?>
+<<script type="text/javascript">
+<!--
+var basinCreate = function(basin) {
+	var tpl = bai.pick('.tpl', 1);
+	if (tpl == null) {
+		return false;
+	}
+	tpl.parentNode.appendChild(tpl.cloneNode(true));
+}
+//-->
+</script>
 <div class="box">
 	<div class="t">
 		<span>流域</span>
-		<a class="fr tg" onclick="bai.bubble('<?php echo $basinCreate; ?>')">新建</a>
+		<a class="fr tg" onclick="bai.bubble('<?php echo $basinCreate; ?>', basinCreate)">新建</a>
 	</div>
 	<div id="services">
 		<div class="text item tpl">
 			<input type="text" name="aservice" value="" />
 			<span class="w100 fr">
+				<a href="">查看</a>
 				<a href="">保存</a>
 				<a href="">删除</a>
 			</span>
