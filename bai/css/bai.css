@@ -141,7 +141,7 @@ textarea {
 }
 
 .h {
-	display: none;
+	display: none !important;
 }
 
 .i {
@@ -252,7 +252,13 @@ header, footer {
 }
 
 .notice {
-	color: $noticecolor$
+	color: #f04000;
+}
+input:after { 
+	content:"-!";
+	background-color:yellow;
+	color:red;
+	font-weight:bold;
 }
 
 .locked {
@@ -418,7 +424,6 @@ header, footer {
 	border-bottom: 1px solid $lightline$;
 }
 .bubble .content {
-	padding: 1em;
 }
 .bubble .toolbar {
 	padding: 0.5em 1em;

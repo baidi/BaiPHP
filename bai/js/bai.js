@@ -31,14 +31,14 @@
 
 	/** 数组：依次处理子项目 */
 	Array.prototype.each = NodeList.prototype.each = function(action) {
-		if (action == null || action.constructor != Function) {
+		if (! bai.is(action, bai.is.FUNCTION)) {
 			return false;
 		}
 		var result = null;
 		for (var i = 0, m = this.length; i < m; i++) {
 			result = action.call(this[i], i);
 			if (result === false) {
-				break;
+				return result;
 			}
 		}
 		return true;
@@ -46,9 +46,6 @@
 
 	/** 元素：执行CSS选择器 */
 	Element.prototype.pick = Document.prototype.pick = function(query, one) {
-		if (query == null || query.constructor != String) {
-			return null;
-		}
 		if (one) {
 			return this.querySelector(query);
 		}
@@ -57,13 +54,10 @@
 
 	/** 元素：读取自身属性 */
 	Element.prototype.get = function(item) {
-		if (item == null || item.constructor != String) {
+		if (! bai.is(action, bai.is.STRING) || item == '') {
 			return null;
 		}
-		var alt = bai.config(bai.alt);
-		if (alt != null && alt[item] != null) {
-			item = alt[item];
-		}
+		item = bai.config('alt', item) || item;
 		if (this.hasAttribute(item)) {
 			return this.getAttribute(item);
 		}
@@ -72,17 +66,11 @@
 
 	/** 元素：设置自身属性 */
 	Element.prototype.set = function(item, value) {
-		if (item == null || item.constructor != String) {
+		if (! bai.is(action, bai.is.STRING) || item == '') {
 			return false;
 		}
-		var alt = bai.config(bai.alt);
-		if (alt != null && alt[item] != null) {
-			item = alt[item];
-		}
+		item = bai.config('alt', item) || item;
 		value = value || '';
-		if (value.constructor != String) {
-			value = value.toString();
-		}
 		if (item == 'className') {
 			var list = this.classList;
 			if (value[0] == '+') {
@@ -98,6 +86,25 @@
 		return true;
 	};
 
+	/** 元素：查验自身属性 */
+	Element.prototype.has = function(item, value) {
+		if (! bai.is(action, bai.is.STRING) || item == '') {
+			return false;
+		}
+		item = bai.config('alt', item) || item;
+		value = value || '';
+		if (this[item] == null || value == '') {
+			return false;
+		}
+		if (item == 'className') {
+			return this.classList.contains(value);
+		}
+		if (this[item].indexOf != null) {
+			return this[item].indexOf(value) !== false;
+		}
+		return false;
+	};
+
 	/** 元素：设置自身样式 */
 	Element.prototype.css = function(item, value) {
 		if (item == null) {
@@ -107,7 +114,8 @@
 		var post = function(prefix) {
 			return prefix[1].toUpperCase();
 		};
-		if (item.constructor == String) {
+		if (bai.is(item, bai.is.STRING)) {
+			//设置单个样式
 			if (item.indexOf('-') >= 0) {
 				item = item.toLowerCase().replace(pre, post);
 			}
@@ -116,9 +124,10 @@
 			}
 			return this.style[item] = value || '';
 		}
-		if (item.constructor == Object) {
-			var key = null, proper = null;
-			for (key in item) {
+		if (bai.is(item, bai.is.JSON)) {
+			// 设置一组样式
+			var proper = null;
+			for (var key in item) {
 				if (key == null) {
 					continue;
 				}
@@ -128,26 +137,23 @@
 				this.style[proper] = item[key] || '';
 			}
 		}
-		return null;
 	};
 
 	/** 元素：绑定事件 */
 	Element.prototype.on = function(item, action) {
-		if (item == null || item.constructor != String) {
+		if (! bai.is(item, bai.is.STRING)) {
 			return false;
 		}
 		if (item.substr(0, 2) != 'on') {
 			item = 'on' + item;
 		}
-		if (this[item] == undefined) {
+		if (this[item] === undefined) {
 			return false;
 		}
-		if (action != null && (action.constructor == String
-				|| action.constructor == Function)) {
-			this[item] = action;
-			return true;
+		if (action === undefined) {
+			return this[item]();
 		}
-		this[item] = null;
+		this[item] = action;
 		return true;
 	};
 
@@ -170,36 +176,34 @@
 		if (style.baicss == null) {
 			style.baicss = {};
 		}
-		if (css.constructor == String) {
+		// 简单变换
+		if (bai.is(css, bai.is.STRING)) {
+			// 建立变换帧
 			if (style.baicss[css] == null) {
-				if (navigator.userAgent.indexOf('AppleWebKit') >= 0) {
-					style.insertRule('@-webkit-keyframes "' + css + '" {from {} to {' + css + '}}');
-				} else {
+				try {
 					style.insertRule('@keyframes "' + css + '" {from {} to {' + css + '}}');
+				} catch (e) {
+					style.insertRule('@-webkit-keyframes "' + css + '" {from {} to {' + css + '}}');
 				}
 				style.baicss[css] = true;
 			}
+			// 建立变换样式
 			var animation = ['"' + css + '"', duration, replay].join(' ');
 			this.css({animation: animation, '-webkit-animation': animation});
 			return true;
 		}
-		var scss = [];
-		for (var i in css) {
-			if (i == null) {
-				continue;
+		// 定制变换
+		css = bai.to(css);
+		if (style.baicss[css] == null) {
+			try {
+				style.insertRule('@keyframes "' + css + '" {' + css + '}');
+			} catch (e) {
+				style.insertRule('@-webkit-keyframes "' + css + '" {' + css + '}');
 			}
-			scss.push(i + css[i]);
+			style.baicss[css] = true;
 		}
-		scss = scss.join();
-		if (style.baicss[scss] == null) {
-			if (navigator.userAgent.indexOf('AppleWebKit') >= 0) {
-				style.insertRule('@-webkit-keyframes "' + scss + '" {' + scss + '}');
-			} else {
-				style.insertRule('@keyframes "' + scss + '" {' + scss + '}');
-			}
-			style.baicss[scss] = true;
-		}
-		var animation = ['"' + scss + '"', duration, replay].join(' ');
+		// 建立变换样式
+		var animation = ['"' + css + '"', duration, replay].join(' ');
 		this.css({animation: animation, '-webkit-animation': animation});
 		return true;
 	};
@@ -212,7 +216,6 @@
 		author: '白晓阳',
 		history: ''
 	};
-	$bai.alt = 'alt';
 	/** 化简JS：全局配置 */
 	var $config = $config$ || {};
 	/** 化简JS：私有属性 */
@@ -231,13 +234,18 @@
 		return value;
 	};
 
+	/** 化简JS：读取消息配置 */
 	$bai.message = function() {
-		return this.config(['message'].concat(arguments));
+		var params = ['message'];
+		for (var i = 0, m = arguments.length; i < m; i++) {
+			params.push(arguments[i]);
+		}
+		return bai.config.apply(this, params);
 	};
 
 	/** 化简JS：访问私有属性 */
 	$bai.own = function(item, value) {
-		if (item == null) {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return null;
 		}
 		if (value === undefined) {
@@ -246,9 +254,9 @@
 		return $own[item] = value;
 	};
 
-	/** 化简JS：输出信息 */
+	/** 化简JS：输出日志信息 */
 	$bai.log = function() {
-		if (console && console.log && console.log.constructor == Function) {
+		if (console && bai.is(console.log, bai.is.FUNCTION)) {
 			console.log.apply(this, arguments);
 		}
 	};
@@ -258,27 +266,35 @@
 		if (origin == null || type == null) {
 			return false;
 		}
+		if (type == bai.is.URL) {
+			return /^https?:\/\//i.test(origin);
+		}
 		return origin.constructor == type;
 	};
 	$bai.is.STRING = String;
-	$bai.is.OBJECT = Object;
 	$bai.is.ARRAY = Array;
 	$bai.is.BOOLEAN = Boolean;
 	$bai.is.NUMBER = Number;
 	$bai.is.DATE = Date;
+	$bai.is.JSON = Object;
 	$bai.is.FUNCTION = Function;
-	$bai.is.EVENT = Event;
+	$bai.is.REGEXP = RegExp;
+	$bai.is.URL = 'URL';
 
-	/** 化简JS：转换对象到特定格式 */
+	/** 化简JS：转换对象到特定格式字符串 */
 	$bai.to = function(origin, type) {
 		if (origin == null) {
 			return '';
 		}
-		if (origin.constructor != Object) {
+		if (! bai.is(origin, bai.is.JSON)) {
 			return origin.toString();
 		}
-		var result = [], gaps;
+		// 转换结果
+		var result = [];
+		// 间隔符
+		var gaps = null;
 		if ($bai.is(type, $bai.is.ARRAY)) {
+			// 自定义间隔符
 			gaps = type;
 		} else if (type == $bai.to.CSS) {
 			gaps = [':', ';', '', ';'];
@@ -289,6 +305,7 @@
 		} else {
 			gaps = ['', ''];
 		}
+		// 插入间隔形成特定格式
 		for (var i in origin) {
 			if (i == null || $bai.is(origin[i], $bai.is.FUNCTION)) {
 				continue;
@@ -301,20 +318,6 @@
 	$bai.to.CSS = 'CSS';
 	$bai.to.POST = 'POST';
 	$bai.to.JSON = 'JSON';
-	
-	$bai.json = function(origin) {
-		if (origin == null || origin.constructor == Object) {
-			return origin;
-		}
-		if (origin.constructor != String || JSON == null) {
-			return false;
-		}
-		try {
-			return JSON.parse(origin);
-		} catch(e) {
-			return false;
-		}
-	};
 
 	/** 化简JS：执行CSS选择器 */
 	$bai.pick = function(query, scope) {
@@ -328,114 +331,146 @@
 })(window);
 
 if (window.bai != null) {
+
 	/** 化简JS：输入项检验 */
 	window.bai.check = function() {
 		var $name = 'check';
-		var $message = bai.message;
+		var $types = ['INPUT', 'SELECT', 'TEXTAREA'];
 
-		/** 输入项非空检验 */
-		var required = function(item) {
-			if (item == null || (item.constructor == String && item.trim() == "")
-					|| (item.constructor == Array && item.length == 0)) {
-				return bai.config($message, $name, 'required');
+		/** 非空检验 */
+		var required = function(input) {
+			if (input == null || input == '' || input.length == 0) {
+				return bai.message($name, 'required');
 			}
 			return false;
 		};
 
-		/** 输入项风险字符检验 */
-		var risk = function(item) {
-			if (item.constructor == Array) {
-				item = item.join('');
+		/** 风险字符检验 */
+		var risk = function(input) {
+			if (bai.is(input, bai.is.ARRAY)) {
+				input = input.join('');
 			}
 			var mode = eval(bai.config($name, 'types', 'risk'));
-			if (mode.constructor != RegExp || mode.test(item)) {
-				return bai.config($message, $name, 'risk');
+			if (bai.is(mode, bai.is.REGEXP) && mode.test(input)) {
+				return bai.message($name, 'risk');
 			}
 			return false;
 		};
 
-		/** 输入项最小长度检验 */
-		var min = function(item, len) {
-			if (item.constructor == String && item.trim().length < len
-					|| item.constructor == Array && item.length < len) {
-				return bai.config($message, $name, 'min').replace('%s', len);
+		/** 最小长度检验 */
+		var min = function(input, len) {
+			if (input.length < len) {
+				return bai.message($name, 'min').replace('%d', len);
 			}
 			return false;
 		};
 
-		/** 输入项最大长度检验 */
-		var max = function(item, len) {
-			if (item.constructor == String && item.trim().length > len
-					|| item.constructor == Array && item.length > len) {
-				return bai.config($message, $name, 'max').replace('%s', len);
+		/** 最大长度检验 */
+		var max = function(input, len) {
+			if (input.length > len) {
+				return bai.message($name, 'max').replace('%d', len);
 			}
 			return false;
 		};
 
-		/** 输入项属性检验 */
+		/** 属性检验 */
 		var type = function(item, type) {
 			var mode = eval(bai.config($name, 'types', type));
-			if (mode.constructor != RegExp || ! mode.test(item)) {
-				return bai.config($message, $name, 'type');
+			if (bai.is(mode, bai.is.REGEXP) && ! mode.test(item)) {
+				return bai.message($name, 'type');
 			}
 			return false;
 		};
 
-		/** 输入项目检验 */
+		/** 检验输入项目 */
 		var checkInput = function(callback) {
-			var mode = bai.config($name, 'mode');
-			if (mode == null || (mode = eval(mode + 'g')).constructor != RegExp) {
-				return false;
-			}
+			// 检验内容
 			var checks = this.get('data-check');
 			if (checks == null || checks == '') {
 				return false;
 			}
+			// 检验条目匹配式
+			var mode = bai.config($name, 'mode');
+			if (mode == null || ! bai.is((mode = eval(mode + 'g')), bai.is.REGEXP)) {
+				return false;
+			}
+			// 检验条目
+			var check = null;
+			// 检验处理
+			var action = null;
+			// 检验参数
+			var params = null;
+			// 检验结果
+			var result = null;
+			// 参数分割符
 			var gap = bai.config($name, 'gap');
-			var check, action, params, result;
 			while ((check = mode.exec(checks)) != null) {
-				if ((action = eval(check[1])).constructor != Function) {
+				// 解析检验处理
+				if (! bai.is((action = eval(check[1])), bai.is.FUNCTION)) {
 					continue;
 				}
+				// 分组织检验参数
 				params = [this.value];
 				if (check[2] != null) {
 					params = params.concat(check[2].split(gap));
 				}
+				// 应用检验处理
 				result = action.apply(this, params);
 				if (result) {
-					if (callback != null && callback.constructor == Function) {
-						callback(this, result);
-					}
+					callback(this, result);
 					return result;
 				}
 			}
 			return false;
 		};
 
+		/** 提示检验结果 */
+		var notice = function(input, result) {
+			var change = input.onchange;
+			input.set('class', '+notice');
+			input.onchange = function(e) {
+				this.set('class', '-notice');
+				this.onchange = change;
+			};
+		};
+
+		/**
+		 * 化简JS：输入项检验
+		 * @param scope 检验区域
+		 * @param callback 后手处理
+		 */
 		var $check = function(scope, callback) {
 			if (scope == null) {
+				// 默认检验区域为当前文档
 				scope = document;
 			}
-			if (scope != null && scope.constructor == String) {
+			if (bai.is(scope, bai.is.STRING)) {
+				// 从文档挑选检验区域
 				scope = document.pick(scope, 1);
 			}
-			if (scope.nodeType == null || scope.nodeType != 1 && scope.nodeType != 9) {
-				return null;
+			if (scope.nodeType != 1 && scope.nodeType != 9) {
+				return false;
 			}
-			var types = ['INPUT', 'SELECT', 'TEXTAREA'];
+			if (! bai.is(callback, bai.is.FUNCTION)) {
+				// 设置默认后手处理
+				callback = notice;
+			}
 			var inputs = null;
-			if (types.indexOf(scope.tagName) < 0) {
+			if ($types.indexOf(scope.tagName) < 0) {
+				// 从检验区域中挑选输入检验项
 				inputs = scope.pick('.input');
 				if (! inputs.length) {
-					return null;
+					return false;
 				}
 			} else {
+				// 检验区域为输入项
 				inputs = [scope];
 			}
 			var data = [];
 			var result = false;
 			for (var i = 0, m = inputs.length; i < m; i++) {
 				data.push(inputs[i].name + '=' + inputs[i].value);
+				// 依次检验输入项目
 				if (result = checkInput.call(inputs[i], callback)) {
 					return {input: inputs[i], result: result};
 				}
@@ -447,156 +482,121 @@ if (window.bai != null) {
 }
 
 if (window.bai != null) {
+
 	/** 化简JS：异步访问 */
 	window.bai.ajax = function() {
 		var $name = 'ajax';
-		var $message = bai.message;
 
+		/** 元素：异步加载内容 */
 		Element.prototype.load = function(url) {
 			bai.ajax(url, this);
 		};
 
-		/** 访问过期时间（毫秒） */
-		var timeout = parseInt(bai.config($name, 'timeout')) || 5000;
+		/** 元素加载后手处理 */
+		var load = function(box) {
+			return function(data, url) {
+				box.innerHTML = data || bai.message($name, 'fail');
+			};
+		};
 
-		/** 访问后手处理 */
-		var callback = function(success, failure) {
-			var _action = function() {
+		/**
+		 * 异步访问后手处理
+		 * @param url 访问地址
+		 * @param success 成功后手处理
+		 * @param failure 失败后手处理
+		 */
+		var callback = function(url, success, failure) {
+			return function() {
 				if (this.readyState != 4) {
 					return false;
 				}
 				if (this.status == 200) {
 					var data = this.responseText;
 					if (data[0] == '{' && data[data.length - 1] == '}') {
+						// 解析JSON对象
 						try {
 							data = eval(data);
-						} catch(e) {
-							data = this.responseText;
-						}
+						} catch(e) {}
 					}
-					if (success && success.constructor == Function) {
-						return success(data);
+					// 成功后手处理
+					if (bai.is(success, bai.is.FUNCTION)) {
+						return success(data, url);
 					}
 					return false;
 				}
-				if (failure && failure.constructor == Function) {
-					return failure(this.responseText);
+				// 失败后手处理
+				if (bai.is(failure, bai.is.FUNCTION)) {
+					return failure(this.responseText, url);
 				}
 				return false;
 			};
-			return _action;
 		};
 
-		/** 元素加载处理 */
-		var load = function(box) {
-			if (! box.nodeType) {
-				return null;
-			}
-			var _load = function(data) {
-				box.innerHTML = data;
-			};
-			return _load;
-		};
-
-		/** 访问数据打包 */
-		var pack = function(data) {
-			if (data == null || data.constructor == String) {
-				return data;
-			}
-			if (data.constructor == Array) {
-				return data.join('&');
-			}
-			if (data.constructor == Object) {
-				var result = [];
-				for (var i in data) {
-					if (i == null) {
-						continue;
-					}
-					if (data.i == null) {
-						result.push(i + '=');
-						continue;
-					}
-					if (data.i.constructor == Function) {
-						continue;
-					}
-					if (data.i.constructor == Boolean) {
-						result.push(i + '=' + (data.i ? 1 : 0));
-						continue;
-					}
-					result.push(i + '=' + data.i.toString());
-				}
-				return result.join('&');
-			}
-			return data.toString();
-		};
-
+		/**
+		 * 化简JS：异步访问
+		 * @param url 访问地址（http|https）
+		 * @param data 访问方式或访问数据
+		 * @param success 成功后手处理
+		 * @param failure 失败后手处理
+		 */
 		var $ajax = function(url, data, success, failure) {
-			if (window.XMLHttpRequest == null || url == null) {
+			if (XMLHttpRequest == null || ! bai.is(url, bai.is.URL)) {
 				return false;
 			}
-			if (url.constructor != String) {
-				data = url['data'];
-				success = url['success'];
-				failure = url['failure'];
-				url = url['url'];
-				if (url == null || url.constructor != String) {
-					return false;
-				}
-			}
-			url += (url.indexOf('?' > 0) ? '&ajax=1' : '?ajax=1');
-			var type = bai.ajax.GET;
-			if (data == null || data == bai.ajax.GET) {
+			// 访问方式，默认为GET
+			var method = bai.ajax.GET;
+			if (data == bai.ajax.GET) {
+				// data传递访问方式
 				data = null;
-			} else if (data.constructor == Function) {
-				if (success) {
-					failure = success;
-				}
+			} else if (bai.is(data, bai.is.FUNCTION)) {
+				// data传递成功后手处理
+				failure = success;
 				success = data;
 				data = null;
 			} else if (data.nodeType) {
-				if (success) {
-					failure = success;
-				}
+				// data传递页面元素
+				failure = success;
 				success = load(data);
 				data = null;
 			} else {
-				type = bai.ajax.POST;
-				data = pack(data);
+				// data传递提交数据
+				method = bai.ajax.POST;
+				data = (data == bai.ajax.POST ? null : bai.to(data, bai.to.POST));
 			}
 
+			// 组织异步请求
 			var xhr = new XMLHttpRequest();
-			xhr.timeout = timeout;
-			xhr.onreadystatechange = callback(success, failure);
-			xhr.open(type, url, true);
-			if (type == bai.ajax.POST) {
+			xhr.timeout = parseInt(bai.config($name, 'timeout')) || 5000;
+			xhr.onreadystatechange = callback(url, success, failure);
+			xhr.open(method, url + '&ajax=1', true);
+			if (method == bai.ajax.POST) {
 				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 			}
 			xhr.send(data);
 			return null;
 		};
-
 		$ajax.GET = 'GET';
 		$ajax.POST = 'POST';
+
 		return $ajax;
 	}();
 }
 
 if (window.bai != null) {
+
 	/** 化简JS：浮出提示 */
 	window.bai.bubble = function() {
 		var $name = 'bubble';
 		var $shade = null, $title = null, $content = null, $toolbar = null, $bubbled = null;
 
 		/** 加载提示内容 */
-		var load = function(content, id) {
+		var load = function(content, url) {
 			if (content == '') {
 				$content.innerHTML = bai.message($name, '');
 			} else {
 				$content.innerHTML = content;
-				if (id == null) {
-					var burl = bai.own($url);
-					var bubbled = $shade.pick('.bubbled', 1);
-					bubbled.innerHTML += '<li id="' + burl + '">' + content + '</li>';
+				if (url != null) {
+					$bubbled.innerHTML += '<li id="' + url + '">' + content + '</li>';
 				}
 			}
 			var title = $content.pick('.bubble-title', 1);
@@ -622,38 +622,26 @@ if (window.bai != null) {
 			$shade.set('class', '+h');
 		};
 
+		/** 准备确认处理 */
 		var submit = function(action) {
 			if (! bai.is(action, bai.is.FUNCTION)) {
-				return function(e) {
-					if (action(e) !== false) {
-						close(e);
-					}
-				};
+				return close;
 			}
-			if (bai.is(action, bai.is.STRING)) {
-				return function(e) {
-					var check = bai.check($content);
-					if (check != null && check.input != null) {
-						check.input.nextSibling.pick(':last-child', 1).innerHTML = check.result;
-						check.input.nextSibling.set('class', '-h');
-						return false;
-					}
-					bai.ajax(action, check.result, function(data){
-						
-					});
-				};
+			return function(e) {
+				if (action(e) !== false) {
+					close(e);
+				}
 			};
-			return close;
 		};
 
 		/**
 		 * 化简JS：浮出提示
 		 * @param content 提示内容，若为网址（http|https）则异步加载
 		 * @param title 提示标题
-		 * @param okay 确认处理，默认关闭提示
+		 * @param action 确认处理，默认关闭提示
 		 * @param cancel 否认处理，默认关闭提示
 		 */
-		var $bubble = function(content, title, okay, cancel, buttons) {
+		var $bubble = function(content, title, action, cancel, buttons) {
 			// 背景
 			$shade = $shade || bai.pick('.shade');
 			if ($shade == null) {
@@ -671,8 +659,8 @@ if (window.bai != null) {
 				return false;
 			}
 			if (bai.is(title, bai.is.FUNCTION)) {
-				cancel = okay;
-				okay = title;
+				cancel = action;
+				action = title;
 				title = null;
 			}
 			// 设置标题
@@ -680,7 +668,7 @@ if (window.bai != null) {
 			// 设置关闭处理
 			$shade.pick('.bclose', 1).onclick = close;
 			// 设置确认处理
-			$shade.pick('.bokay', 1).onclick = submit(okay);
+			$shade.pick('.bokay', 1).onclick = submit(action);
 			// 设置取消处理
 			var bcancel = $shade.pick('.bcancel', 1);
 			if (bai.is(cancel, bai.is.FUNCTION)) {
@@ -693,11 +681,10 @@ if (window.bai != null) {
 				show();
 				return true;
 			}
-			bai.own($url, content);
-			var bubbled = $bubbled.pick('li[id="' + content + '"]', 1);
-			if (bubbled != null) {
+			var last = $bubbled.pick('li[id="' + content + '"]', 1);
+			if (last != null) {
 				// 加载历史内容
-				load(bubbled.innerHTML, content);
+				load(last.innerHTML);
 			} else {
 				// 加载远程内容
 				bai.ajax(content, load, fail);
@@ -710,85 +697,3 @@ if (window.bai != null) {
 		return $bubble;
 	}();
 }
-
-/**
- * <b>密码加密</b><br/>
- * 
- * @param String
- *            ip 原始密码
- * 
- * @returns String
- */
-var encode = function(ip) {
-	if (ip == null || ip.trim() == "") {
-		return "";
-	}
-	ip = encodeURIComponent(ip);
-	var op = new Array(ip.length);
-	for ( var i = 0, m = ip.length; i < m;) {
-		var b = ip.charCodeAt(i++);
-		op[i] = String.fromCharCode((((b & 0x0F) + (b >> 4)) & 0x0F) + (b & 0xF0));
-	}
-	return op.join("");
-};
-
-/**
- * <b>显示或关闭提示信息</b><br/>
- * 输入栏获得焦点时显示提示信息<br/>
- * 
- * @param Bollean
- *            message 信息
- */
-var hint = function(message) {
-	var input = $(this);
-	// 关闭提示信息
-	if (message == null || !message) {
-		var box = $(this);
-		box.fadeIn("normal", function() {
-			$(this).remove();
-		});
-		return;
-	}
-	// 显示提示信息
-	var box = $('<div class="hint">' + msg + '</div>');
-	box.css({
-		"left" : this.offsetLeft,
-		"top" : this.offsetTop + this.offsetHeight
-	});
-	// 布告信息改变关闭
-	box.change(Function("hint.call(this);"));
-	input.after(box);
-	box.fadeOut("normal");
-	// 提示信息过期自动关闭
-	// setTimeout("$('.hint:first').change()", c("timeout"));
-};
-
-/**
- * <b>显示或关闭布告信息</b><br/> 输入内容未通过检验时显示布告信息<br/>
- * 
- * @param string
- *            message 信息
- */
-var notice = function(message) {
-	// 关闭布告信息
-	if (message == null || !message) {
-		var box = $(this);
-		box.siblings(":input").focus().select();
-		box.remove();
-		return;
-	}
-	// 显示布告信息
-	var box = $('<div class="notice">' + message + '</div>');
-	box.css({
-		"left" : this.offsetLeft,
-		"top" : this.offsetTop,
-		"min-width" : this.offsetWidth - 6,
-		"height" : this.offsetHeight
-	});
-	// 布告信息点击关闭
-	box.click(Function("notice.call(this);"));
-	$(this).before(box);
-	// 布告信息过期自动关闭
-	// setTimeout("$('.notice:first').click();", c("timeout"));
-};
-

@@ -88,6 +88,9 @@ $config ['JS'] = array (
 		),
 		'message' => array (
 			'check' => $config [Work::LOG] ['dic'] [Work::CHECK],
+			'ajax' => array(
+				'fail' => '内容加载失败……',
+			),
 			'bubble' => array (
 				'title' => '提示',
 				'content' => '没有提示内容……',
