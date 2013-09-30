@@ -240,7 +240,6 @@ header, footer {
 .box { /* 布局块 */
 	position: relative;
 	margin: 0.5em;
-	margin-bottom: 1em;
 	padding: 0.5em;
 	border: 1px solid $darkline$;
 }
@@ -407,15 +406,16 @@ header, footer {
 .bubble {
 	display: inline-block;
 	min-width: 400px;
-	border: 1px solid $darkline$;
 	background-color: #ffffff;
+	border: 1px solid $lightline$;
+	box-shadow: 0 2px 8px #cccccc;
 }
 .bubble .title {
 	padding: 0.4em;
 	font-size: 1.25em;
 	font-weight: bold;
 	background-color: $darkarea$;
-	border-bottom: 1px solid $darkline$;
+	border-bottom: 1px solid $lightline$;
 }
 .bubble .content {
 	padding: 1em;
@@ -431,14 +431,10 @@ header, footer {
 	padding: 0 0.5em;
 }
 .button:hover {
-	background-color: $lightline$;
-	
+	background-color: #d6ffd6;
 }
 .default {
 	border: 1px solid $lightline$;
-}
-.default:hover {
-	border: 1px solid $darkline$;
 }
 .close {
 	margin: 0.4em;

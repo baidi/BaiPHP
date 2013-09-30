@@ -90,10 +90,10 @@ $config ['JS'] = array (
 			'check' => $config [Work::LOG] ['dic'] [Work::CHECK],
 			'bubble' => array (
 				'title' => '提示',
-				'content' => '没有内容……',
+				'content' => '没有提示内容……',
 				'load' => '请稍候，正在加载……',
 				'fail' => '内容加载失败……',
-				'blank' => '加载完成，但是没有内容……',
+				'' => '加载完成，但是没有内容……',
 			),
 		),
 	) )

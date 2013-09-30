@@ -213,7 +213,6 @@
 		history: ''
 	};
 	$bai.alt = 'alt';
-	$bai.message = 'message';
 	/** 化简JS：全局配置 */
 	var $config = $config$ || {};
 	/** 化简JS：私有属性 */
@@ -230,6 +229,10 @@
 			}
 		}
 		return value;
+	};
+
+	$bai.message = function() {
+		return this.config(['message'].concat(arguments));
 	};
 
 	/** 化简JS：访问私有属性 */
@@ -264,6 +267,7 @@
 	$bai.is.NUMBER = Number;
 	$bai.is.DATE = Date;
 	$bai.is.FUNCTION = Function;
+	$bai.is.EVENT = Event;
 
 	/** 化简JS：转换对象到特定格式 */
 	$bai.to = function(origin, type) {
@@ -313,8 +317,11 @@
 	};
 
 	/** 化简JS：执行CSS选择器 */
-	$bai.pick = function(query, one) {
-		return document.pick(query, one);
+	$bai.pick = function(query, scope) {
+		if (scope != null && scope.pick != null) {
+			return scope.pick(query, 1);
+		}
+		return document.pick(query, 1);
 	};
 
 	p.B = p.bai = $bai;
@@ -575,109 +582,130 @@ if (window.bai != null) {
 }
 
 if (window.bai != null) {
-	/** 化简JS：浮出框体 */
+	/** 化简JS：浮出提示 */
 	window.bai.bubble = function() {
 		var $name = 'bubble';
-		var $message = bai.message;
-		var $url = 'bubble-url';
-		var $shade = 'bubble-shade';
-		var $title = 'bubble-title';
-		var $content = 'bubble-content';
-		var $success = 'bubble-success';
-		var $failure = 'bubble-failure';
+		var $shade = null, $title = null, $content = null, $toolbar = null, $bubbled = null;
 
-		/** 加载框体 */
-		var show = function(data, id) {
-			var bshade = bai.own($shade);
-			var btitle = bai.own($title);
-			var bcontent = bai.own($content);
-			if (data == '') {
-				bcontent.innerHTML = bai.config($message, $name, 'blank');
+		/** 加载提示内容 */
+		var load = function(content, id) {
+			if (content == '') {
+				$content.innerHTML = bai.message($name, '');
 			} else {
-				bcontent.innerHTML = data;
+				$content.innerHTML = content;
 				if (id == null) {
 					var burl = bai.own($url);
-					var bubbled = bshade.pick('.bubbled', 1);
-					bubbled.innerHTML += '<li id="' + burl + '">' + data + '</li>';
+					var bubbled = $shade.pick('.bubbled', 1);
+					bubbled.innerHTML += '<li id="' + burl + '">' + content + '</li>';
 				}
 			}
-			var title = bcontent.pick('.bubble-title', 1);
+			var title = $content.pick('.bubble-title', 1);
 			if (title != null) {
-				btitle.innerHTML = title.innerHTML;
+				$title.innerHTML = title.innerHTML;
 			}
-			bshade.set('class', '-h');
-			return true;
+			show();
 		};
 
-		/** 失败后手处理 */
-		var fail = function(data) {
-			var bshade = document.pick('.shade', 1);
-			var bcontent = bshade.pick('.bubble .content', 1);
-			bcontent.innerHTML = bai.config($message, $name, 'fail');
-			bshade.set('class', '-h');
-			return true;
+		/** 加载失败信息 */
+		var fail = function(content) {
+			$content.innerHTML = content || bai.message($name, 'fail');
+			show();
 		};
 
-		/** 关闭框体 */
+		/** 显示提示框体 */
+		var show = function() {
+			$shade.set('class', '-h');
+		};
+
+		/** 关闭提示框体 */
 		var close = function(e) {
-			bai.pick('.shade', 1).set('class', '+h');
+			$shade.set('class', '+h');
 		};
 
-		var submit = function(e) {
-			var bcontent = bai.own($content);
-			var check = bai.check(bcontent);
-			if (check != null && check.input != null) {
-				check.input.nextSibling.pick(':last-child', 1).innerHTML = check.result;
-				check.input.nextSibling.set('class', '-h');
-				return false;
+		var submit = function(action) {
+			if (! bai.is(action, bai.is.FUNCTION)) {
+				return function(e) {
+					if (action(e) !== false) {
+						close(e);
+					}
+				};
 			}
-			var burl = bai.own($url);
-			bai.ajax(burl, check.result, function(){
-				
-			});
-			close(e);
+			if (bai.is(action, bai.is.STRING)) {
+				return function(e) {
+					var check = bai.check($content);
+					if (check != null && check.input != null) {
+						check.input.nextSibling.pick(':last-child', 1).innerHTML = check.result;
+						check.input.nextSibling.set('class', '-h');
+						return false;
+					}
+					bai.ajax(action, check.result, function(data){
+						
+					});
+				};
+			};
+			return close;
 		};
 
-		var $bubble = function(content, title, success, failure) {
-			var bshade = document.pick('.shade', 1);
-			if (bshade == null) {
+		/**
+		 * 化简JS：浮出提示
+		 * @param content 提示内容，若为网址（http|https）则异步加载
+		 * @param title 提示标题
+		 * @param okay 确认处理，默认关闭提示
+		 * @param cancel 否认处理，默认关闭提示
+		 */
+		var $bubble = function(content, title, okay, cancel, buttons) {
+			// 背景
+			$shade = $shade || bai.pick('.shade');
+			if ($shade == null) {
 				return false;
 			}
-			var btitle = bshade.pick('.bubble .title', 1);
-			var bcontent = bshade.pick('.bubble .content', 1);
-			if (btitle == null || bcontent == null) {
+			// 标题栏
+			$title = $title || $shade.pick('.bubble .title', 1);
+			// 内容栏
+			$content = $content || $shade.pick('.bubble .content', 1);
+			// 工具栏
+			$toolbar = $toolbar || $shade.pick('.bubble .toolbar', 1);
+			// 历史栏
+			$bubbled = $bubbled || $shade.pick('.bubbled', 1);
+			if ($title == null || $content == null || $toolbar == null || $bubbled == null) {
 				return false;
 			}
-			bai.own($shade, bshade);
-			bai.own($title, btitle);
-			bai.own($content, bcontent);
-			if (title != null && bai.is(title, bai.is.Function)) {
-				failure = success;
-				success = title;
+			if (bai.is(title, bai.is.FUNCTION)) {
+				cancel = okay;
+				okay = title;
 				title = null;
 			}
-			bai.own($success, bshade);
-			bai.own($failure, btitle);
-			btitle.innerHTML = title || bai.config($message, $name, 'title');
-			bshade.pick('.bok', 1).onclick = submit;
-			bshade.pick('.bcancel', 1).onclick = close;
-			bshade.pick('.bclose', 1).onclick = close;
+			// 设置标题
+			$title.innerHTML = title || bai.message($name, 'title');
+			// 设置关闭处理
+			$shade.pick('.bclose', 1).onclick = close;
+			// 设置确认处理
+			$shade.pick('.bokay', 1).onclick = submit(okay);
+			// 设置取消处理
+			var bcancel = $shade.pick('.bcancel', 1);
+			if (bai.is(cancel, bai.is.FUNCTION)) {
+				bcancel.addEventListener('click', cancel);
+			}
+			bcancel.addEventListener('click', close);
+			// 加载即时内容
 			if (! /^https?:\/\//i.test(content)) {
-				bcontent.innerHTML = content || bai.config($message, $name, 'content');
-				bshade.set('class', '-h');
+				$content.innerHTML = content || bai.message($name, 'content');
+				show();
 				return true;
 			}
 			bai.own($url, content);
-			var bubbled = bshade.pick('.bubbled li[id="' + content + '"]', 1);
+			var bubbled = $bubbled.pick('li[id="' + content + '"]', 1);
 			if (bubbled != null) {
-				show(bubbled.innerHTML, content);
+				// 加载历史内容
+				load(bubbled.innerHTML, content);
 			} else {
-				bai.ajax(content, show, fail);
+				// 加载远程内容
+				bai.ajax(content, load, fail);
 			}
 			return true;
 		};
-		$bubble.OKCANCEL = 'OKCANCEL';
-		$bubble.YESNO = 'YESNO';
+		$bubble.OKCANCEL = ['bokay', 'bcancel'];
+		$bubble.YESNO = ['byes', 'bno'];
 
 		return $bubble;
 	}();

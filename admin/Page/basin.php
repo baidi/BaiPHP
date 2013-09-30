@@ -3,7 +3,7 @@ $service = $this->target['service'];
 $adata = $this->target[Flow::ACTION];
 $basinCreate = $this->url('basinCreate', $service);
 ?>
-<<script type="text/javascript">
+<script type="text/javascript">
 <!--
 var basinCreate = function(basin) {
 	var tpl = bai.pick('.tpl', 1);

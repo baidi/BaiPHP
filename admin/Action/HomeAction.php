@@ -22,8 +22,9 @@ class HomeAction extends Action
 	 */
 	protected $exclude = array();
 
-	protected function engage()
+	protected function prepare()
 	{
+		$this->end = true;
 		header('Location: '.$this->url('basin', $this->target['service']));
 	}
 }
