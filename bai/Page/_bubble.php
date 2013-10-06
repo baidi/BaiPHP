@@ -4,7 +4,7 @@
 		<div class="title tg"></div>
 		<div class="content tl"></div>
 		<div class="toolbar tr">
-			<span class="result notice"></span>
+			<span class="result notice fl"></span>
 			<a class="button bokay default">确定</a>
 			<a class="button bcancel">取消</a>
 		</div>

@@ -54,7 +54,7 @@
 
 	/** 元素：读取自身属性 */
 	Element.prototype.get = function(item) {
-		if (! bai.is(action, bai.is.STRING) || item == '') {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return null;
 		}
 		item = bai.config('alt', item) || item;
@@ -66,7 +66,7 @@
 
 	/** 元素：设置自身属性 */
 	Element.prototype.set = function(item, value) {
-		if (! bai.is(action, bai.is.STRING) || item == '') {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return false;
 		}
 		item = bai.config('alt', item) || item;
@@ -88,7 +88,7 @@
 
 	/** 元素：查验自身属性 */
 	Element.prototype.has = function(item, value) {
-		if (! bai.is(action, bai.is.STRING) || item == '') {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return false;
 		}
 		item = bai.config('alt', item) || item;
@@ -133,6 +133,8 @@
 				}
 				if (key.indexOf('-') >= 0) {
 					proper = key.toLowerCase().replace(pre, post);
+				} else {
+					proper = key;
 				}
 				this.style[proper] = item[key] || '';
 			}
@@ -158,11 +160,13 @@
 	};
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(css, duration, replay, mode, alt) {
+	Element.prototype.to = function(css, duration, replay, alt, mode) {
 		if (css == null) {
 			return false;
 		}
-		if (duration == null || ! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
+		if (bai.is(duration, bai.is.NUMBER)) {
+			duration = (duration >= 100 ? duration + 'ms' : duration + 's');
+		} else if (! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
 			duration = '1s';
 		}
 		if (replay == null || isNaN(replay) || replay == 0) {
@@ -178,32 +182,54 @@
 		}
 		// 简单变换
 		if (bai.is(css, bai.is.STRING)) {
+			var key = 'BaiCSS-' + bai.encode(css);
 			// 建立变换帧
-			if (style.baicss[css] == null) {
+			if (style.baicss[key] == null) {
 				try {
-					style.insertRule('@keyframes "' + css + '" {from {} to {' + css + '}}');
+					style.insertRule('@keyframes ' + key + ' {0% {} 100% {' + css + '}}', style.cssRules.length);
 				} catch (e) {
-					style.insertRule('@-webkit-keyframes "' + css + '" {from {} to {' + css + '}}');
+					style.insertRule('@-webkit-keyframes ' + key + ' {0% {} 100% {' + css + '}}', style.cssRules.length);
 				}
-				style.baicss[css] = true;
+				style.baicss[key] = true;
+			}
+			if (replay === 1 || replay === '1') {
+				var $this = this;
+				var timeout = parseInt(duration);
+				if (duration[duration.length - 2] != 'm') {
+					timeout *= 1000;
+				}
+				setTimeout(function() {
+					$this.css(bai.from(css, bai.from.CSS));
+				}, timeout);
 			}
 			// 建立变换样式
-			var animation = ['"' + css + '"', duration, replay].join(' ');
+			var animation = [key, duration, replay, alt].join(' ');
 			this.css({animation: animation, '-webkit-animation': animation});
 			return true;
 		}
 		// 定制变换
 		css = bai.to(css);
-		if (style.baicss[css] == null) {
+		var key = 'BaiCSS-' + bai.encode(css);
+		if (style.baicss[key] == null) {
 			try {
-				style.insertRule('@keyframes "' + css + '" {' + css + '}');
+				style.insertRule('@keyframes ' + key + ' {' + css + '}', style.cssRules.length);
 			} catch (e) {
-				style.insertRule('@-webkit-keyframes "' + css + '" {' + css + '}');
+				style.insertRule('@-webkit-keyframes ' + key + ' {' + css + '}', style.cssRules.length);
 			}
-			style.baicss[css] = true;
+			style.baicss[key] = true;
+		}
+		if (replay === 1 || replay === '1') {
+			var $this = this;
+			var timeout = parseInt(duration);
+			if (duration[duration.length - 2] != 'm') {
+				timeout *= 1000;
+			}
+			setTimeout(function() {
+				$this.css(bai.from(css, bai.from.CSS));
+			}, timeout);
 		}
 		// 建立变换样式
-		var animation = ['"' + css + '"', duration, replay].join(' ');
+		var animation = [key, duration, replay, alt].join(' ');
 		this.css({animation: animation, '-webkit-animation': animation});
 		return true;
 	};
@@ -261,6 +287,26 @@
 		}
 	};
 
+	$bai.encode = function(origin) {
+		if (! bai.is(origin, bai.is.STRING) || origin == '') {
+			return '';
+		}
+//		var result = new Array();
+//		for (var i = 0, m = origin.length; i < m; i++) {
+//			var b = origin.charCodeAt(i);
+//			b = ((((b & 0x0F) + (b >> 4)) & 0x0F) + (b & 0xF0)) % 26 + 65;
+//			result[i] = String.fromCharCode(b);
+//		}
+//		return result.join('');
+		var result = 0;
+		for (var i = 0, m = origin.length; i < m; i++) {
+			var b = origin.charCodeAt(i);
+			result = ((result << 5) - result) + b;
+			result = result & result;
+		}
+		return result;
+	};
+
 	/** 化简JS：判断数据类型 */
 	$bai.is = function(origin, type) {
 		if (origin == null || type == null) {
@@ -290,7 +336,7 @@
 			return origin.toString();
 		}
 		// 转换结果
-		var result = [];
+		var result = new Array();
 		// 间隔符
 		var gaps = null;
 		if ($bai.is(type, $bai.is.ARRAY)) {
@@ -318,6 +364,35 @@
 	$bai.to.CSS = 'CSS';
 	$bai.to.POST = 'POST';
 	$bai.to.JSON = 'JSON';
+
+	$bai.from = function(origin, type) {
+		if (origin == null) {
+			return null;
+		}
+		if (! bai.is(origin, bai.is.STRING)) {
+			return origin;
+		}
+		// 转换结果
+		var result = {};
+		// 间隔符
+		var gaps = null;
+		if (type == $bai.to.CSS) {
+			gaps = [':', ';'];
+		} else {
+			gaps = [':', ','];
+		}
+		var items = origin.split(gaps[1]);
+		for (var i = 0, m = items.length; i < m; i++) {
+			var item = items[i].split(gaps[0]);
+			if (item[0].trim() == '') {
+				continue;
+			}
+			result[item[0].trim()] = item[1].trim();
+		}
+		return result;
+	};
+	$bai.from.CSS = 'CSS';
+	$bai.from.JSON = 'JSON';
 
 	/** 化简JS：执行CSS选择器 */
 	$bai.pick = function(query, scope) {
@@ -426,11 +501,13 @@ if (window.bai != null) {
 
 		/** 提示检验结果 */
 		var notice = function(input, result) {
-			var change = input.onchange;
+			var focus = input.onfocus;
+			input.value = result;
 			input.set('class', '+notice');
-			input.onchange = function(e) {
+			input.onfocus = function(e) {
+				this.value = '';
 				this.set('class', '-notice');
-				this.onchange = change;
+				this.onfocus = focus;
 			};
 		};
 
@@ -466,7 +543,7 @@ if (window.bai != null) {
 				// 检验区域为输入项
 				inputs = [scope];
 			}
-			var data = [];
+			var data = new Array();
 			var result = false;
 			for (var i = 0, m = inputs.length; i < m; i++) {
 				data.push(inputs[i].name + '=' + inputs[i].value);
@@ -515,7 +592,7 @@ if (window.bai != null) {
 					if (data[0] == '{' && data[data.length - 1] == '}') {
 						// 解析JSON对象
 						try {
-							data = eval(data);
+							data = JSON.parse(data);
 						} catch(e) {}
 					}
 					// 成功后手处理
@@ -624,14 +701,30 @@ if (window.bai != null) {
 
 		/** 准备确认处理 */
 		var submit = function(action) {
-			if (! bai.is(action, bai.is.FUNCTION)) {
-				return close;
+			if (bai.is(action, bai.is.FUNCTION)) {
+				return function(e) {
+					if (action(e) !== false) {
+						close(e);
+					}
+				};
 			}
-			return function(e) {
-				if (action(e) !== false) {
-					close(e);
-				}
-			};
+			if (bai.is(action, bai.is.URL)) {
+				return function(e) {
+					var check = bai.check($content);
+					if (! check || check.input != null) {
+						return false;
+					}
+					bai.ajax(action, check.result, function(data, url) {
+						var result = $toolbar.pick('.result', 1);
+						if (bai.is(data, bai.is.JSON)) {
+							result.innerHTML = data.notice || bai.message($name, 'success');
+							return;
+						}
+						result.innerHTML = data;
+					});
+				};
+			}
+			return close;
 		};
 
 		/**

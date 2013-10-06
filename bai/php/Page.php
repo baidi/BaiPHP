@@ -42,6 +42,12 @@ class Page extends Flow
 	protected function html()
 	{
 		if ($this->target->notice) {
+			if ($this->target['ajax']) {
+				return json_encode(array(
+					'status' => false,
+					'notice' => $this->target['notice'],
+				));
+			}
 			return $this->load($this->board);
 		}
 		if ($this->target['ajax']) {

@@ -323,6 +323,42 @@ $config['CSS'] = array(
 	'$lockedcolor$' => '#cccccc',
 );
 
+$config ['JS'] = array (
+	'$config$' => json_encode ( array (
+		'alt' => array(
+			'class' => 'className',
+			'html' => 'innerHTML',
+			'text' => 'innerText',
+		),
+		'check' => $config [Work::CHECK],
+		'ajax' => array(
+			'timeout' => 5000,
+		),
+		'bubble' => array (
+			'shade' => '.shade',
+			'title' => '.bubble .title',
+			'content' => '.bubble .content',
+			'bubbled' => '.bubbled',
+		),
+		'message' => array (
+			'check' => $config [Work::LOG] ['dic'] [Work::CHECK],
+			'ajax' => array(
+				'fail' => '内容加载失败……',
+			),
+			'bubble' => array (
+				'title' => '提示',
+				'content' => '没有提示内容……',
+				'load' => '请稍候，正在加载……',
+				'fail' => '内容加载失败……',
+				'' => '加载完成，但是没有内容……',
+				'success' => '操作成功',
+				'complete' => '操作完成',
+				'failure' => '操作失败',
+			),
+		),
+	) )
+);
+
 ### 全局配置：测试工场
 $config[Work::TEST] = array(
 	'success'    => '过',

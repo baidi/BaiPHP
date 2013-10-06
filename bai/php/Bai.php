@@ -204,6 +204,12 @@ abstract class Bai implements ArrayAccess
 	protected function error ()
 	{
 		$this->notice = null;
+		if ($this->target['ajax']) {
+			return json_encode(array(
+				'status' => false,
+				'notice' => $this->target['notice'],
+			));
+		}
 		return $this->load($this->board, false, 'Page');
 	}
 

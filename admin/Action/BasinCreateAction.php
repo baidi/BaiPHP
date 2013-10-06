@@ -39,7 +39,7 @@ class BasinCreateAction extends Action
 		if (is_dir($basin)) {
 			$result['status'] = false;
 			$result['notice'] = Log::logs(__FUNCTION__, __CLASS__);
-			return $result;
+			return json_encode($result);
 		}
 		Log::logf('basin', $basin, __CLASS__);
 		$status = mkdir($basin, 0755);
@@ -55,6 +55,6 @@ class BasinCreateAction extends Action
 		if (! $status) {
 			$result['notice'] = Log::logs('fail', __CLASS__);
 		}
-		return $result;
+		return json_encode($result);
 	}
 }
