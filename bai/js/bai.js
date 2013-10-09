@@ -48,7 +48,16 @@
 	Element.prototype.pick = Document.prototype.pick = function(query, one) {
 		if (one == -1) {
 			var parent = this.parentNode;
-			//while(parent != document)
+			while (parent != document) {
+				var matches = parent.parentNode.querySelectorAll(query);
+				for (var i = 0, m = matches.length; i < m; i++) {
+					if (matches[i] == parent) {
+						return parent;
+					}
+				}
+				parent = parent.parentNode;
+			}
+			return null;
 		}
 		if (one == 1) {
 			return this.querySelector(query);
@@ -599,6 +608,12 @@ if (window.bai != null) {
 							data = JSON.parse(data);
 						} catch(e) {}
 					}
+					if (bai.is(data, bai.is.JSON)) {
+						if (! data.status) {
+							bai.bubble(data.notice || bai.message($name, 'failure'), title);
+							return false;
+						}
+					}
 					// 成功后手处理
 					if (bai.is(success, bai.is.FUNCTION)) {
 						return success(data, url);
@@ -696,6 +711,10 @@ if (window.bai != null) {
 		/** 显示提示框体 */
 		var show = function() {
 			$shade.set('class', '-h');
+			var input = $content.pick('.input, input, textarea, select', 1);
+			if (input) {
+				input.focus();
+			}
 		};
 
 		/** 关闭提示框体 */
@@ -719,12 +738,11 @@ if (window.bai != null) {
 						return false;
 					}
 					bai.ajax(action, check.result, function(data, url) {
-						var result = $toolbar.pick('.result', 1);
 						if (bai.is(data, bai.is.JSON)) {
-							result.innerHTML = data.notice || bai.message($name, 'success');
+							bai.bubble(data.notice || bai.message($name, 'success'), $title.innerHTML);
 							return;
 						}
-						result.innerHTML = data;
+						bai.bubble(data, $title.innerHTML);
 					});
 				};
 			}

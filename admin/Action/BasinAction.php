@@ -34,10 +34,12 @@ class BasinAction extends Action
 				$result[$file] = true;
 			}
 		}
-		$result[$this->target['service']] = false;
-		$result[substr($this->config(_DEF, self::BAI), 0, -1)] = false;
-		$result['service'] = false;
-		$this->target[Flow::ACTION] = $result;
+		$primary = array(
+			'bai' => false,
+			'service' => false,
+			$this->target['service'] => false,
+		);
+		$this->target[Flow::ACTION] = $primary + $result;
 	}
 }
 ?>

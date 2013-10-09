@@ -26,14 +26,35 @@ class BasinDeleteAction extends Action
 	{
 		$this->end = true;
 		$basin = $this->target['abasin'];
-		$result = array('status' => false);
-		if (! empty($this->exclude[$basin]) && is_dir(_LOCAL.$basin._DIR)) {
+		$result = array();
+		if (empty($this->exclude[$basin]) && $this->clearBasin(_LOCAL.$basin)) {
 			Log::logf(__FUNCTION__, $basin, __CLASS__);
-			$result['status'] = rmdir($basin);
-		}
-		if (empty($result['status'])) {
+			$result['status'] = true;
+		} else {
+			$result['status'] = false;
 			$result['notice'] = Log::logf('fail', $basin, __CLASS__);
 		}
 		return json_encode($result);
+	}
+
+	private function clearBasin($dir = null)
+	{
+		if (! is_dir($dir)) {
+			return false;
+		}
+		$result = true;
+		foreach (scandir($dir) as $file) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+			$file = $dir._DIR.$file;
+			if (! is_dir($file)) {
+				$result = unlink($file) && $result;
+				continue;
+			}
+			$result = $this->clearBasin($file) && $result;
+		}
+		$result = rmdir($dir) && $result;
+		return $result;
 	}
 }
