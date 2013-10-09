@@ -20,6 +20,7 @@
  */
 class Log extends Work
 {
+	const FETCH     = 0;
 	/** 日志级别: 致命级 */
 	const FATAL     = 1;
 	/** 日志级别: 错误级 */
@@ -133,6 +134,9 @@ class Log extends Work
 		$this['level']  = $level;
 		### 处理日志
 		$this->result = $this->fetch();
+		if ($level === self::FETCH) {
+			return $this->result;
+		}
 		if ($this->result != null) {
 			$this->result = $this->format();
 			$this->result = $this->record();

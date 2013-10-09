@@ -2,11 +2,11 @@
 	<div class="t">
 <?php
 $service = $this->target['service'];
-$aservice = $this->target['aservice'];
+$abasin = $this->target['abasin'];
 $back = $this->url('service', $service);
 echo
 <<<BOX
-		<a href="$back">$aservice</a>
+		<a href="$back">$abasin</a>
 		<span class="tg">&raquo;</span>
 		<span>流程</span>
 		<a class="fr tg">新建</a>
@@ -17,7 +17,7 @@ $adata = $this->target[Flow::ACTION];
 foreach ($adata as $item => $value) {
 	$actionFile = $this->pick(Flow::ACTION, $value);
 	$pageFile = $this->pick(Flow::PAGE, $value);
-	$url = $this->url('flow', $service, 'aservice=' . $aservice . '&aevent=' . $item);
+	$url = $this->url('flow', $service, 'abasin=' . $abasin . '&aevent=' . $item);
 	echo
 <<<BOX
 		<div class="text item">

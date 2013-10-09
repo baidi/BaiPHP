@@ -9,16 +9,17 @@ body {
 }
 .box {
 	position: relative;
+	border: 1px solid #cccccc;
 	margin: 1em auto;
 	background-color: #ffffff;
 	box-shadow: 0 0 0.5em #ccc;
 }
-.box-480X800 {
+.box-size {
 	width: 480px;
-	height: 800px;
+	height: 700px;
 }
 .page {
-	height: 100%;
+	min-height: 100%;
 	line-height: 1.5em;
 	color: #334f33;
 	background-color: #fcfffc;
@@ -51,7 +52,7 @@ body {
 .button {
 	display: inline-block;
 	margin: 0.25em;
-	padding: 0 0.5em;
+	padding: 0.3em 0.5em;
 	background-color: #f0f9f0;
 	border: 1px solid #CCECCC;
 }
@@ -62,14 +63,21 @@ body {
 .p {
 	text-indent: 2em;
 }
+p {
+	margin: 0;
+	text-indent: 2em;
+}
 .tc {
 	text-align: center;
 }
 .bg {
-	background-image: -webkit-linear-gradient(top, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 51%, rgba(255,255,255,0) 100%);
+	background-image: -webkit-linear-gradient(top, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 50%, rgba(150,220,150,0) 51%, rgba(150,220,150,0.2) 100%);
+}
+.tg {
+	color: #f04000;
 }
 
-.item {
+.index {
 	margin: 0.5em;
 	display: inline-block;
 	width: 8em;
@@ -78,74 +86,115 @@ body {
 	background-color: #F9FFF9;
 	border: 0.1em solid #CCECCC;
 }
-.item:hover {
+.index:hover {
 	border-color: #99cc99;
 	box-shadow: 0 0 0.5em #d0f9d0;
 }
-.item-title {
+.index-title {
 	font-weight: bold;
 	color: #009f3c;
 	background-color: #F6FCF6;
 	border-bottom: 0.1em solid #aaddaa;
 }
-.item:hover .item-title {
+.index:hover .index-title {
 	color: #f04000;
 }
-.item-content {
-	padding: 0.2em 0.4em;
+.index-content {
+	padding: 0.2em 0.5em;
 	word-wrap:break-word;
 	text-align: left;
-	text-indent: 2em;
 	text-overflow: ellipsis;
 }
-.t {
+.detail-title {
 	font-weight: bold;
 	color: #009f3c;
 }
-br:after {
-	content: "　　";
-}
-.pp {
-	padding: 0.5em;
-	line-height: 1.5em;
-	text-indent: 2em;
-	margin: 0.5em 0 1em;
-	border: 1px solid #CCECCC;
+.detail-content {
+	margin: 0 0 1em;
+	padding: 0.2em 0.5em;
+	border: 0.1em solid #CCECCC;
 	background-color: #F9FFF9;
 }
 </style>
 <script type="text/javascript">
+function rotate(e) {
+	var sizedBox = document.querySelector('.box-size');
+	if (sizedBox == null) {
+		return;
+	}
+	var width = sizedBox.clientWidth;
+	var height = sizedBox.clientHeight;
+	var boxes = document.querySelectorAll('.box');
+	for (var i = 0, m = boxes.length; i < m; i++) {
+		boxes[i].style.width = height + 'px';
+		if (boxes[i].classList.contains('box-size')) {
+			boxes[i].style.height = width + 'px';
+		}
+	}
+}
 </script>
 </head>
 <body>
-	<div class="box page" style="width: 480px;">
-		<a class="button">旋转</a>
+	<div class="box" style="width: 480px;">
+		<a class="button" onclick="rotate.call(this)">旋转</a>
 	</div>
-	<div class="box box-480X800">
+	<div class="box box-size">
+		<div class="page">
+			<div class="title bg">目录</div>
+			<div class="content tc">
+				<div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="box box-size">
 		<div class="page">
 			<div class="title bg">标题</div>
-			<div class="content tc">
-				<div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">
-						<span class="p">说明内容一说明内容一</span>
-						<span class="p">说明内容二说明内容二</span>
-					</div>
-				</div><div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">道可道，非常道；名可名，非常名。</div>
-				</div><div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">道可道，非常道；名可名，非常名。</div>
-				</div><div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">道可道，非常道；名可名，非常名。</div>
-				</div><div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">道可道，非常道；名可名，非常名。</div>
-				</div><div class="item">
-					<div class="item-title bg">项目</div>
-					<div class=".item-content">道可道，非常道；名可名，非常名。</div>
+			<div class="content">
+				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
+				<div class="detail-content">
+					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
+					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
+				</div>
+				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
+				<div class="detail-content">
+					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
+					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
 				</div>
 			</div>
 		</div>

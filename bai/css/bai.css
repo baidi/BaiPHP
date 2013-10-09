@@ -425,6 +425,7 @@ input:after {
 	border-bottom: 1px solid $lightline$;
 }
 .bubble .content {
+	padding: 1em;
 }
 .bubble .toolbar {
 	padding: 0.5em 1em;

@@ -26,13 +26,16 @@ $config[_DEF][Target::DEBUG] = true;
 ### 全局配置：检验工场
 $config[Work::CHECK][Work::EVENT] = array(
 	'flow' => array(
-		'aservice' => 'required type=char',
+		'abasin' => 'required type=char',
 	),
 	'action' => array(
-		'aservice' => 'required type=char',
+		'abasin' => 'required type=char',
 		'aevent' => 'required type=char',
 	),
 	'basinCreate' => array(
+		'abasin' => 'required min=3 max=20 type=char',
+	),
+	'basinDelete' => array(
 		'abasin' => 'required min=3 max=20 type=char',
 	),
 );
@@ -41,6 +44,11 @@ $config[Work::LOG]['dic']['BasinCreateAction'] = array(
 	'engage' => '该流域已存在……',
 	'basin' => '新建流域：%s',
 	'fail' => '流域创建失败……',
+);
+$config[Work::LOG]['dic']['BasinDeleteAction'] = array(
+	'delete' => '确定要删除流域？流域下的所有内容都会被删除，且无法撤销。',
+	'engage' => '删除流域： %s',
+	'fail' => '流域 %s 删除失败……',
 );
 
 $config['BasinAction'] = array(
@@ -61,6 +69,18 @@ $config['BasinCreateAction'] = array(
 		Flow::ACTION => true,
 		Work::LANG => true,
 	)
+);
+$config['BasinDeleteAction'] = array(
+	'exclude' => array(
+		'.' => true,
+		'..' => true,
+		'.git' => true,
+		'.runtime' => true,
+		'.settings' => true,
+		'bai' => true,
+		'service' => true,
+		'admin' => true,
+	),
 );
 $config['FlowAction'] = array(
 	'include' => array(

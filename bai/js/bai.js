@@ -46,7 +46,11 @@
 
 	/** 元素：执行CSS选择器 */
 	Element.prototype.pick = Document.prototype.pick = function(query, one) {
-		if (one) {
+		if (one == -1) {
+			var parent = this.parentNode;
+			//while(parent != document)
+		}
+		if (one == 1) {
 			return this.querySelector(query);
 		}
 		return this.querySelectorAll(query);
