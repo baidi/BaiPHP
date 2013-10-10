@@ -15,7 +15,7 @@
  * </p>
  * @author 白晓阳
  */
-class BasinChangeAction extends Action
+class BasinUpdateAction extends Action
 {
 	/**
 	 * 子目录

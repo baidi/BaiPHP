@@ -274,7 +274,7 @@ input:after {
 
 /*--- 内容格式 ---*/
 .item {
-	border-bottom: 1px solid $lightline$;
+	border-bottom: 1px dashed $lightline$;
 }
 .item:last-child {
 	border-bottom: none;

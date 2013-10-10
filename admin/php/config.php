@@ -28,19 +28,32 @@ $config[Work::CHECK][Work::EVENT] = array(
 	'flow' => array(
 		'abasin' => 'required type=char',
 	),
-	'action' => array(
+	'flowCreate' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
+	'flowUpdate' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=50 type=char',
+		'oevent' => 'required min=2 max=50 type=char',
+	),
+	'flowDelete' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
+	'process' => array(
 		'abasin' => 'required type=char',
 		'aevent' => 'required type=char',
 	),
 	'basinCreate' => array(
-		'abasin' => 'required min=3 max=20 type=char',
+		'abasin' => 'required min=2 max=20 type=char',
 	),
-	'basinChange' => array(
-		'obasin' => 'required min=3 max=20 type=char',
-		'abasin' => 'required min=3 max=20 type=char',
+	'basinUpdate' => array(
+		'obasin' => 'required min=2 max=20 type=char',
+		'abasin' => 'required min=2 max=20 type=char',
 	),
 	'basinDelete' => array(
-		'abasin' => 'required min=3 max=20 type=char',
+		'abasin' => 'required min=2 max=20 type=char',
 	),
 );
 
@@ -49,7 +62,7 @@ $config[Work::LOG]['dic']['BasinCreateAction'] = array(
 	'basin' => '新建流域：%s',
 	'fail' => '流域创建失败……',
 );
-$config[Work::LOG]['dic']['BasinChangeAction'] = array(
+$config[Work::LOG]['dic']['BasinUpdateAction'] = array(
 	'deleted' => '该流域已被删除……',
 	'existed' => '该流域已存在……',
 	'basin' => '修改流域 %s 到 %s',
@@ -58,6 +71,11 @@ $config[Work::LOG]['dic']['BasinChangeAction'] = array(
 $config[Work::LOG]['dic']['BasinDeleteAction'] = array(
 	'engage' => '删除流域： %s',
 	'fail' => '流域 %s 删除失败……',
+);
+$config[Work::LOG]['dic']['FlowCreateAction'] = array(
+	'existed' => '该流程已存在……',
+	'flow' => '新建流程：%s',
+	'fail' => '流程创建失败，可能写入受限……',
 );
 
 $config['BasinAction'] = array(
@@ -79,7 +97,7 @@ $config['BasinCreateAction'] = array(
 		Work::LANG => true,
 	)
 );
-$config['BasinChangeAction'] = array(
+$config['BasinUpdateAction'] = array(
 	'exclude' => array(
 		'.' => true,
 		'..' => true,
@@ -107,6 +125,12 @@ $config['FlowAction'] = array(
 	'include' => array(
 		Flow::ACTION => '#^(?<'.Bai::EVENT.'>[a-zA-Z0-9_\x7f-\xff]+)Action\.php$#i',
 		Flow::PAGE => '#^(?<'.Bai::EVENT.'>[a-zA-Z0-9_\x7f-\xff]+)\.php$#i',
+	)
+);
+$config['FlowCreateAction'] = array(
+	'include' => array(
+		Flow::PAGE._DIR.'%s'._EXT,
+		Flow::ACTION._DIR.'%s'.Flow::ACTION._EXT,
 	)
 );
 

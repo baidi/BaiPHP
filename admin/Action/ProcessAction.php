@@ -20,10 +20,10 @@ class ProcessAction extends Action
 	protected function engage()
 	{
 		$aevent = $this->target['aevent'];
-		$aservice = $this->target['aservice'];
-		$this->mockConfig($aservice);
+		$abasin = $this->target['abasin'];
+		$this->mockConfig($abasin);
 		$this->target[Flow::ACTION] = $this->flow($aevent, self::TARGET);
-		$this->mockConfig($aservice, false);
+		$this->mockConfig($abasin, false);
 	}
 
 	private function mockConfig($service = null, $mock = true)

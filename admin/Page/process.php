@@ -2,13 +2,13 @@
 	<div class="t">
 <?php
 $service = $this->target['service'];
+$abasin = $this->target['abasin'];
 $aevent = $this->target['aevent'];
-$aservice = $this->target['aservice'];
-$backs = $this->url('service', $service);
-$backe = $this->url('event', $service, 'aservice=' . $aservice);
+$backs = $this->url('basin', $service);
+$backe = $this->url('flow', $service, 'abasin=' . $abasin);
 echo
 <<<BOX
-		<a href="$backs">$aservice</a>
+		<a href="$backs">$abasin</a>
 		<span class="tg">&raquo;</span>
 		<a href="$backe">$aevent</a>
 		<span class="tg">&raquo;</span>
@@ -23,7 +23,7 @@ foreach ($adata as $item => $value) {
 <<<BOX
 		<div class="text">
 			<div class="b item">$item</div>
-			<ol>
+			<ol class="al">
 BOX;
 	foreach ($value as $name => $mode) {
 		echo

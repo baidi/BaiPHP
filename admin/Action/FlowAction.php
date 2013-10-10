@@ -24,15 +24,15 @@ class FlowAction extends Action
 
 	protected function engage()
 	{
-		$service = _LOCAL.$this->target['aservice']._DIR;
+		$basin = _LOCAL.$this->target['abasin']._DIR;
 		$result = array();
 		foreach ($this->include as $item => $mode) {
-			$files = scandir($service.$item);
+			$files = scandir($basin.$item);
 			if (! is_array($files)) {
 				continue;
 			}
 			foreach ($files as $file) {
-				if (! preg_match($mode, $file, $match) || ! is_file($service.$item._DIR.$file)) {
+				if (! preg_match($mode, $file, $match) || ! is_file($basin.$item._DIR.$file)) {
 					continue;
 				}
 				$event = lcfirst($this->pick(self::EVENT, $match));
