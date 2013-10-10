@@ -35,6 +35,10 @@ $config[Work::CHECK][Work::EVENT] = array(
 	'basinCreate' => array(
 		'abasin' => 'required min=3 max=20 type=char',
 	),
+	'basinChange' => array(
+		'obasin' => 'required min=3 max=20 type=char',
+		'abasin' => 'required min=3 max=20 type=char',
+	),
 	'basinDelete' => array(
 		'abasin' => 'required min=3 max=20 type=char',
 	),
@@ -45,8 +49,13 @@ $config[Work::LOG]['dic']['BasinCreateAction'] = array(
 	'basin' => '新建流域：%s',
 	'fail' => '流域创建失败……',
 );
+$config[Work::LOG]['dic']['BasinChangeAction'] = array(
+	'deleted' => '该流域已被删除……',
+	'existed' => '该流域已存在……',
+	'basin' => '修改流域 %s 到 %s',
+	'fail' => '流域修改失败……',
+);
 $config[Work::LOG]['dic']['BasinDeleteAction'] = array(
-	'delete' => '确定要删除流域？流域下的所有内容都会被删除，且无法撤销。',
 	'engage' => '删除流域： %s',
 	'fail' => '流域 %s 删除失败……',
 );
@@ -69,6 +78,18 @@ $config['BasinCreateAction'] = array(
 		Flow::ACTION => true,
 		Work::LANG => true,
 	)
+);
+$config['BasinChangeAction'] = array(
+	'exclude' => array(
+		'.' => true,
+		'..' => true,
+		'.git' => true,
+		'.runtime' => true,
+		'.settings' => true,
+		'bai' => true,
+		'service' => true,
+		'admin' => true,
+	),
 );
 $config['BasinDeleteAction'] = array(
 	'exclude' => array(

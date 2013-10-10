@@ -15,33 +15,31 @@
  * </p>
  * @author 白晓阳
  */
-class BasinCreateAction extends Action
+class BasinChangeAction extends Action
 {
 	/**
 	 * 子目录
 	 */
-	protected $include = null;
+	protected $exclude = null;
 
 	protected function engage()
 	{
 		$this->end = true;
+		$obasin = _LOCAL.$this->target['obasin']._DIR;
 		$basin = _LOCAL.$this->target['abasin']._DIR;
 		$result = array();
-		if (is_dir($basin)) {
+		if (! is_dir($obasin)) {
 			$result['status'] = false;
-			$result['notice'] = Log::logs(__FUNCTION__, __CLASS__);
+			$result['notice'] = Log::logs('deleted', __CLASS__);
 			return json_encode($result);
 		}
-		Log::logf('basin', $basin, __CLASS__);
-		$status = mkdir($basin, 0755);
-		if ($status && is_array($this->include)) {
-			foreach ($this->include as $item => $flag) {
-				if (! $flag) {
-					continue;
-				}
-				$status = $status && mkdir($basin.$item, 0755);
-			}
+		if (is_dir($basin)) {
+			$result['status'] = false;
+			$result['notice'] = Log::logs('existed', __CLASS__);
+			return json_encode($result);
 		}
+		Log::logf('basin', array($obasin, $basin), __CLASS__);
+		$status = rename($obasin, $basin);
 		$result['status'] = $status;
 		if (! $status) {
 			$result['notice'] = Log::logs('fail', __CLASS__);

@@ -108,7 +108,10 @@ class Input extends Work
 			);
 		}
 		### 匹配检验项
-		$event = "$this->target";
+		$event = $this->pick('event', $setting);
+		if ($event == null) {
+			$event = "$this->target";
+		}
 		$check = $this->config(self::CHECK, self::EVENT, $event, $item);
 		$mode = $this->config(self::CHECK, 'mode');
 		if (preg_match_all($mode, $check, $cases, PREG_SET_ORDER)) {

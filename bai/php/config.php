@@ -391,6 +391,7 @@ $config[Work::TEMPLATE] = array(
 $config[Work::INPUT] = array(
 	'templates' => array(
 		'text' => '<input id="{$item}" name="{$item}" {$type ? type="$type" | type="text" }{$value ? $value }{$class ? class="$class" }{$check ? $check }{$hint ? placeholder="$hint" }/>',
+		'hidden' => '<input id="{$item}" name="{$item}" type="hidden" {$value ? $value }{$class ? class="$class" }{$check ? $check }/>',
 	),
 	'values' => array(
 		null => 'value="%s"',

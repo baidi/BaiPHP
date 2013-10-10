@@ -610,7 +610,7 @@ if (window.bai != null) {
 					}
 					if (bai.is(data, bai.is.JSON)) {
 						if (! data.status) {
-							bai.bubble(data.notice || bai.message($name, 'failure'), title);
+							bai.bubble(data.notice || bai.message($name, 'failure'));
 							return false;
 						}
 					}
@@ -792,7 +792,12 @@ if (window.bai != null) {
 			bcancel.addEventListener('click', close);
 			// 加载即时内容
 			if (! /^https?:\/\//i.test(content)) {
-				$content.innerHTML = content || bai.message($name, 'content');
+				if (content.nodeType) {
+					$content.innerHTML = '';
+					$content.appendChild(content);
+				} else {
+					$content.innerHTML = content || bai.message($name, 'content');
+				}
 				show();
 				return true;
 			}

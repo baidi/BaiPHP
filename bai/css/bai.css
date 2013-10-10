@@ -425,7 +425,7 @@ input:after {
 	border-bottom: 1px solid $lightline$;
 }
 .bubble .content {
-	padding: 1em;
+	padding: 0.5em;
 }
 .bubble .toolbar {
 	padding: 0.5em 1em;
@@ -438,6 +438,7 @@ input:after {
 	padding: 0 0.5em;
 }
 .button:hover {
+	text-decoration: none;
 	background-color: #d6ffd6;
 }
 .default {
