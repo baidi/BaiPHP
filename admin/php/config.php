@@ -74,8 +74,16 @@ $config[Work::LOG]['dic']['BasinDeleteAction'] = array(
 );
 $config[Work::LOG]['dic']['FlowCreateAction'] = array(
 	'existed' => '该流程已存在……',
-	'flow' => '新建流程：%s',
-	'fail' => '流程创建失败，可能写入受限……',
+	'engage' => '新建流程：%s',
+	'fail' => '流程创建失败……',
+);
+$config[Work::LOG]['dic']['FlowUpdateAction'] = array(
+	'engage' => '修改流程：%s',
+	'fail' => '流程修改失败……',
+);
+$config[Work::LOG]['dic']['FlowDeleteAction'] = array(
+	'engage' => '删除流程：%s',
+	'fail' => '流程删除失败……',
 );
 
 $config['BasinAction'] = array(
@@ -129,9 +137,15 @@ $config['FlowAction'] = array(
 );
 $config['FlowCreateAction'] = array(
 	'include' => array(
-		Flow::PAGE._DIR.'%s'._EXT,
-		Flow::ACTION._DIR.'%s'.Flow::ACTION._EXT,
+		Flow::PAGE => '%s'._EXT,
+		Flow::ACTION => '%s'.Flow::ACTION._EXT,
 	)
+);
+$config['FlowDeleteAction'] = array(
+	'include' => $config['FlowCreateAction']['include'],
+);
+$config['FlowUpdateAction'] = array(
+	'include' => $config['FlowCreateAction']['include'],
 );
 
 $config ['JS'] = array (

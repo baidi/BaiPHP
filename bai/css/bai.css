@@ -2,6 +2,7 @@
 body {
 	margin: 0;
 	font: $font$;
+	vertical-align: top;
 	color: $color$;
 	background: $background$;
 }

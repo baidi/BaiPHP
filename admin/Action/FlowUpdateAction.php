@@ -15,7 +15,7 @@
  * </p>
  * @author 白晓阳
  */
-class FlowCreateAction extends Action
+class FlowUpdateAction extends Action
 {
 	/**
 	 * 相关文件
@@ -27,29 +27,21 @@ class FlowCreateAction extends Action
 		$this->end = true;
 		$basin = _LOCAL.$this->target['abasin']._DIR;
 		$event = $this->target['aevent'];
-
+		$oevent = $this->target['oevent'];
+		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
 		$status = true;
 		foreach ($this->include as $item => $file) {
+			$ofile = sprintf($file, $oevent);
 			$file = sprintf($file, $event);
 			if ($item !== self::PAGE) {
 				$file = ucfirst($file);
+				$ofile = ucfirst($ofile);
 			}
-			$status = $status && ! file_exists($basin.$item._DIR.$file);
-		}
-		if (! $status) {
-			$result = array(
-				'status' => $status,
-				'notice' => Log::logs('existed', __CLASS__),
-			);
-			return json_encode($result);
-		}
-		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
-		foreach ($this->include as $item => $file) {
-			$file = sprintf($file, $event);
-			if ($item !== self::PAGE) {
-				$file = ucfirst($file);
+			$file = $basin.$item._DIR.$file;
+			$ofile = $basin.$item._DIR.$ofile;
+			if (is_file($ofile)) {
+				$status = rename($ofile, $file) && $status;
 			}
-			$status = $status && file_put_contents($basin.$item._DIR.$file, '-');
 		}
 		$result = array('status' => $status);
 		if (! $status) {

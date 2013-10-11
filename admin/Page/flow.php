@@ -2,22 +2,25 @@
 $service = $this->target['service'];
 $abasin = $this->target['abasin'];
 $urlBack = $this->url('basin', $service);
+$lblCreate = Lang::cut('create', 0);
+$lblUpdate = Lang::cut('update', 0);
+$lblDelete = Lang::cut('delete', 0);
 ?>
 <div class="box">
 	<div class="t">
+		<a class="fr tg" onclick="flowCreate(/\$aevent\$/g)"><?php echo $lblCreate; ?></a>
 		<a href="<?php echo $urlBack; ?>"><?php echo $abasin; ?></a>
 		<span class="tg">&raquo;</span>
-		<span>流程</span>
-		<a class="fr tg" onclick="flowCreate(/\$aevent\$/g)">新建</a>
+		<span><?php Lang::cut('flow'); ?></span>
 	</div>
-	<div>
+	<div id="flow-list">
 <?php
 $adata = $this->target[Flow::ACTION];
 foreach ($adata as $item => $value) {
 	$actionFile = $this->pick(Flow::ACTION, $value);
-	$actionAction = $actionFile == null ? '新建' : '删除';
+	$actionAction = $actionFile == null ? $lblCreate : $lblDelete;
 	$pageFile = $this->pick(Flow::PAGE, $value);
-	$pageAction = $pageFile == null ? '新建' : '删除';
+	$pageAction = $pageFile == null ? $lblCreate : $lblDelete;
 	$url = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=' . $item);
 	echo
 <<<ITEM
@@ -34,8 +37,8 @@ foreach ($adata as $item => $value) {
 				<a>$pageAction</a>
 			</span>
 			<span class="fr">
-				<a class="button">修改</a>
-				<a class="button">删除</a>
+				<a class="button" onclick="flowUpdate.call(this, '$item')">$lblUpdate</a>
+				<a class="button" onclick="flowDelete.call(this, '$item')">$lblDelete</a>
 			</span>
 		</div>
 ITEM;
@@ -59,24 +62,24 @@ $urlProcess = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=$ae
 			<a class="b" href="<?php echo $urlProcess; ?>">$aevent$</a>
 		</span>
 		<span class="w3">
-			$aevent$Action.php
-			<a>删除</a>
+			<span class="flow-action">$aevent$Action.php</span>
+			<a><?php echo $lblDelete; ?></a>
 		</span>
 		<span class="w2">
-			$aevent$.php
-			<a>删除</a>
+			<span>$aevent$.php</span>
+			<a><?php echo $lblDelete; ?></a>
 		</span>
 		<span class="fr">
-			<a class="button">修改</a>
-			<a class="button">删除</a>
+			<a class="button" onclick="flowUpdate.call(this, '$aevent$')"><?php echo $lblUpdate; ?></a>
+			<a class="button" onclick="flowDelete.call(this, '$aevent$')"><?php echo $lblDelete; ?></a>
 		</span>
 	</div>
 	<div class="text tpl-flowCreate">
-		<label>流程名：</label>
+		<label><?php Lang::cut('flow-name'); ?></label>
 		<?php echo Input::cut('aevent', array('event' => 'flowCreate', 'class' => 'w300')); ?>
 	</div>
 	<div class="text tpl-flowUpdate">
-		<label>流程名：</label>
+		<label><?php Lang::cut('flow-name'); ?></label>
 		<?php echo Input::cut('aevent', array('event' => 'flowUpdate', 'class' => 'w300')); ?>
 		<?php echo Input::cut('oevent', array('event' => 'flowUpdate'), 'hidden'); ?>
 		<div class="q text">
@@ -92,7 +95,7 @@ $urlProcess = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=$ae
 <script type="text/javascript">
 <!--
 var flowCreate = function(event) {
-	var title = '新建流程';
+	var title = '<?php Lang::cut('flow-create'); ?>';
 	var content = bai.pick('.tpl .tpl-flowCreate').cloneNode(true);
 	var url = '<?php echo $urlCreate; ?>';
 	bai.bubble(content, title, function(e) {
@@ -105,16 +108,20 @@ var flowCreate = function(event) {
 			if (data && data.status) {
 				var view = bai.pick('.tpl .tpl-flow').cloneNode(true);
 				view.innerHTML = view.innerHTML.replace(event, aevent);
-				bai.pick('#basin-list').appendChild(view);
+				var action = view.pick('.flow-action', 1);
+				action.innerHTML = action.innerHTML[0].toUpperCase() + action.innerHTML.substring(1);
+				bai.pick('#flow-list').appendChild(view);
+				return true;
 			}
+			bai.bubble(data);
 		});
 	});
 };
-var basinUpdate = function(basin) {
-	var title = '修改流域';
-	var content = bai.pick('.tpl .tpl-basinUpdate').cloneNode(true);
-	content.pick('.input[name=abasin]', 1).value = basin;
-	content.pick('.input[name=obasin]', 1).value = basin;
+var flowUpdate = function(event) {
+	var title = '<?php Lang::cut('flow-update'); ?>';
+	var content = bai.pick('.tpl .tpl-flowUpdate').cloneNode(true);
+	content.pick('.input[name=aevent]', 1).value = event;
+	content.pick('.input[name=oevent]', 1).value = event;
 	var url = '<?php echo $urlnUpdate; ?>';
 	var view = this.pick('.item', -1);
 	bai.bubble(content, title, function(e) {
@@ -122,20 +129,24 @@ var basinUpdate = function(basin) {
 		if (! check || check.input != null) {
 			return false;
 		}
-		var abasin = content.pick('.input[name=abasin]', 1).value;
+		var aevent = content.pick('.input[name=aevent]', 1).value;
 		bai.ajax(url, check.result, function(data) {
 			if (data && data.status) {
-				var changed = bai.pick('.tpl .tpl-basin').cloneNode(true);
-				changed.innerHTML = changed.innerHTML.replace(/\$abasin\$/g, abasin);
-				bai.pick('#basin-list').replaceChild(changed, view);
+				var last = bai.pick('.tpl .tpl-flow').cloneNode(true);
+				last.innerHTML = last.innerHTML.replace(/\$aevent\$/g, aevent);
+				var action = last.pick('.flow-action', 1);
+				action.innerHTML = action.innerHTML[0].toUpperCase() + action.innerHTML.substring(1);
+				bai.pick('#flow-list').replaceChild(last, view);
+				return true;
 			}
+			bai.bubble(data);
 		});
 	});
 };
-var basinDelete = function(basin) {
-	var title = '删除流域';
-	var content = bai.pick('.tpl .tpl-basinDelete').cloneNode(true);
-	var url = '<?php echo $urlDelete; ?>' + '&abasin=' + basin;
+var flowDelete = function(event) {
+	var title = '<?php Lang::cut('flow-delete'); ?>';
+	var content = bai.pick('.tpl .tpl-flowDelete').cloneNode(true);
+	var url = '<?php echo $urlDelete; ?>' + '&aevent=' + event;
 	var view = this.pick('.item', -1);
 	bai.bubble(content, title, function(e) {
 		bai.ajax(url, function(data) {
@@ -143,6 +154,7 @@ var basinDelete = function(basin) {
 				view.parentNode.removeChild(view);
 				return true;
 			}
+			bai.bubble(data);
 		});
 	});
 };

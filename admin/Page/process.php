@@ -1,22 +1,21 @@
-<div class="box">
-	<div class="t">
 <?php
 $service = $this->target['service'];
 $abasin = $this->target['abasin'];
 $aevent = $this->target['aevent'];
-$backs = $this->url('basin', $service);
-$backe = $this->url('flow', $service, 'abasin=' . $abasin);
-echo
-<<<BOX
-		<a href="$backs">$abasin</a>
+$urlBackBasin = $this->url('basin', $service);
+$urlBackFlow = $this->url('flow', $service, 'abasin=' . $abasin);
+?>
+<div class="box">
+	<div class="t">
+		<a class="fr tg"><?php Lang::cut('create'); ?></a>
+		<a href="<?php echo $urlBackBasin; ?>"><?php echo $abasin; ?></a>
 		<span class="tg">&raquo;</span>
-		<a href="$backe">$aevent</a>
+		<a href="<?php echo $urlBackFlow; ?>"><?php echo $aevent; ?></a>
 		<span class="tg">&raquo;</span>
-		<span>处理</span>
-		<a class="fr tg">新建</a>
+		<span><?php Lang::cut('process'); ?></span>
 	</div>
 	<div>
-BOX;
+<?php
 $adata = $this->target[Flow::ACTION];
 foreach ($adata as $item => $value) {
 	echo
