@@ -36,8 +36,14 @@ class FlowAction extends Action
 					continue;
 				}
 				$event = lcfirst($this->pick(self::EVENT, $match));
+				if (strpos($event, _DEF) === 0) {
+					continue;
+				}
 				$result[$event][$item] = $file;
 			}
+		}
+		if (! empty($result['home'])) {
+			$result = array('home' => $result['home']) + $result;
 		}
 		$this->target[Flow::ACTION] = $result;
 	}

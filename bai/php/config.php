@@ -297,6 +297,7 @@ $config[Work::STYLE] = array(
 	'insets'   => array(
 		'css' => '<style type="text/css">%s</style>',
 		'js'  => '<script type="text/javascript">%s</script>',
+		Work::TEMPLATE => '%s',
 	),
 	### 外链模板
 	'links'    => array(
@@ -374,12 +375,13 @@ $config[Work::TEST] = array(
 $config[Work::TEMPLATE] = array(
 	'peg'       => '$',
 	'mode'      => '#\{\$(?<' . Template::ITEM . '>[a-zA-Z0-9_\x7f-\xff]+)\s*(?:(?<' . Template::HANDLE .
-			 '>[?!])\s*(?:(?<' . Template::PRIMARY . '>[^|}]+)\s*(?:\|\s*(?<' . Template::SECORDARY .
+			 '>[?!.])\s*(?:(?<' . Template::PRIMARY . '>[^|}]+)\s*(?:\|\s*(?<' . Template::SECORDARY .
 			 '>[^|}]+)\s*)?)?)?\}#',
 	'handler'   => array(
 		null    => 'param',
 		'?'     => 'choose',
 		'!'     => 'loop',
+		'.'     => 'call',
 	),
 	'looper'    => array('$value', '$key'),
 	'dic'       => array(

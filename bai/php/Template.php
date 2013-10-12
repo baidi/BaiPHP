@@ -64,6 +64,7 @@ class Template extends Work
 		'?' => 'choose',
 		### 循环处理式
 		'!' => 'loop',
+		'.' => 'call',
 	);
 	/**
 	 * 循环体变量
@@ -125,7 +126,18 @@ class Template extends Work
 	public static function file ($item = null, $setting = null)
 	{
 		$template = Template::access();
-		return $template->entrust($this->load($item), $setting);
+		### 路径
+		$path    = $template->locate($item, __CLASS__);
+		$bai     = $template->pick(self::BAI, $path);
+		$service = $template->pick(self::SERVICE, $path);
+		### 加载文件
+		$content = '';
+		if ($service != null) {
+			$content = file_get_contents(_LOCAL.$service);
+		} else if ($bai != null) {
+			$content = file_get_contents(_LOCAL.$bai);
+		}
+		return $template->entrust($content, $setting);
 	}
 
 	/**
@@ -243,7 +255,7 @@ class Template extends Work
 	 *
 	 * @return string 参数输出片段
 	 */
-	protected function loop ()
+	protected function loop()
 	{
 		### 执行数据
 		$item = $this[self::ITEM];
@@ -261,6 +273,25 @@ class Template extends Work
 		$result = '';
 		foreach ($value as $key => $val) {
 			$result .= str_replace($this->looper, array($val,$key), $content);
+		}
+		return $result;
+	}
+
+	/**
+	 * <h4>模板解析器：调用</h4>
+	 *
+	 * @return string 参数输出片段
+	 */
+	protected function call()
+	{
+		### 执行数据
+		$item = $this[self::ITEM];
+		$value = $this['value'];
+		### 表达式
+		$content = $this[self::PRIMARY];
+		$result = '';
+		if (is_callable($content)) {
+			$result = call_user_func_array($content, array($value));
 		}
 		return $result;
 	}

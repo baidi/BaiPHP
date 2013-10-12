@@ -45,5 +45,5 @@ BOX;
 </div>
 <div class="q row">
 	<span class="tg b">::</span>
-	处理由全局配置：流程（$config[Flow::FLOW]）决定，总是优先选用当前服务下的流程和工场。
+	处理由全局配置：流程（$config[Flow::FLOW]）决定，总是优先选用当前服务下的流程和工场。以上过程仅供参考，处理中可能会产生跳转或中止。
 </div>

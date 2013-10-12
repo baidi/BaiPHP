@@ -25,6 +25,16 @@ $config[_DEF][Target::DEBUG] = true;
 
 ### 全局配置：检验工场
 $config[Work::CHECK][Work::EVENT] = array(
+	'basinCreate' => array(
+		'abasin' => 'required min=2 max=20 type=char',
+	),
+	'basinUpdate' => array(
+		'obasin' => 'required min=2 max=20 type=char',
+		'abasin' => 'required min=2 max=20 type=char',
+	),
+	'basinDelete' => array(
+		'abasin' => 'required min=2 max=20 type=char',
+	),
 	'flow' => array(
 		'abasin' => 'required type=char',
 	),
@@ -41,19 +51,25 @@ $config[Work::CHECK][Work::EVENT] = array(
 		'abasin' => 'required type=char',
 		'aevent' => 'required min=2 max=20 type=char',
 	),
+	'actionCreate' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
+	'actionDelete' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
+	'pageCreate' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
+	'pageDelete' => array(
+		'abasin' => 'required type=char',
+		'aevent' => 'required min=2 max=20 type=char',
+	),
 	'process' => array(
 		'abasin' => 'required type=char',
 		'aevent' => 'required type=char',
-	),
-	'basinCreate' => array(
-		'abasin' => 'required min=2 max=20 type=char',
-	),
-	'basinUpdate' => array(
-		'obasin' => 'required min=2 max=20 type=char',
-		'abasin' => 'required min=2 max=20 type=char',
-	),
-	'basinDelete' => array(
-		'abasin' => 'required min=2 max=20 type=char',
 	),
 );
 
@@ -63,7 +79,7 @@ $config[Work::LOG]['dic']['BasinCreateAction'] = array(
 	'fail' => '流域创建失败……',
 );
 $config[Work::LOG]['dic']['BasinUpdateAction'] = array(
-	'deleted' => '该流域已被删除……',
+	'deleted' => '该流域已被删除或无法修改……',
 	'existed' => '该流域已存在……',
 	'basin' => '修改流域 %s 到 %s',
 	'fail' => '流域修改失败……',
@@ -84,6 +100,24 @@ $config[Work::LOG]['dic']['FlowUpdateAction'] = array(
 $config[Work::LOG]['dic']['FlowDeleteAction'] = array(
 	'engage' => '删除流程：%s',
 	'fail' => '流程删除失败……',
+);
+$config[Work::LOG]['dic']['ActionCreateAction'] = array(
+	'existed' => '该处理已存在……',
+	'engage' => '新建处理：%s',
+	'fail' => '处理创建失败……',
+);
+$config[Work::LOG]['dic']['ActionDeleteAction'] = array(
+	'engage' => '删除处理：%s',
+	'fail' => '处理删除失败……',
+);
+$config[Work::LOG]['dic']['PageCreateAction'] = array(
+	'existed' => '该页面已存在……',
+	'engage' => '新建页面：%s',
+	'fail' => '页面创建失败……',
+);
+$config[Work::LOG]['dic']['PageDeleteAction'] = array(
+	'engage' => '删除页面：%s',
+	'fail' => '页面删除失败……',
 );
 
 $config['BasinAction'] = array(
@@ -141,11 +175,23 @@ $config['FlowCreateAction'] = array(
 		Flow::ACTION => '%s'.Flow::ACTION._EXT,
 	)
 );
+$config['FlowUpdateAction'] = array(
+	'include' => $config['FlowCreateAction']['include'],
+);
 $config['FlowDeleteAction'] = array(
 	'include' => $config['FlowCreateAction']['include'],
 );
-$config['FlowUpdateAction'] = array(
-	'include' => $config['FlowCreateAction']['include'],
+$config['ActionCreateAction'] = array(
+	'include' => Flow::ACTION._DIR.'%s'.Flow::ACTION._EXT,
+);
+$config['ActionDeleteAction'] = array(
+	'include' => Flow::ACTION._DIR.'%s'.Flow::ACTION._EXT,
+);
+$config['PageCreateAction'] = array(
+	'include' => Flow::PAGE._DIR.'%s'._EXT,
+);
+$config['PageDeleteAction'] = array(
+	'include' => Flow::PAGE._DIR.'%s'._EXT,
 );
 
 $config ['JS'] = array (

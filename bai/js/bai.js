@@ -46,7 +46,7 @@
 
 	/** 元素：执行CSS选择器 */
 	Element.prototype.pick = Document.prototype.pick = function(query, one) {
-		if (one == -1) {
+		if (one < 0) {
 			var parent = this.parentNode;
 			while (parent != document) {
 				var matches = parent.parentNode.querySelectorAll(query);
@@ -62,7 +62,11 @@
 		if (one == 1) {
 			return this.querySelector(query);
 		}
-		return this.querySelectorAll(query);
+		var result = this.querySelectorAll(query);
+		if (one > 1 && one < result.length) {
+			result.length = one;
+		}
+		return result;
 	};
 
 	/** 元素：读取自身属性 */

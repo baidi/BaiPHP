@@ -15,7 +15,7 @@
  * </p>
  * @author 白晓阳
  */
-class FlowCreateAction extends Action
+class PageDeleteAction extends Action
 {
 	/**
 	 * 相关文件
@@ -27,36 +27,18 @@ class FlowCreateAction extends Action
 		$this->end = true;
 		$basin = _LOCAL.$this->target['abasin']._DIR;
 		$event = $this->target['aevent'];
+		$file = $basin.sprintf($this->include, ucfirst($event));
 
-		$status = true;
-		$files = array();
-		foreach ($this->include as $item => $file) {
-			$file = sprintf($file, $event);
-			if ($item !== self::PAGE) {
-				$file = ucfirst($file);
-			}
-			$file = $basin.$item._DIR.$file;
-			$status = $status && ! is_file($file);
-			if ($status) {
-				$files[$item] = $file;
-			}
-		}
-		if (! $status) {
+		if (! is_file($file) || ! unlink($file)) {
 			$result = array(
-				'status' => $status,
-				'notice' => Log::logs('existed', __CLASS__),
+				'status' => false,
+				'notice' => Log::logs('fail', __CLASS__),
 			);
 			return json_encode($result);
 		}
+
 		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
-		foreach ($files as $item => $file) {
-			$template = Template::file($item._EXT, array('event' => $event));
-			$status = $status && file_put_contents($file, $template);
-		}
-		$result = array('status' => $status);
-		if (! $status) {
-			$result['notice'] = Log::logs('fail', __CLASS__);
-		}
+		$result = array('status' => true);
 		return json_encode($result);
 	}
 }

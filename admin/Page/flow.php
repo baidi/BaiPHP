@@ -29,12 +29,12 @@ foreach ($adata as $item => $value) {
 				<a class="b" href="$url">$item</a>
 			</span>
 			<span class="w3">
-				$actionFile
-				<a>$actionAction</a>
+				<span>$actionFile</span>
+				<a onclick="flowAction.call(this, '$item', '$actionFile')">$actionAction</a>
 			</span>
 			<span class="w2">
-				$pageFile
-				<a>$pageAction</a>
+				<span>$pageFile</span>
+				<a onclick="flowPage.call(this, '$item', '$pageFile')">$pageAction</a>
 			</span>
 			<span class="fr">
 				<a class="button" onclick="flowUpdate.call(this, '$item')">$lblUpdate</a>
@@ -54,6 +54,10 @@ ITEM;
 $urlCreate = $this->url('flowCreate', $service, 'abasin=' . $abasin);
 $urlnUpdate = $this->url('flowUpdate', $service, 'abasin=' . $abasin);
 $urlDelete = $this->url('flowDelete', $service, 'abasin=' . $abasin);
+$urlActionCreate = $this->url('actionCreate', $service, 'abasin=' . $abasin);
+$urlActionDelete = $this->url('actionDelete', $service, 'abasin=' . $abasin);
+$urlPageCreate = $this->url('pageCreate', $service, 'abasin=' . $abasin);
+$urlPageDelete = $this->url('pageDelete', $service, 'abasin=' . $abasin);
 $urlProcess = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=$aevent$');
 ?>
 <div class="tpl">
@@ -62,12 +66,12 @@ $urlProcess = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=$ae
 			<a class="b" href="<?php echo $urlProcess; ?>">$aevent$</a>
 		</span>
 		<span class="w3">
-			<span class="flow-action">$aevent$Action.php</span>
+			<span class="flow-action" onclick="flowAction.call(this, '$aevent$', '$aevent$Action.php')">$aevent$Action.php</span>
 			<a><?php echo $lblDelete; ?></a>
 		</span>
 		<span class="w2">
 			<span>$aevent$.php</span>
-			<a><?php echo $lblDelete; ?></a>
+			<a onclick="flowPage.call(this, '$aevent$', '$aevent$.php')"><?php echo $lblDelete; ?></a>
 		</span>
 		<span class="fr">
 			<a class="button" onclick="flowUpdate.call(this, '$aevent$')"><?php echo $lblUpdate; ?></a>
@@ -90,6 +94,22 @@ $urlProcess = $this->url('process', $service, 'abasin=' . $abasin . '&aevent=$ae
 	<div class="tpl-flowDelete">
 		<p>确定要删除该流程？</p>
 		<p>该流程对应的所有文件都会被删除，并且无法恢复！</p>
+	</div>
+	<div class="tpl-action-create">
+		<p>确定要建立该处理文件？</p>
+		<p>新建文件只是一个示范的模板，不包含具体处理！</p>
+	</div>
+	<div class="tpl-action-delete">
+		<p>确定要删除该处理文件？</p>
+		<p>文件删除后无法恢复！</p>
+	</div>
+	<div class="tpl-page-create">
+		<p>确定要建立该页面文件？</p>
+		<p>新建文件只是一个示范的模板，你需要手动添加你期望的内容！</p>
+	</div>
+	<div class="tpl-page-delete">
+		<p>确定要删除该页面文件？</p>
+		<p>页面文件删除后无法恢复！</p>
 	</div>
 </div>
 <script type="text/javascript">
@@ -152,6 +172,68 @@ var flowDelete = function(event) {
 		bai.ajax(url, function(data) {
 			if (data && data.status) {
 				view.parentNode.removeChild(view);
+				return true;
+			}
+			bai.bubble(data);
+		});
+	});
+};
+// 新建或删除处理文件
+var flowAction = function(event, file) {
+	var title = null, content = null, url = null;
+	if (file) {
+		title = '<?php Lang::cut('action-delete'); ?>';
+		content = bai.pick('.tpl .tpl-action-delete').cloneNode(true);
+		url = '<?php echo $urlActionDelete; ?>' + '&aevent=' + event;
+	} else {
+		title = '<?php Lang::cut('action-create'); ?>';
+		content = bai.pick('.tpl .tpl-action-create').cloneNode(true);
+		url = '<?php echo $urlActionCreate; ?>' + '&aevent=' + event;
+	}
+	var view = this;
+	bai.bubble(content, title, function(e) {
+		bai.ajax(url, function(data) {
+			if (data && data.status) {
+				if (file) {
+					view.previousElementSibling.innerHTML = '';
+					view.innerHTML = '<?php echo $lblCreate;?>';
+					view.onclick = Function("flowAction.call(this, '" + event + "', '')");
+					return true;
+				}
+				view.previousElementSibling.innerHTML = data.file;
+				view.innerHTML = '<?php echo $lblDelete;?>';
+				view.onclick = Function("flowAction.call(this, '" + event + "', '" + data.file + "')");
+				return true;
+			}
+			bai.bubble(data);
+		});
+	});
+};
+// 新建或删除页面文件
+var flowPage = function(event, file) {
+	var title = null, content = null, url = null;
+	if (file) {
+		title = '<?php Lang::cut('page-delete'); ?>';
+		content = bai.pick('.tpl .tpl-page-delete').cloneNode(true);
+		url = '<?php echo $urlPageDelete; ?>' + '&aevent=' + event;
+	} else {
+		title = '<?php Lang::cut('action-create'); ?>';
+		content = bai.pick('.tpl .tpl-action-create').cloneNode(true);
+		url = '<?php echo $urlPageCreate; ?>' + '&aevent=' + event;
+	}
+	var view = this;
+	bai.bubble(content, title, function(e) {
+		bai.ajax(url, function(data) {
+			if (data && data.status) {
+				if (file) {
+					view.previousElementSibling.innerHTML = '';
+					view.innerHTML = '<?php echo $lblCreate;?>';
+					view.onclick = Function("flowPage.call(this, '" + event + "', '')");
+					return true;
+				}
+				view.previousElementSibling.innerHTML = data.file;
+				view.innerHTML = '<?php echo $lblDelete;?>';
+				view.onclick = Function("flowPage.call(this, '" + event + "', '" + data.file + "')");
 				return true;
 			}
 			bai.bubble(data);

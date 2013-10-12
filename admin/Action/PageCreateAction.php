@@ -15,10 +15,10 @@
  * </p>
  * @author 白晓阳
  */
-class BasinCreateAction extends Action
+class PageCreateAction extends Action
 {
 	/**
-	 * 子目录
+	 * 相关文件
 	 */
 	protected $include = null;
 
@@ -26,29 +26,25 @@ class BasinCreateAction extends Action
 	{
 		$this->end = true;
 		$basin = _LOCAL.$this->target['abasin']._DIR;
-		$result = array();
-		if (is_dir($basin)) {
-			$result['status'] = false;
-			$result['notice'] = Log::logs(__FUNCTION__, __CLASS__);
+		$event = $this->target['aevent'];
+		$file = $basin.sprintf($this->include, $event);
+
+		if (is_file($file)) {
+			$result = array(
+				'status' => false,
+				'notice' => Log::logs('existed', __CLASS__),
+			);
 			return json_encode($result);
 		}
-		Log::logf('basin', $basin, __CLASS__);
-		$status = mkdir($basin, 0755);
-		if ($status && is_array($this->include)) {
-			foreach ($this->include as $item => $flag) {
-				if (! $flag) {
-					continue;
-				}
-				$status = $status && mkdir($basin.$item, 0755);
-			}
-		}
-		if (is_dir($basin.self::PAGE)) {
-			$template = Template::file(self::PAGE._EXT, array('event' => 'home'));
-			$status = $status && file_put_contents($basin.self::PAGE._DIR.'home.php', $template);
-		}
-		$result['status'] = $status;
+
+		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
+		$template = Template::file(self::PAGE._EXT, array('event' => $event));
+		$status = file_put_contents($file, $template);
+		$result = array('status' => $status);
 		if (! $status) {
 			$result['notice'] = Log::logs('fail', __CLASS__);
+		} else {
+			$result['file'] = basename($file);
 		}
 		return json_encode($result);
 	}

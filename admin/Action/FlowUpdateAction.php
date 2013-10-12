@@ -32,14 +32,20 @@ class FlowUpdateAction extends Action
 		$status = true;
 		foreach ($this->include as $item => $file) {
 			$ofile = sprintf($file, $oevent);
-			$file = sprintf($file, $event);
 			if ($item !== self::PAGE) {
-				$file = ucfirst($file);
 				$ofile = ucfirst($ofile);
 			}
-			$file = $basin.$item._DIR.$file;
 			$ofile = $basin.$item._DIR.$ofile;
 			if (is_file($ofile)) {
+				$file = sprintf($file, $event);
+				if ($item !== self::PAGE) {
+					$file = ucfirst($file);
+					$content = file_get_contents($ofile);
+					$search =  '#(?<=\s)'.ucfirst($oevent).$item.'(?=\s|::)#';
+					$content = preg_replace($search, ucfirst($event).$item, $content);
+					file_put_contents($ofile, $content);
+				}
+				$file = $basin.$item._DIR.$file;
 				$status = rename($ofile, $file) && $status;
 			}
 		}
