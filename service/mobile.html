@@ -17,12 +17,16 @@ body {
 .box-size {
 	width: 480px;
 	height: 700px;
+	overflow: hidden;
 }
 .page {
+	position: absolute;
+	top: 0;
 	min-height: 100%;
 	line-height: 1.5em;
 	color: #334f33;
 	background-color: #fcfffc;
+	display:-webkit-flex;
 }
 
 .title {
@@ -62,6 +66,9 @@ body {
 
 .p {
 	text-indent: 2em;
+}
+.h {
+	display: none;
 }
 p {
 	margin: 0;
@@ -117,6 +124,414 @@ p {
 }
 </style>
 <script type="text/javascript">
+/** BaiPHP - 化简PHP */
+(function(p) {
+	if (p.bai != null) {
+		return;
+	}
+
+	/** 字符串：去除首尾空格 */
+	if (String.prototype.trim == null) {
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g, '');
+		};
+	}
+
+	/** 数组：依次处理子项目 */
+	Array.prototype.each = NodeList.prototype.each = function(action) {
+		if (! bai.is(action, bai.is.FUNCTION)) {
+			return false;
+		}
+		var result = null;
+		for (var i = 0, m = this.length; i < m; i++) {
+			result = action.call(this[i], i);
+			if (result === false) {
+				return result;
+			}
+		}
+		return true;
+	};
+
+	/** 元素：执行CSS选择器 */
+	Element.prototype.pick = Document.prototype.pick = function(query, one) {
+		if (one < 0) {
+			var parent = this.parentNode;
+			while (parent != document) {
+				var matches = parent.parentNode.querySelectorAll(query);
+				for (var i = 0, m = matches.length; i < m; i++) {
+					if (matches[i] == parent) {
+						return parent;
+					}
+				}
+				parent = parent.parentNode;
+			}
+			return null;
+		}
+		if (one == 1) {
+			return this.querySelector(query);
+		}
+		var result = this.querySelectorAll(query);
+		if (one > 1 && one < result.length) {
+			result.length = one;
+		}
+		return result;
+	};
+
+	/** 元素：读取自身属性 */
+	Element.prototype.get = function(item) {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
+			return null;
+		}
+		item = bai.config('alt', item) || item;
+		if (this.hasAttribute(item)) {
+			return this.getAttribute(item);
+		}
+		return this[item];
+	};
+
+	/** 元素：设置自身属性 */
+	Element.prototype.set = function(item, value) {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
+			return false;
+		}
+		item = bai.config('alt', item) || item;
+		value = value || '';
+		if (item == 'className') {
+			var list = this.classList;
+			if (value[0] == '+') {
+				list.add(value.substr(1));
+				return true;
+			}
+			if (value[0] == '-') {
+				list.remove(value.substr(1));
+				return true;
+			}
+		}
+		this[item] = value;
+		return true;
+	};
+
+	/** 元素：查验自身属性 */
+	Element.prototype.has = function(item, value) {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
+			return false;
+		}
+		item = bai.config('alt', item) || item;
+		value = value || '';
+		if (this[item] == null || value == '') {
+			return false;
+		}
+		if (item == 'className') {
+			return this.classList.contains(value);
+		}
+		if (this[item].indexOf != null) {
+			return this[item].indexOf(value) !== false;
+		}
+		return false;
+	};
+
+	/** 元素：设置自身样式 */
+	Element.prototype.css = function(item, value) {
+		if (item == null) {
+			return null;
+		}
+		var pre = /-[a-z]/gi;
+		var post = function(prefix) {
+			return prefix[1].toUpperCase();
+		};
+		if (bai.is(item, bai.is.STRING)) {
+			//设置单个样式
+			if (item.indexOf('-') >= 0) {
+				item = item.toLowerCase().replace(pre, post);
+			}
+			if (value === undefined) {
+				return this.style.item;
+			}
+			return this.style[item] = value || '';
+		}
+		if (bai.is(item, bai.is.JSON)) {
+			// 设置一组样式
+			var proper = null;
+			for (var key in item) {
+				if (key == null) {
+					continue;
+				}
+				if (key.indexOf('-') >= 0) {
+					proper = key.toLowerCase().replace(pre, post);
+				} else {
+					proper = key;
+				}
+				this.style[proper] = item[key] || '';
+			}
+		}
+	};
+
+	/** 元素：绑定事件 */
+	Element.prototype.on = function(item, action) {
+		if (! bai.is(item, bai.is.STRING)) {
+			return false;
+		}
+		if (item.substr(0, 2) != 'on') {
+			item = 'on' + item;
+		}
+		if (this[item] === undefined) {
+			return false;
+		}
+		if (action === undefined) {
+			return this[item]();
+		}
+		this[item] = action;
+		return true;
+	};
+
+	/** 元素：执行CSS变换 */
+	Element.prototype.to = function(css, duration, replay, alt, mode) {
+		if (css == null) {
+			return false;
+		}
+		if (bai.is(duration, bai.is.NUMBER)) {
+			duration = (duration >= 100 ? duration + 'ms' : duration + 's');
+		} else if (! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
+			duration = '1s';
+		}
+		if (replay == null || isNaN(replay) || replay == 0) {
+			replay = 'infinite';
+		}
+		alt = (alt == null ? '' : (alt ? 'alternate' : 'reverse'));
+		if (document.styleSheets.length == 0) {
+			document.head.innerHTML += '<style id="BaiCSS" type="text/css"></style>';
+		}
+		var style = document.styleSheets[0];
+		if (style.baicss == null) {
+			style.baicss = {};
+		}
+		// 简单变换
+		if (bai.is(css, bai.is.STRING)) {
+			var key = 'BaiCSS-' + bai.encode(css);
+			// 建立变换帧
+			if (style.baicss[key] == null) {
+				try {
+					style.insertRule('@keyframes ' + key + ' {0% {} 100% {' + css + '}}', style.cssRules.length);
+				} catch (e) {
+					style.insertRule('@-webkit-keyframes ' + key + ' {0% {} 100% {' + css + '}}', style.cssRules.length);
+				}
+				style.baicss[key] = true;
+			}
+			var $this = this;
+			var timeout = parseInt(duration);
+			if (duration[duration.length - 2] != 'm') {
+				timeout *= 1000;
+			}
+			setTimeout(function() {
+				$this.css({animation: '', '-webkit-animation': ''});
+				if ((replay === 1 || replay === '1') && alt != 'reverse') {
+					$this.css(bai.from(css, bai.from.CSS));
+				}
+			}, timeout);
+			// 建立变换样式
+			var animation = [key, duration, mode, replay, alt].join(' ');
+			this.css({animation: animation, '-webkit-animation': animation});
+			return true;
+		}
+		// 定制变换
+		css = bai.to(css);
+		var key = 'BaiCSS-' + bai.encode(css);
+		if (style.baicss[key] == null) {
+			try {
+				style.insertRule('@keyframes ' + key + ' {' + css + '}', style.cssRules.length);
+			} catch (e) {
+				style.insertRule('@-webkit-keyframes ' + key + ' {' + css + '}', style.cssRules.length);
+			}
+			style.baicss[key] = true;
+		}
+			var $this = this;
+			var timeout = parseInt(duration);
+			if (duration[duration.length - 2] != 'm') {
+				timeout *= 1000;
+			}
+			setTimeout(function() {
+				$this.css({animation: '', '-webkit-animation': ''});
+				if ((replay === 1 || replay === '1') && alt != 'reverse') {
+					$this.css(bai.from(css, bai.from.CSS));
+				}
+			}, timeout);
+		// 建立变换样式
+		var animation = [key, duration, mode, replay, alt].join(' ');
+		this.css({animation: animation, '-webkit-animation': animation});
+		return true;
+	};
+
+	/** 化简JS - BaiJS */
+	var $bai = {
+		name: 'BaiJS',
+		verson: '2.0.0',
+		date: '2013-7-30',
+		author: '白晓阳',
+		history: ''
+	};
+	/** 化简JS：全局配置 */
+	var $config = {};
+	/** 化简JS：私有属性 */
+	var $own = {};
+
+	/** 化简JS：读取全局配置 */
+	$bai.config = function() {
+		var value = $config;
+		// 逐层读取配置
+		for ( var i = 0, m = arguments.length; i < m; i++) {
+			value = value[arguments[i]];
+			if (value == null) {
+				return null;
+			}
+		}
+		return value;
+	};
+
+	/** 化简JS：读取消息配置 */
+	$bai.message = function() {
+		var params = ['message'];
+		for (var i = 0, m = arguments.length; i < m; i++) {
+			params.push(arguments[i]);
+		}
+		return bai.config.apply(this, params);
+	};
+
+	/** 化简JS：访问私有属性 */
+	$bai.own = function(item, value) {
+		if (! bai.is(item, bai.is.STRING) || item == '') {
+			return null;
+		}
+		if (value === undefined) {
+			return $own[item];
+		}
+		return $own[item] = value;
+	};
+
+	/** 化简JS：输出日志信息 */
+	$bai.log = function() {
+		if (console && bai.is(console.log, bai.is.FUNCTION)) {
+			console.log.apply(this, arguments);
+		}
+	};
+
+	$bai.encode = function(origin) {
+		if (! bai.is(origin, bai.is.STRING) || origin == '') {
+			return '';
+		}
+//		var result = new Array();
+//		for (var i = 0, m = origin.length; i < m; i++) {
+//			var b = origin.charCodeAt(i);
+//			b = ((((b & 0x0F) + (b >> 4)) & 0x0F) + (b & 0xF0)) % 26 + 65;
+//			result[i] = String.fromCharCode(b);
+//		}
+//		return result.join('');
+		var result = 0;
+		for (var i = 0, m = origin.length; i < m; i++) {
+			var b = origin.charCodeAt(i);
+			result = ((result << 5) - result) + b;
+			result = result & result;
+		}
+		return result;
+	};
+
+	/** 化简JS：判断数据类型 */
+	$bai.is = function(origin, type) {
+		if (origin == null || type == null) {
+			return false;
+		}
+		if (type == bai.is.URL) {
+			return /^https?:\/\//i.test(origin);
+		}
+		return origin.constructor == type;
+	};
+	$bai.is.STRING = String;
+	$bai.is.ARRAY = Array;
+	$bai.is.BOOLEAN = Boolean;
+	$bai.is.NUMBER = Number;
+	$bai.is.DATE = Date;
+	$bai.is.JSON = Object;
+	$bai.is.FUNCTION = Function;
+	$bai.is.REGEXP = RegExp;
+	$bai.is.URL = 'URL';
+
+	/** 化简JS：转换对象到特定格式字符串 */
+	$bai.to = function(origin, type) {
+		if (origin == null) {
+			return '';
+		}
+		if (! bai.is(origin, bai.is.JSON)) {
+			return origin.toString();
+		}
+		// 转换结果
+		var result = new Array();
+		// 间隔符
+		var gaps = null;
+		if ($bai.is(type, $bai.is.ARRAY)) {
+			// 自定义间隔符
+			gaps = type;
+		} else if (type == $bai.to.CSS) {
+			gaps = [':', ';', '', ';'];
+		} else if (type == $bai.to.POST) {
+			gaps = ['=', '&'];
+		} else if (type == $bai.to.JSON) {
+			gaps = [':', ',', '{', '}'];
+		} else {
+			gaps = ['', ''];
+		}
+		// 插入间隔形成特定格式
+		for (var i in origin) {
+			if (i == null || $bai.is(origin[i], $bai.is.FUNCTION)) {
+				continue;
+			}
+			result.push(i + (gaps[0] || '') + origin[i]);
+		}
+		result = (gaps[2] || '') + result.join(gaps[1] || '') + (gaps[3] || '');
+		return result;
+	};
+	$bai.to.CSS = 'CSS';
+	$bai.to.POST = 'POST';
+	$bai.to.JSON = 'JSON';
+
+	$bai.from = function(origin, type) {
+		if (origin == null) {
+			return null;
+		}
+		if (! bai.is(origin, bai.is.STRING)) {
+			return origin;
+		}
+		// 转换结果
+		var result = {};
+		// 间隔符
+		var gaps = null;
+		if (type == $bai.to.CSS) {
+			gaps = [':', ';'];
+		} else {
+			gaps = [':', ','];
+		}
+		var items = origin.split(gaps[1]);
+		for (var i = 0, m = items.length; i < m; i++) {
+			var item = items[i].split(gaps[0]);
+			if (item[0].trim() == '') {
+				continue;
+			}
+			result[item[0].trim()] = item[1].trim();
+		}
+		return result;
+	};
+	$bai.from.CSS = 'CSS';
+	$bai.from.JSON = 'JSON';
+
+	/** 化简JS：执行CSS选择器 */
+	$bai.pick = function(query, scope) {
+		if (scope != null && scope.pick != null) {
+			return scope.pick(query, 1);
+		}
+		return document.pick(query, 1);
+	};
+
+	p.B = p.bai = $bai;
+})(window);
+
 function rotate(e) {
 	var sizedBox = document.querySelector('.box-size');
 	if (sizedBox == null) {
@@ -132,14 +547,36 @@ function rotate(e) {
 		}
 	}
 }
+function transform(mode) {
+	var page = bai.pick('.page');
+	var next = page.nextElementSibling;
+	if (next == null) {
+		return;
+	}
+	page.css('z-index', '');
+	next.css('z-index', 4);
+	next.css('width', page.clientWidth+'px');
+	if (mode == 1) {
+		next.to('left:100%;', 1, 1, false, 'linear');
+		page.to('left:-100%;', 1, 1, true, 'linear');
+	} else if (mode == 2) {
+		next.to('left:-100%;', 1, 1, false, 'linear');
+		page.to('left:100%;', 1, 1, true, 'linear');
+	} else if (mode == 3) {
+		next.to('opacity:0', 1, 1, false, 'linear');
+	}
+}
 </script>
 </head>
 <body>
 	<div class="box" style="width: 480px;">
 		<a class="button" onclick="rotate.call(this)">旋转</a>
+		<a class="button" onclick="transform(1)">右切</a>
+		<a class="button" onclick="transform(2)">左切</a>
+		<a class="button" onclick="transform(3)">浮出</a>
 	</div>
 	<div class="box box-size">
-		<div class="page">
+		<div class="page" style="z-index:1;">
 			<div class="title bg">目录</div>
 			<div class="content tc">
 				<div class="index">
@@ -178,6 +615,21 @@ function rotate(e) {
 						<p>项目内容一项目内容一</p>
 						<p>项目内容二项目内容二</p>
 					</div>
+				</div>
+			</div>
+		</div>
+		<div class="page">
+			<div class="title bg">标题</div>
+			<div class="content">
+				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
+				<div class="detail-content">
+					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
+					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
+				</div>
+				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
+				<div class="detail-content">
+					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
+					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
 				</div>
 			</div>
 		</div>

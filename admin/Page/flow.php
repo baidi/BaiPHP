@@ -217,8 +217,8 @@ var flowPage = function(event, file) {
 		content = bai.pick('.tpl .tpl-page-delete').cloneNode(true);
 		url = '<?php echo $urlPageDelete; ?>' + '&aevent=' + event;
 	} else {
-		title = '<?php Lang::cut('action-create'); ?>';
-		content = bai.pick('.tpl .tpl-action-create').cloneNode(true);
+		title = '<?php Lang::cut('page-create'); ?>';
+		content = bai.pick('.tpl .tpl-page-create').cloneNode(true);
 		url = '<?php echo $urlPageCreate; ?>' + '&aevent=' + event;
 	}
 	var view = this;

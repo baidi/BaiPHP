@@ -209,18 +209,19 @@
 				}
 				style.baicss[key] = true;
 			}
-			if (replay === 1 || replay === '1') {
-				var $this = this;
-				var timeout = parseInt(duration);
-				if (duration[duration.length - 2] != 'm') {
-					timeout *= 1000;
-				}
-				setTimeout(function() {
-					$this.css(bai.from(css, bai.from.CSS));
-				}, timeout);
+			var $this = this;
+			var timeout = parseInt(duration);
+			if (duration[duration.length - 2] != 'm') {
+				timeout *= 1000;
 			}
+			setTimeout(function() {
+				$this.css({animation: '', '-webkit-animation': ''});
+				if ((replay === 1 || replay === '1') && alt != 'reverse') {
+					$this.css(bai.from(css, bai.from.CSS));
+				}
+			}, timeout);
 			// 建立变换样式
-			var animation = [key, duration, replay, alt].join(' ');
+			var animation = [key, duration, mode, replay, alt].join(' ');
 			this.css({animation: animation, '-webkit-animation': animation});
 			return true;
 		}
@@ -235,18 +236,19 @@
 			}
 			style.baicss[key] = true;
 		}
-		if (replay === 1 || replay === '1') {
 			var $this = this;
 			var timeout = parseInt(duration);
 			if (duration[duration.length - 2] != 'm') {
 				timeout *= 1000;
 			}
 			setTimeout(function() {
-				$this.css(bai.from(css, bai.from.CSS));
+				$this.css({animation: '', '-webkit-animation': ''});
+				if ((replay === 1 || replay === '1') && alt != 'reverse') {
+					$this.css(bai.from(css, bai.from.CSS));
+				}
 			}, timeout);
-		}
 		// 建立变换样式
-		var animation = [key, duration, replay, alt].join(' ');
+		var animation = [key, duration, mode, replay, alt].join(' ');
 		this.css({animation: animation, '-webkit-animation': animation});
 		return true;
 	};

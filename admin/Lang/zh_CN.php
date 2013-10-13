@@ -16,4 +16,6 @@ $config[Lang::LANG][Lang::ZH]['flow-update'] = '修改流程';
 $config[Lang::LANG][Lang::ZH]['flow-delete'] = '删除流程';
 $config[Lang::LANG][Lang::ZH]['action-create'] = '新建处理';
 $config[Lang::LANG][Lang::ZH]['action-delete'] = '删除处理';
+$config[Lang::LANG][Lang::ZH]['page-create'] = '新建页面';
+$config[Lang::LANG][Lang::ZH]['page-delete'] = '删除页面';
 $config[Lang::LANG][Lang::ZH]['process'] = '处理';
