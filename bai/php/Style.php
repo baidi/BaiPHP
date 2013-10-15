@@ -145,16 +145,16 @@ class Style extends Work
 		### 路径
 		$path    = $this->locate($item, $branch);
 		$bai     = $this->pick(self::BAI,     $path);
-		$service = $this->pick(self::SERVICE, $path);
+		$basin = $this->pick(self::BASIN, $path);
 		### 加载文件
 		$content = '';
 		if ($bai != null) {
 			Log::logf(__FUNCTION__, $bai, __CLASS__);
 			$content .= file_get_contents(_LOCAL.$bai);
 		}
-		if ($service != null) {
-			Log::logf(__FUNCTION__, $service, __CLASS__);
-			$content .= file_get_contents(_LOCAL.$service);
+		if ($basin != null) {
+			Log::logf(__FUNCTION__, $basin, __CLASS__);
+			$content .= file_get_contents(_LOCAL.$basin);
 		}
 		if ($content != null) {
 		    $content = sprintf($template, $content);
@@ -175,13 +175,13 @@ class Style extends Work
 		### 路径
 		$path    = $this->locate($item, $branch);
 		$bai     = $this->pick(self::BAI,     $path);
-		$service = $this->pick(self::SERVICE, $path);
+		$basin   = $this->pick(self::BASIN, $path);
 		### 外链文件
 		if ($template != null) {
 			$content = '';
-			if ($service != null) {
-				Log::logf(__FUNCTION__, $service, __CLASS__);
-				$content .= sprintf($template, _WEB.$service);
+			if ($basin != null) {
+				Log::logf(__FUNCTION__, $basin, __CLASS__);
+				$content .= sprintf($template, _WEB.$basin);
 			}
 			if ($bai != null) {
 				Log::logf(__FUNCTION__, $bai, __CLASS__);
@@ -190,9 +190,9 @@ class Style extends Work
 			return $content;
 		}
 		### 外链文件名
-		if ($service != null) {
-			Log::logf(__FUNCTION__, $service, __CLASS__);
-			return _WEB.$service;
+		if ($basin != null) {
+			Log::logf(__FUNCTION__, $basin, __CLASS__);
+			return _WEB.$basin;
 		}
 		if ($bai != null) {
 			Log::logf(__FUNCTION__, $bai, __CLASS__);

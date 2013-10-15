@@ -169,7 +169,7 @@ class Cache extends Work
 	 */
 	protected function rename($item)
 	{
-		$item = $this->target['service'].$this->target['event']._DEF.$item;
+		$item = $this->target['basin'].$this->target['event']._DEF.$item;
 		$item = urlencode($item);
 		return $item;
 	}

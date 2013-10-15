@@ -38,9 +38,9 @@ abstract class Bai implements ArrayAccess
 	 */
 	const BAI = 'Bai';
 	/**
-	 * 标识：服务
+	 * 标识：流程
 	 */
-	const SERVICE = 'Service';
+	const BASIN = 'Basin';
 	/**
 	 * 标识：流程
 	 */
@@ -356,7 +356,7 @@ abstract class Bai implements ArrayAccess
 	 *
 	 * @param string $item 文件名
 	 * @param string $branch 扩展分支路径
-	 * @return array 文件路径，最多包含两项内容：self::Bai指向框架核心文件路径，self::Service指向用户服务文件路径
+	 * @return array 文件路径，最多包含两项内容：self::Bai指向框架核心文件路径，self::BASIN指向用户服务文件路径
 	 */
 	protected function locate ($item = null, $branch = null)
 	{
@@ -373,15 +373,15 @@ abstract class Bai implements ArrayAccess
 		}
 		### 文件路径
 		$bai = $this->config(_DEF, self::BAI) . $branch . $item;
-		$service = $this->config(_DEF, self::SERVICE) . $branch . $item;
+		$basin = $this->config(_DEF, self::BASIN) . $branch . $item;
 		$result = array();
 		### 系统框架文件
 		if (is_file(_LOCAL . $bai)) {
 			$result[self::BAI] = $bai;
 		}
 		### 用户服务文件
-		if (is_file(_LOCAL . $service)) {
-			$result[self::SERVICE] = $service;
+		if (is_file(_LOCAL . $basin)) {
+			$result[self::BASIN] = $basin;
 		}
 		return $result;
 	}
@@ -410,22 +410,22 @@ abstract class Bai implements ArrayAccess
 		### 定位文件路径
 		$path = $this->locate($item, $branch);
 		$bai = $this->pick(self::BAI, $path);
-		$service = $this->pick(self::SERVICE, $path);
+		$basin = $this->pick(self::BASIN, $path);
 		### 加载全部文件，系统框架文件优先
 		if ($all) {
 			ob_start();
 			if ($bai != null) {
 				include _LOCAL . $bai;
 			}
-			if ($service != null) {
-				include _LOCAL . $service;
+			if ($basin != null) {
+				include _LOCAL . $basin;
 			}
 			return ob_get_clean();
 		}
 		### 加载单个文件，用户服务文件优先
-		if ($service != null) {
+		if ($basin != null) {
 			ob_start();
-			include _LOCAL . $service;
+			include _LOCAL . $basin;
 			return ob_get_clean();
 		}
 		if ($bai != null) {
@@ -480,14 +480,14 @@ abstract class Bai implements ArrayAccess
 	 * @param string $setting 即时配置
 	 * @return string 网址
 	 */
-	protected function url ($event = null, $service = null, $setting = null)
+	protected function url ($event = null, $basin = null, $setting = null)
 	{
 		$params = array();
 		if ($event != null) {
 			$params[] = lcfirst(self::EVENT) . '=' . $event;
 		}
-		if ($service != null) {
-			$params[] = lcfirst(self::SERVICE) . '=' . $service;
+		if ($basin != null) {
+			$params[] = lcfirst(self::BASIN) . '=' . $basin;
 		}
 		if ($setting != null) {
 			foreach ((array) $setting as $item => $value) {

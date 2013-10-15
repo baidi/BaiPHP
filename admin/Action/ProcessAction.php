@@ -26,7 +26,7 @@ class ProcessAction extends Action
 		$this->mockConfig($abasin, false);
 	}
 
-	private function mockConfig($service = null, $mock = true)
+	private function mockConfig($basin = null, $mock = true)
 	{
 		global $config;
 		if (! $mock) {
@@ -37,7 +37,7 @@ class ProcessAction extends Action
 		}
 		$this['config'] = $config;
 		$config = array(_DEF => $config[_DEF]);
-		$config[_DEF][self::SERVICE] = $service._DIR;
+		$config[_DEF][self::BASIN] = $basin._DIR;
 		$target = new Target('config.php');
 	}
 

@@ -36,8 +36,8 @@ class BasinAction extends Action
 		}
 		$primary = array(
 			'bai' => false,
-			'service' => false,
-			$this->target['service'] => false,
+			'basin' => false,
+			$this->target['basin'] => false,
 		);
 		$this->target[Flow::ACTION] = $primary + $result;
 	}

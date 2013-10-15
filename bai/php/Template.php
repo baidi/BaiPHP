@@ -129,11 +129,11 @@ class Template extends Work
 		### 路径
 		$path    = $template->locate($item, __CLASS__);
 		$bai     = $template->pick(self::BAI, $path);
-		$service = $template->pick(self::SERVICE, $path);
+		$basin   = $template->pick(self::BASIN, $path);
 		### 加载文件
 		$content = '';
-		if ($service != null) {
-			$content = file_get_contents(_LOCAL.$service);
+		if ($basin != null) {
+			$content = file_get_contents(_LOCAL.$basin);
 		} else if ($bai != null) {
 			$content = file_get_contents(_LOCAL.$bai);
 		}

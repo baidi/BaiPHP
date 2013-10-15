@@ -32,9 +32,9 @@
 class Target extends Bai
 {
 	/**
-	 * 当前服务
+	 * 当前流域
 	 */
-	protected $service = null;
+	protected $basin = null;
 	/**
 	 * 当前事项
 	 */
@@ -60,7 +60,7 @@ class Target extends Bai
 	 */
 	public function entrust ($setting = null)
 	{
-		$event = $this->service . $this->event;
+		$event = $this->basin . $this->event;
 		Log::logf(__FUNCTION__, $event, __CLASS__);
 		Log::logf('start', date('Y-m-d H:m:s.B', _START), __CLASS__);
 		$this->result = $this->run($setting);
@@ -154,12 +154,12 @@ class Target extends Bai
 			$this->event = $event;
 		}
 		### 应用服务入口
-		$service = $this['service'];
-		if ($service == null) {
-			$service = $this->config(_DEF, self::SERVICE);
+		$basin = $this['basin'];
+		if ($basin == null) {
+			$basin = $this->config(_DEF, self::BASIN);
 		}
-		if ($service != null) {
-			$this->service = $service;
+		if ($basin != null) {
+			$this->basin = $basin;
 		}
 		$this->target = $this;
 	}

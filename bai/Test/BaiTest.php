@@ -113,7 +113,7 @@ $config[Work::TEST][Work::BAI] = array(
 		Test::ITEM     => 'locate',
 		Test::EXPECTED => array(
 		    Work::BAI     => 'bai/php/config.php',
-		    Work::SERVICE => 'service/php/config.php',
+		    Work::BASIN => 'basin/php/config.php',
 		),
 		Test::PARAM    => array(
 			'config.php',
@@ -173,7 +173,7 @@ $config[Work::TEST][Work::BAI] = array(
 	### url（字符串）
 	array(
 		Test::ITEM     => 'url',
-		Test::EXPECTED => _WEB.'?event=test&service=test&testee=bai',
+		Test::EXPECTED => _WEB.'?event=test&basin=test&testee=bai',
 		Test::PARAM    => array(
 		    'test',
 		    'test',
@@ -183,7 +183,7 @@ $config[Work::TEST][Work::BAI] = array(
 	### url（数组）
 	array(
 		Test::ITEM     => 'url',
-		Test::EXPECTED => _WEB.'?event=test&service=test&testee=bai&file=bai',
+		Test::EXPECTED => _WEB.'?event=test&basin=test&testee=bai&file=bai',
 		Test::PARAM    => array(
 		    'test',
 		    'test',

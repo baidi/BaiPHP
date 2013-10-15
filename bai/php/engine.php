@@ -76,8 +76,8 @@ $config = array();
 $config[_DEF] = array(
 	### 系统路径，存放系统框架文件
 	'Bai'       => 'bai'._DIR,
-	### 服务路径，存放用户响应文件
-	'Service'   => 'service'._DIR,
+	### 流域路径，存放用户响应文件
+	'Basin'     => 'basin'._DIR,
 	### 运行路径，存放运行时产生的文件
 	'Runtime'   => '.runtime'._DIR,
 	### 基本路径，相对于系统路径和服务路径，存放核心文件
@@ -91,8 +91,8 @@ $config[_DEF] = array(
 	'Exception' => '不是没做到，就是没想到：[%s] %s',
 	'Notice'    => '大体还可以，细节要留意：[%s] %s',
 );
-if (! empty($_REQUEST['service'])) {
-	$config[_DEF]['Service'] = preg_replace('#[\/]#', '', $_REQUEST['service'])._DIR;
+if (! empty($_REQUEST['basin'])) {
+	$config[_DEF]['Basin'] = preg_replace('#[\/]#', '', $_REQUEST['basin'])._DIR;
 }
 
 
@@ -102,7 +102,7 @@ spl_autoload_register(function($class)
 	$config = $GLOBALS['config'][_DEF];
 	### 加载路径
 	$bai     = _LOCAL.$config['Bai'];
-	$service = _LOCAL.$config['Service'];
+	$basin   = _LOCAL.$config['Basin'];
 	$root    = $config['Root'];
 	$branch  = null;
 	foreach ((array)$config['Extent'] as $item => $mode) {
@@ -115,8 +115,8 @@ spl_autoload_register(function($class)
 	$file = $class._EXT;
 	if ($branch != null) {
 		### 加载用户扩展文件
-		if (is_file($service.$branch.$file)) {
-			require_once $service.$branch.$file;
+		if (is_file($basin.$branch.$file)) {
+			require_once $basin.$branch.$file;
 			return class_exists($class, false);
 		}
 		### 加载系统扩展文件
@@ -126,8 +126,8 @@ spl_autoload_register(function($class)
 		}
 	}
 	### 加载用户核心文件
-	if (is_file($service.$root.$file)) {
-		require_once $service.$root.$file;
+	if (is_file($basin.$root.$file)) {
+		require_once $basin.$root.$file;
 		return class_exists($class, false);
 	}
 	### 加载系统核心文件

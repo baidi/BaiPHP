@@ -134,6 +134,7 @@ $config['BasinCreateAction'] = array(
 		'php' => true,
 		'css' => true,
 		'js' => true,
+		'img' => true,
 		Flow::PAGE => true,
 		Flow::ACTION => true,
 		Work::LANG => true,
@@ -147,7 +148,7 @@ $config['BasinUpdateAction'] = array(
 		'.runtime' => true,
 		'.settings' => true,
 		'bai' => true,
-		'service' => true,
+		'basin' => true,
 		'admin' => true,
 	),
 );
@@ -159,7 +160,7 @@ $config['BasinDeleteAction'] = array(
 		'.runtime' => true,
 		'.settings' => true,
 		'bai' => true,
-		'service' => true,
+		'basin' => true,
 		'admin' => true,
 	),
 );

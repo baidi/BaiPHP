@@ -1,5 +1,6 @@
 <?php
 global $config;
+$config[Lang::LANG][Lang::ZH]['admin'] = '管理';
 $config[Lang::LANG][Lang::ZH]['create'] = '新建';
 $config[Lang::LANG][Lang::ZH]['update'] = '修改';
 $config[Lang::LANG][Lang::ZH]['delete'] = '删除';

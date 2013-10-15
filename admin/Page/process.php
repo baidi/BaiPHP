@@ -1,9 +1,9 @@
 <?php
-$service = $this->target['service'];
+$basin = $this->target['basin'];
 $abasin = $this->target['abasin'];
 $aevent = $this->target['aevent'];
-$urlBackBasin = $this->url('basin', $service);
-$urlBackFlow = $this->url('flow', $service, 'abasin=' . $abasin);
+$urlBackBasin = $this->url('basin', $basin);
+$urlBackFlow = $this->url('flow', $basin, 'abasin=' . $abasin);
 ?>
 <div class="box">
 	<div class="t">

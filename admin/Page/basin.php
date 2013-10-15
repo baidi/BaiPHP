@@ -1,7 +1,3 @@
-<?php
-$service = $this->target['service'];
-$adata = $this->target[Flow::ACTION];
-?>
 <div class="box">
 	<div class="t">
 		<a class="fr tg" onclick="basinCreate(/\$abasin\$/g)"><?php Lang::cut('create'); ?></a>
@@ -9,8 +5,10 @@ $adata = $this->target[Flow::ACTION];
 	</div>
 	<div id="basin-list">
 <?php
+$basin = $this->target['basin'];
+$adata = $this->target[Flow::ACTION];
 foreach ($adata as $item => $mode) {
-	$url = $this->url('flow', $service, 'abasin='.$item);
+	$url = $this->url('flow', $basin, 'abasin='.$item);
 	$operation = $mode ? '<a class="button" onclick="basinUpdate.call(this, \''.$item.'\')">'.Lang::cut('update', 0).'</a> <a class="button" onclick="basinDelete.call(this, \''.$item.'\')">'.Lang::cut('delete', 0).'</a>' : '';
 	echo
 <<<ITEM
@@ -28,13 +26,13 @@ ITEM;
 </div>
 <div class="q row">
 	<span class="tg b">::</span>
-	<span>流域是相关流程的集合，主要包含php、js、css、img、Action、Page等目录，初始系统包含bai、service和admin三个流域。</span>
+	<span>流域是相关流程的集合，主要包含php、js、css、img、Action、Page等目录，初始系统包含bai、basin和admin三个流域。</span>
 </div>
 <?php
-$urlCreate = $this->url('basinCreate', $service);
-$urlnUpdate = $this->url('basinUpdate', $service);
-$urlDelete = $this->url('basinDelete', $service);
-$urlFlow = $this->url('flow', $service, '&abasin=$abasin$');
+$urlCreate = $this->url('basinCreate', $basin);
+$urlnUpdate = $this->url('basinUpdate', $basin);
+$urlDelete = $this->url('basinDelete', $basin);
+$urlFlow = $this->url('flow', $basin, '&abasin=$abasin$');
 ?>
 <div class="tpl">
 	<div class="text item tpl-basin">
