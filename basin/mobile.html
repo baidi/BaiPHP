@@ -90,11 +90,10 @@ p {
 	color: #f04000;
 }
 .bm {
-	-webkit-mask-box-image: -webkit-linear-gradient(left, white, white 50%, transparent);
+	-webkit-mask-box-image: -webkit-linear-gradient(left, white, transparent 1%, transparent);
 }
 .bt {
-	-webkit-transition-property: all;
-	-webkit-transition-duration: 500ms;
+	-webkit-transition: all 1000ms;
 }
 
 .index {
@@ -570,18 +569,28 @@ function transform(mode) {
 	if (next == null) {
 		return;
 	}
-	page.css('z-index', '');
-	next.css('z-index', 4);
+	page.css('z-index', '1');
 	next.set('class', '-h');
 	//next.css('width', page.clientWidth+'px');
 	if (mode == 1) {
-		next.css('-webkit-mask-box-image', '-webkit-linear-gradient(left, white, transparent)%');
-		next.set('class', '+bt');
-		next.css('-webkit-mask-box-image', '');
+		page.css('-webkit-transform-origin', '0% 50%');
+		page.css('-webkit-transform', 'scale(1,0.6)  translate(-100%,0)');
+		page.css('opacity', '0');
+		//next.css('-webkit-mask-box-image', '-webkit-linear-gradient(left, white, transparent)');
+		//next.css('width', page.offsetWidth + 'px');
+		//next.set('class', '+bt');
 	} else if (mode == 2) {
-		next.to('left:-100%;', 1, 1, false, 'linear');
+		page.css('-webkit-transform-origin', '100% 50%');
+		page.css('-webkit-transform', 'scale(1,0.6)  translate(100%,0)');
+		page.css('opacity', '0');
 	} else if (mode == 3) {
-		next.to('opacity:0', 1, 1, false, 'linear');
+		page.css('-webkit-transform-origin', '50% 100%');
+		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, 100%)');
+		page.css('opacity', '0');
+	} else {
+		page.css('-webkit-transform-origin', '50% 0%');
+		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, -100%)');
+		page.css('opacity', '0');
 	}
 }
 </script>
@@ -589,12 +598,13 @@ function transform(mode) {
 <body>
 	<div class="box" style="width: 480px;">
 		<a class="button" onclick="rotate.call(this)">旋转</a>
-		<a class="button" onclick="transform(1)">右切</a>
-		<a class="button" onclick="transform(2)">左切</a>
-		<a class="button" onclick="transform(3)">浮出</a>
+		<a class="button" onclick="transform(1)">左切</a>
+		<a class="button" onclick="transform(2)">右切</a>
+		<a class="button" onclick="transform(3)">下切</a>
+		<a class="button" onclick="transform(4)">上切</a>
 	</div>
 	<div class="box box-size">
-		<div class="page" style="z-index:1;">
+		<div class="page bt" style="z-index:1;">
 			<div class="title bg bt">目录</div>
 			<div class="content tc">
 				<div class="index">
@@ -671,7 +681,7 @@ function transform(mode) {
 		</div>
 	</div>
 	<div class="box box-size">
-		<div class="page bm">
+		<div class="page bm bt">
 			<div class="title bg">标题</div>
 			<div class="content">
 				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
