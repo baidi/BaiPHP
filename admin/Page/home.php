@@ -4,31 +4,27 @@
 	</div>
 	<div>
 		<p>化简PHP（BaiPHP）由数个流域组成，每个流域包含一组相关的流程，每个流程又由一步一步的处理构成，从而自上而下地实现目标的调度、委托和处理，最终交付结果。</p>
-		<table>
-			<tr>
-				<td rowspan="3">目标<br/>Target</td>
-				<td>
-					<div class="p al bl">
-						<span class="tg">流域：bai</span>
-						<div class="p ad bl">
-							<span class="tg">流程：home</span>
-								<div class="p bl" style="background-color:#ffffff;">
-									<span class="tg">处理：</span>
-									<span class="bl">Control</span>
-									<span class="bl">Action</span>
-									<span class="bl">Page</span>
-								</div>
-						</div>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-			</tr>
-			<tr>
-				<td></td>
-			</tr>
-		</table>
+		<div class="basin w300">
+			<div class="b"><?php Lang::cut('basin'); ?></div>
+			<div class="flow">
+				<div class="b"><?php Lang::cut('flow'); ?></div>
+				<div>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process">……</span>
+				</div>
+			</div>
+			<div class="flow">
+				<span class="b"><?php Lang::cut('flow'); ?></span>
+				<div>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process"><?php Lang::cut('process'); ?></span>
+					<span class="process">……</span>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 <div class="box">

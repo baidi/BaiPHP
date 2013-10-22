@@ -11,18 +11,17 @@ body {
 	position: relative;
 	border: 1px solid #cccccc;
 	margin: 1em auto;
-	background-color: #ffffff;
+	background-image: -webkit-radial-gradient(#ffffff,#f0f0f0);
 	box-shadow: 0 0 0.5em #ccc;
+	-webkit-perspective: 480px;
 }
 .box-size {
-	width: 480px;
-	height: 700px;
+	width: 300px;
+	height: 500px;
 	overflow: hidden;
 }
 .page {
 	position: absolute;
-	display:-webkit-box;
-	-webkit-box-orient: vertical;
 	top: 0;
 	left: 0;
 	height: 100%;
@@ -93,7 +92,7 @@ p {
 	-webkit-mask-box-image: -webkit-linear-gradient(left, white, transparent 1%, transparent);
 }
 .bt {
-	-webkit-transition: all 1000ms;
+	-webkit-transition: all 500ms;
 }
 
 .index {
@@ -301,19 +300,34 @@ p {
 	};
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(css, duration, replay, alt, mode) {
+	Element.prototype.to = function(css, duration, replay, alt, mode, action) {
 		if (css == null) {
 			return false;
 		}
-		if (bai.is(duration, bai.is.NUMBER)) {
+		if (bai.is(duration, bai.is.FUNCTION)) {
+			action = duration;
+			duration = '1s';
+		} else if (bai.is(duration, bai.is.NUMBER)) {
 			duration = (duration >= 100 ? duration + 'ms' : duration + 's');
 		} else if (! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
 			duration = '1s';
 		}
-		if (replay == null || isNaN(replay) || replay == 0) {
+		if (bai.is(replay, bai.is.FUNCTION)) {
+			action = replay;
+			replay = 'infinite';
+		} else if (replay == null || isNaN(replay) || replay == 0) {
 			replay = 'infinite';
 		}
-		alt = (alt == null ? '' : (alt ? 'alternate' : 'reverse'));
+		if (bai.is(alt, bai.is.FUNCTION)) {
+			action = alt;
+			alt = '';
+		} else {
+			alt = (alt == null ? '' : (alt ? 'alternate' : 'reverse'));
+		}
+		if (bai.is(mode, bai.is.FUNCTION)) {
+			action = mode;
+			mode = '';
+		}
 		if (document.styleSheets.length == 0) {
 			document.head.innerHTML += '<style id="BaiCSS" type="text/css"></style>';
 		}
@@ -343,6 +357,9 @@ p {
 				if ((replay === 1 || replay === '1') && alt != 'reverse') {
 					$this.css(bai.from(css, bai.from.CSS));
 				}
+				if (bai.is(action, bai.is.FUNCTION)) {
+					action.call($this, e);
+				} 
 			}, timeout);
 			// 建立变换样式
 			var animation = [key, duration, mode, replay, alt].join(' ');
@@ -370,6 +387,9 @@ p {
 				if ((replay === 1 || replay === '1') && alt != 'reverse') {
 					$this.css(bai.from(css, bai.from.CSS));
 				}
+				if (bai.is(action, bai.is.FUNCTION)) {
+					action.call(this, e);
+				} 
 			}, timeout);
 		// 建立变换样式
 		var animation = [key, duration, mode, replay, alt].join(' ');
@@ -386,7 +406,13 @@ p {
 		history: ''
 	};
 	/** 化简JS：全局配置 */
-	var $config = {};
+	var $config = {
+		"alt": {
+                "class": "className",
+                "html": "innerHTML",
+                "text": "innerText"
+        }
+	};
 	/** 化简JS：私有属性 */
 	var $own = {};
 
@@ -563,48 +589,57 @@ function rotate(e) {
 		}
 	}
 }
-function transform(mode) {
-	var page = bai.pick('.page');
-	var next = page.nextElementSibling;
-	if (next == null) {
+var reset = function(e) {
+	this.set('class', '+h');
+	this.css('-webkit-transform', ''); 
+}
+function transform(mode, dir) {
+	var page = bai.pick('.page:not(.h)');
+	var to = null;
+	if (dir) {
+		to = page.previousElementSibling;
+	} else {
+		to = page.nextElementSibling;
+	}
+	if (to == null) {
 		return;
 	}
-	page.css('z-index', '1');
-	next.set('class', '-h');
-	//next.css('width', page.clientWidth+'px');
+	to.set('class', '-h');
+	to.css('z-index', '1');
+	//to.css('-webkit-transition', 'none');
+	page.css('z-index', '');
+	//to.css('width', page.clientWidth+'px');
 	if (mode == 1) {
-		page.css('-webkit-transform-origin', '0% 50%');
-		page.css('-webkit-transform', 'scale(1,0.6)  translate(-100%,0)');
-		page.css('opacity', '0');
-		//next.css('-webkit-mask-box-image', '-webkit-linear-gradient(left, white, transparent)');
-		//next.css('width', page.offsetWidth + 'px');
-		//next.set('class', '+bt');
+		to.to('-webkit-transform:translate(100%,0)',1,1,false);
+		page.to('-webkit-transform:translateZ(-240px)', 1, 1, reset);
+		//page.css('opacity', '0');
+		//to.css('-webkit-mask-box-image', '-webkit-linear-gradient(left, white, transparent)');
+		//to.css('width', page.offsetWidth + 'px');
+		//to.set('class', '+bt');
 	} else if (mode == 2) {
-		page.css('-webkit-transform-origin', '100% 50%');
-		page.css('-webkit-transform', 'scale(1,0.6)  translate(100%,0)');
-		page.css('opacity', '0');
+		to.to('-webkit-transform:translate(100%,0)',1,1,false);
+		page.to('-webkit-transform:translateZ(-240px)', 1, 1, reset);
+		//page.css('opacity', '0');
 	} else if (mode == 3) {
 		page.css('-webkit-transform-origin', '50% 100%');
 		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, 100%)');
-		page.css('opacity', '0');
 	} else {
 		page.css('-webkit-transform-origin', '50% 0%');
 		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, -100%)');
-		page.css('opacity', '0');
 	}
 }
 </script>
 </head>
 <body>
-	<div class="box" style="width: 480px;">
+	<div class="box" style="width: 300px;">
 		<a class="button" onclick="rotate.call(this)">旋转</a>
 		<a class="button" onclick="transform(1)">左切</a>
-		<a class="button" onclick="transform(2)">右切</a>
+		<a class="button" onclick="transform(2,1)">右切</a>
 		<a class="button" onclick="transform(3)">下切</a>
 		<a class="button" onclick="transform(4)">上切</a>
 	</div>
 	<div class="box box-size">
-		<div class="page bt" style="z-index:1;">
+		<div class="page">
 			<div class="title bg bt">目录</div>
 			<div class="content tc">
 				<div class="index">
@@ -625,25 +660,13 @@ function transform(mode) {
 						<p>项目内容一项目内容一</p>
 						<p>项目内容二项目内容二</p>
 					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
+				</div>
+			</div>
+		</div>
+		<div class="page h">
+			<div class="title bg bt">目录2</div>
+			<div class="content tc">
+				<div class="index">
 					<div class="index-title bg">项目</div>
 					<div class="index-content">
 						<p>项目内容一项目内容一</p>
@@ -664,18 +687,27 @@ function transform(mode) {
 				</div>
 			</div>
 		</div>
-		<div class="page">
-			<div class="title bg">标题</div>
-			<div class="content">
-				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
-				<div class="detail-content">
-					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
-					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
-				</div>
-				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
-				<div class="detail-content">
-					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
-					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
+		<div class="page h">
+			<div class="title bg bt">目录3</div>
+			<div class="content tc">
+				<div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
+				</div><div class="index">
+					<div class="index-title bg">项目</div>
+					<div class="index-content">
+						<p>项目内容一项目内容一</p>
+						<p>项目内容二项目内容二</p>
+					</div>
 				</div>
 			</div>
 		</div>
