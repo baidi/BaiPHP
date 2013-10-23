@@ -11,9 +11,9 @@ body {
 	position: relative;
 	border: 1px solid #cccccc;
 	margin: 1em auto;
-	background-image: -webkit-radial-gradient(#ffffff,#f0f0f0);
+	background-color: #CCECCC;
 	box-shadow: 0 0 0.5em #ccc;
-	-webkit-perspective: 480px;
+	-webkit-perspective: 100px;
 }
 .box-size {
 	width: 300px;
@@ -29,6 +29,7 @@ body {
 	color: #334f33;
 	background-color: #fcfffc;
 	overflow-y: auto;
+	box-shadow: 0 0 0.5em #cceccc inset;
 }
 
 .title {
@@ -87,9 +88,6 @@ p {
 }
 .tg {
 	color: #f04000;
-}
-.bm {
-	-webkit-mask-box-image: -webkit-linear-gradient(left, white, transparent 1%, transparent);
 }
 .bt {
 	-webkit-transition: all 500ms;
@@ -300,7 +298,7 @@ p {
 	};
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(css, duration, replay, alt, mode, action) {
+	Element.prototype.flow = function(css, duration, replay, alt, mode, action) {
 		if (css == null) {
 			return false;
 		}
@@ -358,7 +356,7 @@ p {
 					$this.css(bai.from(css, bai.from.CSS));
 				}
 				if (bai.is(action, bai.is.FUNCTION)) {
-					action.call($this, e);
+					action.call($this);
 				} 
 			}, timeout);
 			// 建立变换样式
@@ -610,33 +608,29 @@ function transform(mode, dir) {
 	page.css('z-index', '');
 	//to.css('width', page.clientWidth+'px');
 	if (mode == 1) {
-		to.to('-webkit-transform:translate(100%,0)',1,1,false);
-		page.to('-webkit-transform:translateZ(-240px)', 1, 1, reset);
-		//page.css('opacity', '0');
-		//to.css('-webkit-mask-box-image', '-webkit-linear-gradient(left, white, transparent)');
-		//to.css('width', page.offsetWidth + 'px');
-		//to.set('class', '+bt');
+		to.flow('-webkit-transform:translate3d(100%,0,-30px)',1,1,false);
+		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
 	} else if (mode == 2) {
-		to.to('-webkit-transform:translate(100%,0)',1,1,false);
-		page.to('-webkit-transform:translateZ(-240px)', 1, 1, reset);
+		to.flow('-webkit-transform:translate3d(-100%,0,-30px)',1,1,false);
+		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
 		//page.css('opacity', '0');
 	} else if (mode == 3) {
-		page.css('-webkit-transform-origin', '50% 100%');
-		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, 100%)');
+		to.flow('-webkit-transform:translate3d(0,-100%,-30px)',1,1,false);
+		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
 	} else {
-		page.css('-webkit-transform-origin', '50% 0%');
-		page.css('-webkit-transform', 'scale(0.6,1)  translate(0, -100%)');
+		to.flow('-webkit-transform:translate3d(0,100%,-30px)',1,1,false);
+		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
 	}
 }
 </script>
 </head>
 <body>
-	<div class="box" style="width: 300px;">
+	<div class="box" style="width: 330px;">
 		<a class="button" onclick="rotate.call(this)">旋转</a>
 		<a class="button" onclick="transform(1)">左切</a>
 		<a class="button" onclick="transform(2,1)">右切</a>
 		<a class="button" onclick="transform(3)">下切</a>
-		<a class="button" onclick="transform(4)">上切</a>
+		<a class="button" onclick="transform(4,1)">上切</a>
 	</div>
 	<div class="box box-size">
 		<div class="page">
@@ -713,7 +707,7 @@ function transform(mode, dir) {
 		</div>
 	</div>
 	<div class="box box-size">
-		<div class="page bm bt">
+		<div class="page bt">
 			<div class="title bg">标题</div>
 			<div class="content">
 				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
