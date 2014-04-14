@@ -6,30 +6,52 @@
 <style>
 body {
 	background-color: #f9f9f9;
+	box-sizing: border-box;
 }
-.box {
+p {
+	margin: 0;
+	text-indent: 2em;
+}
+
+.back {
 	position: relative;
-	border: 1px solid #cccccc;
-	margin: 1em auto;
-	background-color: #CCECCC;
-	box-shadow: 0 0 0.5em #ccc;
+	overflow: hidden;
+	background-color: #f0f9f0;
 	-webkit-perspective: 100px;
+	perspective: 100px;
+
+	margin: 2em auto;
+	border: 2px solid #ddd;
+	box-shadow: 0 0 1em #ccc;
 }
-.box-size {
+.back-v {
 	width: 300px;
 	height: 500px;
-	overflow: hidden;
 }
-.page {
+.back-h {
+	width: 500px;
+	height: 300px;
+}
+.page, .page-v, .page-h {
 	position: absolute;
-	top: 0;
+	display: -webkit-box;
+	display: box;
+	overflow: hidden;
 	left: 0;
+	top: 0;
 	height: 100%;
+	width: 100%;
 	line-height: 1.5em;
 	color: #334f33;
 	background-color: #fcfffc;
-	overflow-y: auto;
-	box-shadow: 0 0 0.5em #cceccc inset;
+}
+.page-v {
+	-webkit-box-orient: vertical;
+	box-orient: vertical;
+}
+.page-h {
+	-webkit-box-orient: horizontal;
+	box-orient: horizontal;
 }
 
 .title {
@@ -47,7 +69,9 @@ body {
 }
 .content {
 	padding: 1em;
-	-webkit-box-flex: 1;
+	-webkit-box-flex: 10;
+	box-flex: 10;
+	overflow-y: auto;
 }
 .toolbar {
 	padding: 0.5em 1em;
@@ -57,28 +81,11 @@ body {
 	border-top: 1px solid #CCECCC;
 }
 
-.button {
-	display: inline-block;
-	margin: 0.25em;
-	padding: 0.3em 0.5em;
-	background-color: #f0f9f0;
-	border: 1px solid #CCECCC;
-	-webkit-transition-property: all;
-	-webkit-transition-duration: 500ms;
-}
-.button:hover {
-	background-color: #d0f9d0;
-}
-
 .p {
 	text-indent: 2em;
 }
 .h {
 	display: none;
-}
-p {
-	margin: 0;
-	text-indent: 2em;
 }
 .tc {
 	text-align: center;
@@ -91,49 +98,6 @@ p {
 }
 .bt {
 	-webkit-transition: all 500ms;
-}
-
-.index {
-	margin: 0.5em;
-	display: inline-block;
-	width: 8em;
-	height: 6.2em;
-	overflow: hidden;
-	background-color: #F9FFF9;
-	border: 0.1em solid #CCECCC;
-	-webkit-transition-property: all;
-	-webkit-transition-duration: 500ms;
-}
-.index:hover {
-	border-color: #99cc99;
-	box-shadow: 0 0 0.5em #d0f9d0;
-}
-.index-title {
-	font-weight: bold;
-	color: #009f3c;
-	background-color: #F6FCF6;
-	border-bottom: 0.1em solid #aaddaa;
-	-webkit-transition-property: all;
-	-webkit-transition-duration: 500ms;
-}
-.index:hover .index-title {
-	color: #f04000;
-}
-.index-content {
-	padding: 0.2em 0.5em;
-	word-wrap:break-word;
-	text-align: left;
-	text-overflow: ellipsis;
-}
-.detail-title {
-	font-weight: bold;
-	color: #009f3c;
-}
-.detail-content {
-	margin: 0 0 1em;
-	padding: 0.2em 0.5em;
-	border: 0.1em solid #CCECCC;
-	background-color: #F9FFF9;
 }
 </style>
 <script type="text/javascript">
@@ -570,156 +534,67 @@ p {
 	};
 
 	p.B = p.bai = $bai;
-})(window);
-
-function rotate(e) {
-	var sizedBox = document.querySelector('.box-size');
-	if (sizedBox == null) {
-		return;
-	}
-	var width = sizedBox.clientWidth;
-	var height = sizedBox.clientHeight;
-	var boxes = document.querySelectorAll('.box');
-	for (var i = 0, m = boxes.length; i < m; i++) {
-		boxes[i].style.width = height + 'px';
-		if (boxes[i].classList.contains('box-size')) {
-			boxes[i].style.height = width + 'px';
-		}
-	}
-}
-var reset = function(e) {
-	this.set('class', '+h');
-	this.css('-webkit-transform', ''); 
-}
-function transform(mode, dir) {
-	var page = bai.pick('.page:not(.h)');
-	var to = null;
-	if (dir) {
-		to = page.previousElementSibling;
-	} else {
-		to = page.nextElementSibling;
-	}
-	if (to == null) {
-		return;
-	}
-	to.set('class', '-h');
-	to.css('z-index', '1');
-	//to.css('-webkit-transition', 'none');
-	page.css('z-index', '');
-	//to.css('width', page.clientWidth+'px');
-	if (mode == 1) {
-		to.flow('-webkit-transform:translate3d(100%,0,-30px)',1,1,false);
-		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
-	} else if (mode == 2) {
-		to.flow('-webkit-transform:translate3d(-100%,0,-30px)',1,1,false);
-		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
-		//page.css('opacity', '0');
-	} else if (mode == 3) {
-		to.flow('-webkit-transform:translate3d(0,-100%,-30px)',1,1,false);
-		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
-	} else {
-		to.flow('-webkit-transform:translate3d(0,100%,-30px)',1,1,false);
-		page.flow('-webkit-transform:translateZ(-60px)', 1, 1, reset);
-	}
-}
+})(this);
 </script>
 </head>
 <body>
-	<div class="box" style="width: 330px;">
-		<a class="button" onclick="rotate.call(this)">旋转</a>
-		<a class="button" onclick="transform(1)">左切</a>
-		<a class="button" onclick="transform(2,1)">右切</a>
-		<a class="button" onclick="transform(3)">下切</a>
-		<a class="button" onclick="transform(4,1)">上切</a>
-	</div>
-	<div class="box box-size">
-		<div class="page">
-			<div class="title bg bt">目录</div>
+	<div class="back back-v">
+		<div class="page-v">
+			<div class="title bg bt">Title</div>
 			<div class="content tc">
-				<div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="page h">
-			<div class="title bg bt">目录2</div>
-			<div class="content tc">
-				<div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="page h">
-			<div class="title bg bt">目录3</div>
-			<div class="content tc">
-				<div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div><div class="index">
-					<div class="index-title bg">项目</div>
-					<div class="index-content">
-						<p>项目内容一项目内容一</p>
-						<p>项目内容二项目内容二</p>
-					</div>
-				</div>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
 			</div>
 		</div>
 	</div>
-	<div class="box box-size">
-		<div class="page bt">
-			<div class="title bg">标题</div>
+	<div class="back back-h">
+		<div class="page-h bt">
+			<div class="title bg">Title</div>
 			<div class="content">
-				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
-				<div class="detail-content">
-					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
-					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
-				</div>
-				<div class="detail-title"><span class="tg">&raquo;&nbsp;</span>栏目</div>
-				<div class="detail-content">
-					<p>栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一栏目内容一</p>
-					<p>栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二栏目内容二</p>
-				</div>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
+				<p>content</p>
 			</div>
 		</div>
 	</div>

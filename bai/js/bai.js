@@ -30,27 +30,28 @@
 	}
 
 	/** 数组：依次处理子项目 */
-	Array.prototype.each = NodeList.prototype.each = function(action) {
-		if (! bai.is(action, bai.is.FUNCTION)) {
-			return false;
-		}
-		var result = null;
-		for (var i = 0, m = this.length; i < m; i++) {
-			result = action.call(this[i], i);
-			if (result === false) {
-				return result;
-			}
-		}
-		return true;
-	};
+//	Array.prototype.each = NodeList.prototype.each = function(action) {
+//		if (! bai.is(action, bai.is.FUNCTION)) {
+//			return false;
+//		}
+//		var result = null;
+//		for (var i = 0, m = this.length; i < m; i++) {
+//			result = action.call(this[i], i);
+//			if (result === false) {
+//				return result;
+//			}
+//		}
+//		return true;
+//	};
 
 	/** 元素：执行CSS选择器 */
 	Element.prototype.pick = Document.prototype.pick = function(query, one) {
 		if (one < 0) {
 			var parent = this.parentNode;
+			var i = 0, m = 0, matches = null;
 			while (parent != document) {
-				var matches = parent.parentNode.querySelectorAll(query);
-				for (var i = 0, m = matches.length; i < m; i++) {
+				matches = parent.parentNode.querySelectorAll(query);
+				for (i = 0, m = matches.length; i < m; i++) {
 					if (matches[i] == parent) {
 						return parent;
 					}
@@ -69,7 +70,7 @@
 		return result;
 	};
 
-	/** 元素：读取自身属性 */
+	/** 元素：读取属性 */
 	Element.prototype.get = function(item) {
 		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return null;
@@ -81,20 +82,22 @@
 		return this[item];
 	};
 
-	/** 元素：设置自身属性 */
+	/** 元素：设置属性 */
 	Element.prototype.set = function(item, value) {
 		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return false;
 		}
 		item = bai.config('alt', item) || item;
-		value = value || '';
+		if (value == null) {
+			value = '';
+		}
 		if (item == 'className') {
 			var list = this.classList;
-			if (value[0] == '+') {
+			if (value[0] == '+' && value.length > 1) {
 				list.add(value.substr(1));
 				return true;
 			}
-			if (value[0] == '-') {
+			if (value[0] == '-' && value.length > 1) {
 				list.remove(value.substr(1));
 				return true;
 			}
@@ -103,13 +106,15 @@
 		return true;
 	};
 
-	/** 元素：查验自身属性 */
+	/** 元素：查验属性 */
 	Element.prototype.has = function(item, value) {
 		if (! bai.is(item, bai.is.STRING) || item == '') {
 			return false;
 		}
 		item = bai.config('alt', item) || item;
-		value = value || '';
+		if (value == null) {
+			value = '';
+		}
 		if (this[item] == null || value == '') {
 			return false;
 		}
@@ -127,7 +132,7 @@
 		if (item == null) {
 			return null;
 		}
-		var pre = /-[a-z]/gi;
+		var pre = /-[a-zA-Z]/g;
 		var post = function(prefix) {
 			return prefix[1].toUpperCase();
 		};
@@ -177,19 +182,34 @@
 	};
 
 	/** 元素：执行CSS变换 */
-	Element.prototype.to = function(css, duration, replay, alt, mode) {
+	Element.prototype.flow = function(css, duration, replay, alt, mode, action) {
 		if (css == null) {
 			return false;
 		}
-		if (bai.is(duration, bai.is.NUMBER)) {
+		if (bai.is(duration, bai.is.FUNCTION)) {
+			action = duration;
+			duration = '1s';
+		} else if (bai.is(duration, bai.is.NUMBER)) {
 			duration = (duration >= 100 ? duration + 'ms' : duration + 's');
 		} else if (! /^(\d{1,2}s|\d{3,}ms)$/.test(duration)) {
 			duration = '1s';
 		}
-		if (replay == null || isNaN(replay) || replay == 0) {
+		if (bai.is(replay, bai.is.FUNCTION)) {
+			action = replay;
+			replay = 'infinite';
+		} else if (replay == null || isNaN(replay) || replay == 0) {
 			replay = 'infinite';
 		}
-		alt = (alt == null ? '' : (alt ? 'alternate' : 'reverse'));
+		if (bai.is(alt, bai.is.FUNCTION)) {
+			action = alt;
+			alt = '';
+		} else {
+			alt = (alt == null ? '' : (alt ? 'alternate' : 'reverse'));
+		}
+		if (bai.is(mode, bai.is.FUNCTION)) {
+			action = mode;
+			mode = '';
+		}
 		if (document.styleSheets.length == 0) {
 			document.head.innerHTML += '<style id="BaiCSS" type="text/css"></style>';
 		}
@@ -219,6 +239,9 @@
 				if ((replay === 1 || replay === '1') && alt != 'reverse') {
 					$this.css(bai.from(css, bai.from.CSS));
 				}
+				if (bai.is(action, bai.is.FUNCTION)) {
+					action.call($this);
+				}
 			}, timeout);
 			// 建立变换样式
 			var animation = [key, duration, mode, replay, alt].join(' ');
@@ -226,7 +249,7 @@
 			return true;
 		}
 		// 定制变换
-		css = bai.to(css);
+		css = bai.to(css, [' ', ' ']);
 		var key = 'BaiCSS-' + bai.encode(css);
 		if (style.baicss[key] == null) {
 			try {
@@ -246,6 +269,9 @@
 				if ((replay === 1 || replay === '1') && alt != 'reverse') {
 					$this.css(bai.from(css, bai.from.CSS));
 				}
+				if (bai.is(action, bai.is.FUNCTION)) {
+					action.call(this, e);
+				}
 			}, timeout);
 		// 建立变换样式
 		var animation = [key, duration, mode, replay, alt].join(' ');
@@ -254,15 +280,82 @@
 	};
 
 	/** 化简JS - BaiJS */
-	var $bai = {
-		name: 'BaiJS',
-		verson: '2.0.0',
-		date: '2013-7-30',
-		author: '白晓阳',
-		history: ''
+	var $bai = function(query, scope) {
+		if (scope != null && scope.pick != null) {
+			return scope.pick(query, 1);
+		}
+		return document.pick(query, 1);
 	};
+	$bai.name = 'BaiJS';
+	$bai.verson = '2.0.0';
+	$bai.date = '2013-7-30';
+	$bai.author = '白晓阳';
+	$bai.history = '';
 	/** 化简JS：全局配置 */
-	var $config = $config$ || {};
+	var $config = $config$ || {
+		"alt": {
+			"class": "className",
+			"html": "innerHTML",
+			"text": "innerText"
+		},
+		"check": {
+			"charset": "utf-8",
+			"gap": ",",
+			"mode": "\/([^\\s=]+)(?:=([^\\s]+))?\/i",
+			"types": {
+				"risk": "\/[<>&%'\\\\]+\/",
+				"integer": "\/^[+-]?[1-9]\\d*$\/",
+				"float": "\/^[+-]?\\d+(?:\\.\\d+)?$\/",
+				"letter": "\/^[a-zA-Z]+$\/",
+				"char": "\/^[a-zA-Z0-9_-]+$\/",
+				"mobile": "\/^(?:\\+86)?1[358][0-9]{9}$\/",
+				"fax": "\/^0[0-9]{2,3}-[1-9][0-9]{6,7}$\/",
+				"url": "\/^(?:https?:\\\/\\\/)?[a-zA-Z0-9-_.\\\/]+(?:\\?.+)?$\/",
+				"email": "\/^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+$\/",
+				"date": "\/^[0-9]{4}[-.\\\/]?(?:0?[1-9]|1[0-2])[-.\\\/]?(?:0?[1-9]|[12][0-9]|3[01])$\/",
+				"time": "\/^(?:0?[0-9]|1[0-9]|2[0-3])[:-]?(?:0?[0-9]|[1-5][0-9])[:-]?(?:0?[0-9]|[1-5][0-9])$\/"
+			},
+			"extensions": ["mbstring"]
+		},
+		"ajax": {
+			"timeout": 5000
+		},
+		"bubble": {
+			"shade": ".shade",
+			"title": ".bubble .title",
+			"content": ".bubble .content",
+			"bubbled": ".bubbled"
+		},
+		"message": {
+			"check": {
+				"config": "\u68c0\u9a8c\u5de5\u573a\uff08Check\uff09\u8bbe\u7f6e\u6709\u8bef\u2026\u2026",
+				"checks": "\u68c0\u9a8c\u8f93\u5165\u9879\u76ee\uff1a%s[%s]",
+				"cipher": "\u5b89\u5168\u6697\u53f7\u4e0d\u7b26\u6216\u5df2\u8fc7\u671f\uff0c\u8bf7\u5237\u65b0\u9875\u9762\u540e\u91cd\u8bd5\u2026\u2026",
+				"risk": "\u8f93\u5165\u9879\u4e0d\u80fd\u5305\u542b&lt; &gt; &amp; ' \" ; % \\ \u7b49\u975e\u6cd5\u5b57\u7b26\u2026\u2026",
+				"required": "\u8f93\u5165\u9879\u4e0d\u80fd\u4e3a\u7a7a\u2026\u2026",
+				"min": "\u8f93\u5165\u9879\u4e0d\u80fd\u5c0f\u4e8e\u3016%d\u3017\u4f4d\u2026\u2026",
+				"max": "\u8f93\u5165\u9879\u4e0d\u80fd\u5927\u4e8e\u3016%d\u3017\u4f4d\u2026\u2026",
+				"range": "\u8bf7\u8f93\u5165%d\u5230%d\u95f4\u7684\u6570\u503c\u2026\u2026",
+				"enum": "\u8bf7\u9009\u62e9\u6b63\u786e\u7684\u9009\u9879\u2026\u2026",
+				"set": "\u8bf7\u9009\u62e9\u6b63\u786e\u7684\u9009\u9879\u2026\u2026",
+				"type": "\u8bf7\u8f93\u5165\u6b63\u786e\u7684\u5185\u5bb9\u2026\u2026",
+				"__call": "\u8f93\u5165\u9879\u68c0\u9a8c\u8bbe\u7f6e\u6709\u8bef\uff1a%s"
+			},
+			"ajax": {
+				"fail": "\u5185\u5bb9\u52a0\u8f7d\u5931\u8d25\u2026\u2026"
+			},
+			"bubble": {
+				"title": "\u63d0\u793a",
+				"content": "\u6ca1\u6709\u63d0\u793a\u5185\u5bb9\u2026\u2026",
+				"load": "\u8bf7\u7a0d\u5019\uff0c\u6b63\u5728\u52a0\u8f7d\u2026\u2026",
+				"fail": "\u5185\u5bb9\u52a0\u8f7d\u5931\u8d25\u2026\u2026",
+				"": "\u52a0\u8f7d\u5b8c\u6210\uff0c\u4f46\u662f\u6ca1\u6709\u5185\u5bb9\u2026\u2026",
+				"success": "\u64cd\u4f5c\u6210\u529f",
+				"complete": "\u64cd\u4f5c\u5b8c\u6210",
+				"failure": "\u64cd\u4f5c\u5931\u8d25"
+			}
+		}
+	};
 	/** 化简JS：私有属性 */
 	var $own = {};
 
@@ -270,7 +363,7 @@
 	$bai.config = function() {
 		var value = $config;
 		// 逐层读取配置
-		for ( var i = 0, m = arguments.length; i < m; i++) {
+		for (var i = 0, m = arguments.length; i < m; i++) {
 			value = value[arguments[i]];
 			if (value == null) {
 				return null;
@@ -351,7 +444,7 @@
 		if (origin == null) {
 			return '';
 		}
-		if (! bai.is(origin, bai.is.JSON)) {
+		if (! origin instanceof Object) {
 			return origin.toString();
 		}
 		// 转换结果
@@ -764,7 +857,7 @@ if (window.bai != null) {
 		 */
 		var $bubble = function(content, title, action, cancel, buttons) {
 			// 背景
-			$shade = $shade || bai.pick('.shade');
+			$shade = $shade || bai('.shade');
 			if ($shade == null) {
 				return false;
 			}
