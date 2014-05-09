@@ -41,6 +41,6 @@ class {$event . ucfirst}Action extends Action
 		# 在这里写入你需要执行的处理内容
 
 		# 保存处理结果
-		$this->target[Flow::ACTION] = $result;
+		$this->event[Flow::ACTION] = $result;
 	}
 }

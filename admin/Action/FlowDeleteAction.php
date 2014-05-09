@@ -25,9 +25,9 @@ class FlowDeleteAction extends Action
 	protected function engage()
 	{
 		$this->end = true;
-		$basin = _LOCAL.$this->target['abasin']._DIR;
-		$event = $this->target['aevent'];
-		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
+		$basin = _LOCAL.$this->event['abasin']._DIR;
+		$event = $this->event['aevent'];
+		Log::logf(__FUNCTION__, $this->event['abasin']._DIR.$event, __CLASS__);
 		$status = true;
 		foreach ($this->include as $item => $file) {
 			$file = sprintf($file, $event);

@@ -25,8 +25,8 @@ class ActionCreateAction extends Action
 	protected function engage()
 	{
 		$this->end = true;
-		$basin = _LOCAL.$this->target['abasin']._DIR;
-		$event = $this->target['aevent'];
+		$basin = _LOCAL.$this->event['abasin']._DIR;
+		$event = $this->event['aevent'];
 		$file = $basin.sprintf($this->include, ucfirst($event));
 		if (is_file($file)) {
 			$result = array(
@@ -36,7 +36,7 @@ class ActionCreateAction extends Action
 			return json_encode($result);
 		}
 
-		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
+		Log::logf(__FUNCTION__, $this->event['abasin']._DIR.$event, __CLASS__);
 		$template = Template::file(self::ACTION._EXT, array('event' => $event));
 		$status = file_put_contents($file, $template);
 		$result = array('status' => $status);

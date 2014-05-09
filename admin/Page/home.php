@@ -29,7 +29,7 @@
 </div>
 <div class="box">
 	<div class="t">
-		<a href="<?php echo $this->url('basin', $this->target['basin']); ?>"><?php Lang::cut('basin'); ?></a>
+		<a href="<?php echo self::url('basin', $this->event['basin']); ?>"><?php Lang::cut('basin'); ?></a>
 	</div>
 	<div>
 		<p>流域是系统的基本组成单元，主要用于分流目标和组织文件。它由一组流程及其相关文件组成，仅允许该流域的目标进入。</p>

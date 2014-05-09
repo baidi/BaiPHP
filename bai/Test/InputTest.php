@@ -2,7 +2,7 @@
 /**
  * 样式工场测试场景
  */
-$this->target['input-test'] = 'test-value';
+$this->event['input-test'] = 'test-value';
 global $config;
 $config[Work::CHECK][Work::EVENT]['test'] = array(
 	'input-test' => 'required min=3 max=9 type=number'

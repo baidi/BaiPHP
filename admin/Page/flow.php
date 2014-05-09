@@ -1,7 +1,7 @@
 <?php
-$basin = $this->target['basin'];
-$abasin = $this->target['abasin'];
-$urlBack = $this->url('basin', $basin);
+$basin = $this->event['basin'];
+$abasin = $this->event['abasin'];
+$urlBack = self::url('basin', $basin);
 $lblCreate = Lang::cut('create', 0);
 $lblUpdate = Lang::cut('update', 0);
 $lblDelete = Lang::cut('delete', 0);
@@ -15,13 +15,13 @@ $lblDelete = Lang::cut('delete', 0);
 	</div>
 	<div id="flow-list">
 <?php
-$adata = $this->target[Flow::ACTION];
+$adata = $this->event[Flow::ACTION];
 foreach ($adata as $item => $value) {
-	$actionFile = $this->pick(Flow::ACTION, $value);
+	$actionFile = self::pick(Flow::ACTION, $value);
 	$actionAction = $actionFile == null ? $lblCreate : $lblDelete;
-	$pageFile = $this->pick(Flow::PAGE, $value);
+	$pageFile = self::pick(Flow::PAGE, $value);
 	$pageAction = $pageFile == null ? $lblCreate : $lblDelete;
-	$url = $this->url('process', $basin, 'abasin=' . $abasin . '&aevent=' . $item);
+	$url = self::url('process', $basin, 'abasin=' . $abasin . '&aevent=' . $item);
 	echo
 <<<ITEM
 		<div class="text item">
@@ -51,14 +51,14 @@ ITEM;
 	流程主要基于页面内容（/流域名/Page/事件名.php）和（或）处理内容（/流域名/Action/事件名Action.php）等文件。
 </div>
 <?php
-$urlCreate = $this->url('flowCreate', $basin, 'abasin=' . $abasin);
-$urlnUpdate = $this->url('flowUpdate', $basin, 'abasin=' . $abasin);
-$urlDelete = $this->url('flowDelete', $basin, 'abasin=' . $abasin);
-$urlActionCreate = $this->url('actionCreate', $basin, 'abasin=' . $abasin);
-$urlActionDelete = $this->url('actionDelete', $basin, 'abasin=' . $abasin);
-$urlPageCreate = $this->url('pageCreate', $basin, 'abasin=' . $abasin);
-$urlPageDelete = $this->url('pageDelete', $basin, 'abasin=' . $abasin);
-$urlProcess = $this->url('process', $basin, 'abasin=' . $abasin . '&aevent=$aevent$');
+$urlCreate = self::url('flowCreate', $basin, 'abasin=' . $abasin);
+$urlnUpdate = self::url('flowUpdate', $basin, 'abasin=' . $abasin);
+$urlDelete = self::url('flowDelete', $basin, 'abasin=' . $abasin);
+$urlActionCreate = self::url('actionCreate', $basin, 'abasin=' . $abasin);
+$urlActionDelete = self::url('actionDelete', $basin, 'abasin=' . $abasin);
+$urlPageCreate = self::url('pageCreate', $basin, 'abasin=' . $abasin);
+$urlPageDelete = self::url('pageDelete', $basin, 'abasin=' . $abasin);
+$urlProcess = self::url('process', $basin, 'abasin=' . $abasin . '&aevent=$aevent$');
 ?>
 <div class="tpl">
 	<div class="text item tpl-flow">

@@ -1,19 +1,19 @@
 <?php
-$action = $this->target[Flow::ACTION];
+$action = $this->event[Flow::ACTION];
 ### 测试对象
-$testee = $this->pick(Test::TESTEE, $action);
+$testee = self::pick(Test::TESTEE, $action);
 ### 源代码
-$codes = file($this->pick(Test::SOURCE, $action), true);
+$codes = file(self::pick(Test::SOURCE, $action), true);
 ### 测试结果
-$results = $this->pick(Test::RESULT, $action);
+$results = self::pick(Test::RESULT, $action);
 ### 代码覆盖
-$lines = $this->pick(Test::LINES, $action);
+$lines = self::pick(Test::LINES, $action);
 ### 项目统计
-$counts = $this->pick(Test::COUNT, $action);
+$counts = self::pick(Test::COUNT, $action);
 ### 通过的测试
-$resultCovered = $this->pick(Test::RESULT, $counts);
+$resultCovered = self::pick(Test::RESULT, $counts);
 ### 覆盖的代码
-$lineCovered   = $this->pick(Test::LINES, $counts);
+$lineCovered   = self::pick(Test::LINES, $counts);
 $resultCount   = count($results);
 $lineCount     = count($lines);
 $linePercent = '100%';

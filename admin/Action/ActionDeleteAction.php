@@ -25,8 +25,8 @@ class ActionDeleteAction extends Action
 	protected function engage()
 	{
 		$this->end = true;
-		$basin = _LOCAL.$this->target['abasin']._DIR;
-		$event = $this->target['aevent'];
+		$basin = _LOCAL.$this->event['abasin']._DIR;
+		$event = $this->event['aevent'];
 		$file = $basin.sprintf($this->include, ucfirst($event));
 
 		if (! is_file($file) || ! unlink($file)) {
@@ -37,7 +37,7 @@ class ActionDeleteAction extends Action
 			return json_encode($result);
 		}
 
-		Log::logf(__FUNCTION__, $this->target['abasin']._DIR.$event, __CLASS__);
+		Log::logf(__FUNCTION__, $this->event['abasin']._DIR.$event, __CLASS__);
 		$result = array('status' => true);
 		return json_encode($result);
 	}

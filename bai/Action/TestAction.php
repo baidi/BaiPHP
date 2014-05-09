@@ -22,10 +22,10 @@ class TestAction extends Action
 	 */
 	protected function engage()
 	{
-		$testee = ucfirst($this->target['testee']);
-		$test = $this->build(Work::TEST);
-		$this->target[Flow::ACTION] = $test->entrust($testee, $testee.Work::TEST);
-		$this->notice = $test->notice;
+		$testee = ucfirst($this->event['testee']);
+		$test = self::build(Work::TEST);
+		$this->event[Flow::ACTION] = $test->entrust($testee, $testee.Work::TEST);
+		$this->message = $test->message;
 		return true;
 	}
 }

@@ -21,7 +21,7 @@ hr {border: 1px solid #cceccc;}
 		<div class="box">
 			<div class="t">提示：</div>
 			<div class="notice">
-			    <?php echo $this->target->notice; ?>
+			    <?php echo $this->event->message; ?>
 			</div>
 			<hr/>
 			<div class="tr">

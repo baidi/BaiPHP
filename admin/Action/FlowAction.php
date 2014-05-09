@@ -24,7 +24,7 @@ class FlowAction extends Action
 
 	protected function engage()
 	{
-		$basin = _LOCAL.$this->target['abasin']._DIR;
+		$basin = _LOCAL.$this->event['abasin']._DIR;
 		$result = array();
 		foreach ($this->include as $item => $mode) {
 			$files = scandir($basin.$item);
@@ -35,7 +35,7 @@ class FlowAction extends Action
 				if (! preg_match($mode, $file, $match) || ! is_file($basin.$item._DIR.$file)) {
 					continue;
 				}
-				$event = lcfirst($this->pick(self::EVENT, $match));
+				$event = lcfirst(self::pick(self::EVENT, $match));
 				if (strpos($event, _DEF) === 0) {
 					continue;
 				}
@@ -45,7 +45,7 @@ class FlowAction extends Action
 		if (! empty($result['home'])) {
 			$result = array('home' => $result['home']) + $result;
 		}
-		$this->target[Flow::ACTION] = $result;
+		$this->event[Flow::ACTION] = $result;
 	}
 }
 ?>

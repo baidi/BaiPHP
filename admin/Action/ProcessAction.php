@@ -19,10 +19,10 @@ class ProcessAction extends Action
 {
 	protected function engage()
 	{
-		$aevent = $this->target['aevent'];
-		$abasin = $this->target['abasin'];
+		$aevent = $this->event['aevent'];
+		$abasin = $this->event['abasin'];
 		$this->mockConfig($abasin);
-		$this->target[Flow::ACTION] = $this->flow($aevent, self::TARGET);
+		$this->event[Flow::ACTION] = $this->flow($aevent, self::TARGET);
 		$this->mockConfig($abasin, false);
 	}
 
@@ -47,13 +47,13 @@ class ProcessAction extends Action
 			return null;
 		}
 		$event = ucfirst($event);
-		$flow = $this->config(self::FLOW, $event.$from);
+		$flow = self::config(self::FLOW, $event.$from);
 		if ($flow == null) {
-			$flow = $this->config(self::FLOW, $from);
+			$flow = self::config(self::FLOW, $from);
 		}
 		$class = $from;
 		while (($flow == null || ! is_array($flow)) && ($class = get_parent_class($class))) {
-			$flow = $this->config(self::FLOW, $class);
+			$flow = self::config(self::FLOW, $class);
 		}
 		if (! is_array($flow)) {
 			return null;
@@ -68,7 +68,7 @@ class ProcessAction extends Action
 				$result[$class][$item] = '方法';
 			} else if (class_exists($item)) {
 				$result[$class][$item] = '委托';
-				$this->stuff($this->flow($event, $item), $result);
+				$this->fit($this->flow($event, $item), $result);
 			}
 			if (! $mode) {
 				break;

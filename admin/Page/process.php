@@ -1,9 +1,9 @@
 <?php
-$basin = $this->target['basin'];
-$abasin = $this->target['abasin'];
-$aevent = $this->target['aevent'];
-$urlBackBasin = $this->url('basin', $basin);
-$urlBackFlow = $this->url('flow', $basin, 'abasin=' . $abasin);
+$basin = $this->event['basin'];
+$abasin = $this->event['abasin'];
+$aevent = $this->event['aevent'];
+$urlBackBasin = self::url('basin', $basin);
+$urlBackFlow = self::url('flow', $basin, 'abasin=' . $abasin);
 ?>
 <div class="box">
 	<div class="t">
@@ -16,7 +16,7 @@ $urlBackFlow = $this->url('flow', $basin, 'abasin=' . $abasin);
 	</div>
 	<div>
 <?php
-$adata = $this->target[Flow::ACTION];
+$adata = $this->event[Flow::ACTION];
 foreach ($adata as $item => $value) {
 	echo
 <<<BOX

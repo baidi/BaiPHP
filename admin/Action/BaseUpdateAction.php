@@ -15,36 +15,34 @@
  * </p>
  * @author 白晓阳
  */
-class PageCreateAction extends Action
+class BaseUpdateAction extends Action
 {
 	/**
-	 * 相关文件
+	 * 子目录
 	 */
-	protected $include = null;
+	protected $exclude = null;
 
 	protected function engage()
 	{
 		$this->end = true;
+		$obasin = _LOCAL.$this->event['obasin']._DIR;
 		$basin = _LOCAL.$this->event['abasin']._DIR;
-		$event = $this->event['aevent'];
-		$file = $basin.sprintf($this->include, $event);
-
-		if (is_file($file)) {
-			$result = array(
-				'status' => false,
-				'notice' => Log::logs('existed', __CLASS__),
-			);
+		$result = array();
+		if (! is_dir($obasin)) {
+			$result['status'] = false;
+			$result['notice'] = Log::logs('deleted', __CLASS__);
 			return json_encode($result);
 		}
-
-		Log::logf(__FUNCTION__, $this->event['abasin']._DIR.$event, __CLASS__);
-		$template = Template::file(self::PAGE._EXT, array('event' => $event));
-		$status = file_put_contents($file, $template);
-		$result = array('status' => $status);
+		if (is_dir($basin)) {
+			$result['status'] = false;
+			$result['notice'] = Log::logs('existed', __CLASS__);
+			return json_encode($result);
+		}
+		Log::logf('basin', array($obasin, $basin), __CLASS__);
+		$status = rename($obasin, $basin);
+		$result['status'] = $status;
 		if (! $status) {
 			$result['notice'] = Log::logs('fail', __CLASS__);
-		} else {
-			$result['file'] = basename($file);
 		}
 		return json_encode($result);
 	}

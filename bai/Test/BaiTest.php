@@ -74,7 +74,7 @@ $config[Work::TEST][Work::BAI] = array(
 		Test::EXPECTED => true,
 		Test::PARAM    => array(
 			array('ak' => 'av', 'bk' => array('ck' => 'cv', 'dk' => array('fk' => 'fv'))),
-		    &$this->target->preset,
+		    &$this->event->config,
 		),
 	),
 	### stuff（递归填充对象列表）
@@ -83,7 +83,7 @@ $config[Work::TEST][Work::BAI] = array(
 		Test::EXPECTED => true,
 		Test::PARAM    => array(
 			array('ak' => 'av', 'bk' => array('ek' => 'ev', 'dk' => array('fk' => 'fv'))),
-		    &$this->target->preset,
+		    &$this->event->config,
 		),
 	),
 	### stuff（覆盖非列表）
@@ -92,7 +92,7 @@ $config[Work::TEST][Work::BAI] = array(
 		Test::EXPECTED => true,
 		Test::PARAM    => array(
 			array('ak' => 'av', 'bk' => array('ek' => 'ev', 'dk' => array('fk' => 'fv'))),
-		    &$this->target->preset['ak'],
+		    &$this->event->config['ak'],
 		),
 	),
 	### locate（缺少文件名）
@@ -113,7 +113,7 @@ $config[Work::TEST][Work::BAI] = array(
 		Test::ITEM     => 'locate',
 		Test::EXPECTED => array(
 		    Work::BAI     => 'bai/php/config.php',
-		    Work::BASIN => 'basin/php/config.php',
+		    Work::BASE => 'base/php/config.php',
 		),
 		Test::PARAM    => array(
 			'config.php',

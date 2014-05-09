@@ -1,6 +1,6 @@
 <?php
 global $config;
-$config[Lang::LANG][Lang::ZH] = array(
+$config['Lang'][Lang::ZH] = array(
 	'title'       => 'BaiPHP-化简PHP',
 	'author'      => 'baidi-白晓阳',
 	'keywords'    => 'BaiPHP-化简PHP',

@@ -1,5 +1,3 @@
-DirectoryIndex home.php index.php
-
 <IfModule mod_rewrite.c>
     Options +FollowSymLinks
 	#RewriteEngine On
